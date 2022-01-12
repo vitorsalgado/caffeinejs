@@ -1,0 +1,18 @@
+{
+  "version": "0.0.0",
+  "npmClient": "yarn",
+  "useWorkspaces": true,
+  "packages": [
+  ],
+  "ignoreChanges": [
+    "**/*.md"
+  ],
+  "command": {
+    "publish": {
+      "ignoreChanges": [
+        "*.md"
+      ],
+      "message": "chore(release): %s"
+    }
+  }
+}

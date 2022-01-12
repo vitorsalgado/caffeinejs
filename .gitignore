@@ -80,7 +80,6 @@ typings/
 
 # Nuxt.js build / generate output
 .nuxt
-dist
 
 # Gatsby files
 .cache/
@@ -89,7 +88,7 @@ dist
 # public
 
 # vuepress build output
-.vuepress/dist
+.vuepress/distDir
 
 # Serverless directories
 .serverless/
@@ -102,3 +101,32 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Yarn
+**/.yarn/*
+!**/.yarn/releases
+!**/.yarn/plugins
+!**/.yarn/sdks
+!**/.yarn/versions
+**/.pnp.*
+
+# Mac
+.DS_Store
+
+# Rollup
+.rollup.cache
+
+# Project
+.clinic/
+.vscode/
+.idea/
+.tasks/
+.temp/
+
+.nvmrc
+.npmrc
+package-lock.json
+
+# Dist
+dist/
+out/

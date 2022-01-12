@@ -1,5 +1,9 @@
 {
   "extends": [
     "config:base"
-  ]
+  ],
+  "automerge": true,
+  "rebaseStalePrs": true,
+  "lockFileMaintenance": { "enabled": true },
+  "updateInternalDeps": true
 }
