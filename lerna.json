@@ -3,6 +3,7 @@
   "npmClient": "yarn",
   "useWorkspaces": true,
   "packages": [
+    "core"
   ],
   "ignoreChanges": [
     "**/*.md"
@@ -12,7 +13,7 @@
       "ignoreChanges": [
         "*.md"
       ],
-      "message": "chore(release): %s"
+      "message": "release: %s"
     }
   }
 }

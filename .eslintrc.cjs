@@ -14,6 +14,10 @@ module.exports = {
     '@typescript-eslint/no-empty-function': ['error', { allow: ['decoratedFunctions'] }],
     '@typescript-eslint/no-useless-constructor': ['error'],
 
+    'node/no-missing-import': ['off'],
+    'node/no-unpublished-import': ['off'],
+
+    'import/extensions': ['error', 'ignorePackages', { js: 'always', jsx: 'never', ts: 'never', tsx: 'never' }],
     'import/order': [
       'error',
       {
