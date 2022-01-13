@@ -8,6 +8,7 @@
     "build": "yarn workspaces foreach run build",
     "build:clean": "yarn workspaces foreach exec rm -rf dist",
     "test": "jest --detectOpenHandles",
+    "test:ci": "yarn test --colors --coverage --ci",
     "lint": "eslint --ext .ts .",
     "lint:fix": "yarn lint -- --fix",
     "format": "prettier './**' --write --ignore-unknown",
