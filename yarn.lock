@@ -2276,11 +2276,11 @@ __metadata:
     eslint-plugin-node: ^11.1.0
     eslint-plugin-prettier: ^4.0.0
     eslint-plugin-tsdoc: ^0.2.14
-    husky: ^7.0.0
+    husky: ^7.0.4
     jest: ^27.4.7
     lerna: ^4.0.0
     lint-staged: ^12.1.7
-    pinst: ^2.0.0
+    pinst: ^2.1.6
     prettier: ^2.5.1
     ts-jest: ^27.1.2
     ts-node: ^10.4.0
@@ -4932,7 +4932,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^7.0.0":
+"husky@npm:^7.0.4":
   version: 7.0.4
   resolution: "husky@npm:7.0.4"
   bin:
@@ -7548,7 +7548,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pinst@npm:^2.0.0":
+"pinst@npm:^2.1.6":
   version: 2.1.6
   resolution: "pinst@npm:2.1.6"
   dependencies:
