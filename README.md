@@ -7,6 +7,9 @@
 </p>
 
 <p align='center'>
+  <a href="https://github.com/vitorsalgado/winter-framework/actions/workflows/ci.yml">
+    <img src="https://github.com/vitorsalgado/winter-framework/actions/workflows/ci.yml/badge.svg" alt="GitHub Action Status" />
+  </a>
   <a href="https://codecov.io/gh/vitorsalgado/winter-framework">
     <img src="https://codecov.io/gh/vitorsalgado/winter-framework/branch/main/graph/badge.svg?token=RDVBVV9OGK" alt="Codecov"/>
   </a>
