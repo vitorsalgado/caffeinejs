@@ -25,11 +25,11 @@
     "noImplicitReturns": true,
     "strict": true,
     "noFallthroughCasesInSwitch": true,
-    "emitDecoratorMetadata": false,
+    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "composite": true,
     "skipLibCheck": true,
-    "noEmitHelpers": true
+    "noEmitHelpers": false
   },
   "exclude": [
     "**/node_modules",

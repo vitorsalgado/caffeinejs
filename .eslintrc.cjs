@@ -13,6 +13,7 @@ module.exports = {
     '@typescript-eslint/no-dupe-class-members': ['error'],
     '@typescript-eslint/no-empty-function': ['error', { allow: ['decoratedFunctions'] }],
     '@typescript-eslint/no-useless-constructor': ['error'],
+    '@typescript-eslint/no-explicit-any': ['off'],
 
     'node/no-missing-import': ['off'],
     'node/no-unpublished-import': ['off'],
@@ -36,5 +37,18 @@ module.exports = {
     'import/no-self-import': ['error'],
     'import/export': ['error'],
     'import/no-deprecated': ['error']
-  }
+  },
+  overrides: [
+    {
+      files: [
+        '*.test.ts',
+        '*.spec.ts'
+      ],
+      rules: {
+        'import/extensions': ['off'],
+        '@typescript-eslint/no-useless-constructor': ['off'],
+        '@typescript-eslint/no-empty-function': ['off']
+      }
+    }
+  ]
 }

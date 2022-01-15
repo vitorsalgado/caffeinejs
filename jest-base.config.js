@@ -5,6 +5,7 @@ const config = {
   resetModules: true,
   restoreMocks: true,
   preset: 'ts-jest/presets/default-esm',
+  setupFilesAfterEnv: ['<rootDir>/test/jest.setup.ts'],
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1'
   },
