@@ -14,6 +14,8 @@ module.exports = {
     '@typescript-eslint/no-empty-function': ['error', { allow: ['decoratedFunctions'] }],
     '@typescript-eslint/no-useless-constructor': ['error'],
     '@typescript-eslint/no-explicit-any': ['off'],
+    '@typescript-eslint/ban-types': ['off'],
+    '@typescript-eslint/no-namespace': ['off'],
 
     'node/no-missing-import': ['off'],
     'node/no-unpublished-import': ['off'],
@@ -40,14 +42,12 @@ module.exports = {
   },
   overrides: [
     {
-      files: [
-        '*.test.ts',
-        '*.spec.ts'
-      ],
+      files: ['*.test.ts', '*.spec.ts'],
       rules: {
         'import/extensions': ['off'],
         '@typescript-eslint/no-useless-constructor': ['off'],
-        '@typescript-eslint/no-empty-function': ['off']
+        '@typescript-eslint/no-empty-function': ['off'],
+        '@typescript-eslint/no-unused-vars': ['off']
       }
     }
   ]

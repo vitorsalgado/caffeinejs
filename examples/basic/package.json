@@ -1,0 +1,21 @@
+{
+  "name": "@winter-framework/examples-basic",
+  "version": "0.0.0",
+  "description": "Basic Example",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "rm -rf dist && tsc --build --force tsconfig.build.json"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@winter-framework/core": "0.0.0",
+    "reflect-metadata": "^0.1.13"
+  }
+}
