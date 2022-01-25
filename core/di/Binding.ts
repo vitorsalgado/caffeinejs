@@ -5,14 +5,14 @@ import { Token } from './Token.js'
 
 export class Binding<T> {
   provider!: Provider<T>
-  dependencies: (Token<unknown> | TokenSpec<unknown>)[] = []
+  dependencies: TokenSpec<unknown>[] = []
   instance?: T
   primary?: boolean
 
   constructor(
     public lifecycle: Scope,
     provider?: Provider<T>,
-    dependencies: (Token<unknown> | TokenSpec<unknown>)[] = [],
+    dependencies: TokenSpec<unknown>[] = [],
     primary = false
   ) {
     this.provider = provider as Provider<T>

@@ -6,11 +6,11 @@ export type Token<T> = Ctor<T> | DeferredCtor<T> | AbstractCtor<T> | string | sy
 
 export interface TokenSpec<T> {
   token: Token<T>
-  multiple: boolean
+  multiple?: boolean
 }
 
 export function isTokenSpec<T>(spec: unknown): spec is TokenSpec<T> {
-  return spec !== null && typeof spec === 'object' && 'token' in spec && 'multiple' in spec
+  return spec !== null && typeof spec === 'object' && 'token' in spec
 }
 
 export function isNamedToken(dep: Token<unknown>): dep is string | symbol {

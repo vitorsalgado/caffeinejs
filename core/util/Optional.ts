@@ -23,7 +23,7 @@ export class Optional<T> {
   }
 
   isPresent() {
-    return isNil(this.value)
+    return !isNil(this.value)
   }
 
   get(): T {
@@ -31,22 +31,22 @@ export class Optional<T> {
   }
 
   or(value: T): T {
-    if (isNil(this.value)) {
-      return this.value
+    if (this.isPresent()) {
+      return this.value as T
     }
 
     return value
   }
 
   orNothing(): T | undefined {
-    return isNil(this.value) ? this.value : undefined
+    return this.isPresent() ? (this.value as T) : undefined
   }
 
   map<R>(mapper: (value: T) => R): Optional<R> {
-    if (isNil(this.value)) {
-      return Optional.empty()
-    } else {
+    if (this.isPresent()) {
       return Optional.ofNullable(mapper(this.value as T))
+    } else {
+      return Optional.empty()
     }
   }
 

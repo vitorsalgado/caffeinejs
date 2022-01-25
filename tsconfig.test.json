@@ -1,8 +1,6 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "ESNext",
-    "target": "ESNext",
     "noUnusedParameters": false,
     "noUnusedLocals": false,
     "allowUnusedLabels": true,

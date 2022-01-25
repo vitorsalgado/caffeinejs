@@ -1,4 +1,4 @@
-import { valueOr } from '../internal/valueOr.js'
+import { valueOr } from '../_internal/valueOr.js'
 import { Ctor } from '../types/Ctor.js'
 import { newTypeInfo, TypeInfo } from './TypeInfo.js'
 

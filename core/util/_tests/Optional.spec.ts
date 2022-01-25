@@ -1,8 +1,8 @@
 import { Optional } from '../Optional.js'
 
 describe('Optional', function () {
-  it('should throw error when using .of() with null value', function () {
-    expect(() => Optional.of(null)).toThrow()
+  it('should not throw error when using .of() with null value', function () {
+    expect(() => Optional.of(null)).not.toThrow()
   })
 
   describe('when optional data is present', function () {

@@ -12,7 +12,7 @@ import { isFunctionProvider } from './Provider.js'
 import { isClassProvider } from './Provider.js'
 import { Registry, RegistryEntry } from './Registry.js'
 import { Scope } from './Scope.js'
-import { isNamedToken, isTokenSpec, Token } from './Token.js'
+import { isNamedToken, Token } from './Token.js'
 import { newTypeInfo, TypeInfo } from './TypeInfo.js'
 
 export class DI {
@@ -139,7 +139,7 @@ export class DI {
           } else {
             const type = notNil(DecoratedInjectables.instance().get(token as Ctor), 'Non registered type')
             const deps = type.dependencies.map(dep =>
-              isTokenSpec(dep) && dep.multiple ? this.resolveAll(dep.token) : this.resolve(dep as Token<unknown>)
+              dep.multiple ? this.resolveAll(dep.token) : this.resolve(dep.token)
             )
 
             registration.instance = registration.provider.useFunction(...deps)
@@ -148,7 +148,7 @@ export class DI {
         } else {
           const type = notNil(DecoratedInjectables.instance().get(token as Ctor), 'Non registered type')
           const deps = type.dependencies.map(dep =>
-            isTokenSpec(dep) && dep.multiple ? this.resolveAll(dep.token) : this.resolve(dep as Token<unknown>)
+            dep.multiple ? this.resolveAll(dep.token) : this.resolve(dep.token)
           )
           resolved = registration.provider.useFunction(...deps) as T
         }
@@ -196,12 +196,10 @@ export class DI {
     const dependencies = type.dependencies
 
     const deps = dependencies.map(dep => {
-      if (isTokenSpec(dep)) {
-        if (dep.multiple) {
-          return this.resolveAll(dep.token)
-        }
+      if (dep.multiple) {
+        return this.resolveAll(dep.token)
       } else {
-        return this.resolve(dep)
+        return this.resolve(dep.token)
       }
     })
 
@@ -219,10 +217,6 @@ export class DI {
   private setup() {
     for (const [ctor, info] of DecoratedInjectables.instance().entries()) {
       if (info.namespace !== this.namespace) {
-        continue
-      }
-
-      if (info.autoInit === false) {
         continue
       }
 

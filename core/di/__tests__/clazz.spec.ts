@@ -13,7 +13,7 @@ describe('DI - Class', function () {
     const spy = jest.fn()
 
     @Injectable()
-    class ByeService {
+    class SeeYaService {
       readonly id: string = v4()
 
       constructor() {
@@ -29,12 +29,12 @@ describe('DI - Class', function () {
     class OkService {
       readonly id: string = v4()
 
-      constructor(private readonly byeService: ByeService) {
+      constructor(private readonly seeYaService: SeeYaService) {
         spy()
       }
 
       ok(): string {
-        return `ok-${this.byeService.bye()}`
+        return `ok-${this.seeYaService.bye()}`
       }
     }
 
@@ -42,7 +42,7 @@ describe('DI - Class', function () {
     class Root {
       readonly id: string = v4()
 
-      constructor(readonly byeService: ByeService, readonly okService: OkService) {
+      constructor(readonly seeYaService: SeeYaService, readonly okService: OkService) {
         spy()
       }
     }
@@ -54,7 +54,7 @@ describe('DI - Class', function () {
 
       expect(root).toBeDefined()
       expect(DI.setup().has(Root)).toBeTruthy()
-      expect(root.byeService.bye()).toEqual('bye-bye')
+      expect(root.seeYaService.bye()).toEqual('bye-bye')
       expect(root.okService.ok()).toEqual('ok-bye-bye')
     })
 
@@ -81,46 +81,6 @@ describe('DI - Class', function () {
 
     it('should throw error', function () {
       expect(() => DI.setup().resolve(Service)).toThrow()
-    })
-  })
-
-  describe('when using named dependencies', function () {
-    const ok = Symbol.for('ok')
-
-    @Injectable()
-    @Named('bye')
-    class ByeService {
-      readonly id: string = v4()
-
-      bye(): string {
-        return 'bye-bye'
-      }
-    }
-
-    @Injectable()
-    @Named(ok)
-    class OkService {
-      readonly id: string = v4()
-
-      constructor(private readonly byeService: ByeService) {}
-
-      ok(): string {
-        return `ok-${this.byeService.bye()}`
-      }
-    }
-
-    @Injectable()
-    class Root {
-      readonly id: string = v4()
-
-      constructor(@Inject('bye') readonly byeService: ByeService, @Inject(ok) readonly okService: OkService) {}
-    }
-
-    it('should resolve based on dependency qualifier', function () {
-      const root = DI.setup().resolve(Root)
-
-      expect(root.byeService.bye()).toEqual('bye-bye')
-      expect(root.okService.ok()).toEqual('ok-bye-bye')
     })
   })
 
