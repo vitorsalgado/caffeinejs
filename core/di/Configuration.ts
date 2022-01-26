@@ -4,7 +4,6 @@ import { DI } from './DI.js'
 import { DiMetadata } from './DiMetadata.js'
 import { Injectable } from './Injectable.js'
 import { FactoryOptions } from './Provides.js'
-import { isTokenSpec } from './Token.js'
 import { Token } from './Token.js'
 
 export function Configuration<T>(): ClazzDecorator<T> {
@@ -18,7 +17,7 @@ export function Configuration<T>(): ClazzDecorator<T> {
         provider: {
           useFactory: di => {
             const deps = factory.dependencies.map(dep =>
-              isTokenSpec(dep) && dep.multiple ? di.resolveAll(dep.token) : di.resolve(dep as Token<unknown>)
+              dep.multiple ? di.resolveAll(dep.token) : di.resolve(dep.token)
             )
             const configuration = di.resolve<{ [key: symbol | string]: (...args: unknown[]) => T }>(
               target as Token<any>

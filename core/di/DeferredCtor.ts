@@ -35,7 +35,7 @@ export class DeferredCtor<T> {
     return new Proxy<any>({}, DeferredCtor.createHandler(deferredObject))
   }
 
-  public unwrap() {
+  private unwrap() {
     return this.callback()
   }
 

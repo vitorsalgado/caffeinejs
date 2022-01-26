@@ -1,7 +1,6 @@
-import { Scope } from './Scope.js'
 import { Provider } from './Provider.js'
+import { Scope } from './Scope.js'
 import { TokenSpec } from './Token.js'
-import { Token } from './Token.js'
 
 export class Binding<T> {
   provider!: Provider<T>

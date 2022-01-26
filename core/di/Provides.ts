@@ -4,7 +4,7 @@ import { Token } from './Token.js'
 
 export interface FactoryOptions {
   token: Token<unknown>
-  dependencies: (Token<unknown> | TokenSpec<unknown>)[]
+  dependencies: TokenSpec<unknown>[]
   method: string | symbol
 }
 
