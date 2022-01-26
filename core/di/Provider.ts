@@ -1,6 +1,6 @@
 import { Ctor } from '../types/Ctor.js'
-import { DI } from './DI.js'
 import { DeferredCtor } from './DeferredCtor.js'
+import { DI } from './DI.js'
 import { Token } from './Token.js'
 import { isNamedToken } from './Token.js'
 
@@ -20,8 +20,8 @@ export interface NamedProvider {
   useName: string | symbol
 }
 
-export interface LazyProvider<T> {
-  useLazy: DeferredCtor<T>
+export interface DeferredProvider<T> {
+  useDefer: DeferredCtor<T>
 }
 
 export interface FactoryProvider<T> {
@@ -34,7 +34,7 @@ export type Provider<T> =
   | ClassProvider<T>
   | FunctionProvider<T>
   | NamedProvider
-  | LazyProvider<T>
+  | DeferredProvider<T>
   | FactoryProvider<T>
 
 export function isValueProvider<T>(provider: unknown): provider is ValueProvider<T> {
@@ -53,8 +53,8 @@ export function isFunctionProvider<T>(provider: unknown): provider is FunctionPr
   return !!(provider as FunctionProvider<T>).useFunction
 }
 
-export function isLazyProvider<T>(provider: unknown): provider is LazyProvider<T> {
-  return !!(provider as LazyProvider<T>).useLazy
+export function isDeferredProvider<T>(provider: unknown): provider is DeferredProvider<T> {
+  return !!(provider as DeferredProvider<T>).useDefer
 }
 
 export function isFactoryProvider<T>(provider: unknown): provider is FactoryProvider<T> {
@@ -67,7 +67,7 @@ export function isProvider<T>(provider: unknown): provider is Provider<T> {
     isClassProvider(provider) ||
     isNamedProvider(provider) ||
     isFunctionProvider(provider) ||
-    isLazyProvider(provider) ||
+    isDeferredProvider(provider) ||
     isFactoryProvider(provider)
   )
 }
