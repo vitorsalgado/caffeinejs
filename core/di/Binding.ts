@@ -1,5 +1,5 @@
 import { Provider } from './Provider.js'
-import { Scope } from './Scope.js'
+import { Lifecycle } from './Lifecycle.js'
 import { TokenSpec } from './Token.js'
 
 export class Binding<T> {
@@ -9,7 +9,7 @@ export class Binding<T> {
   primary?: boolean
 
   constructor(
-    public lifecycle: Scope,
+    public lifecycle: Lifecycle,
     provider?: Provider<T>,
     dependencies: TokenSpec<unknown>[] = [],
     primary = false

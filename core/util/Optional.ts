@@ -10,7 +10,7 @@ export class Optional<T> {
     return Optional.EMPTY as Optional<T>
   }
 
-  static ofNullable<T>(value?: T): Optional<T> {
+  static ofNullable<T>(value?: T | null): Optional<T> {
     return typeof value === 'undefined' || value === null ? Optional.empty<T>() : Optional.of(value)
   }
 

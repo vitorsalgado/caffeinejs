@@ -1,7 +1,7 @@
 import { TokenSpec } from '../Token.js'
 import { INJECTION_TOKEN_METADATA_KEY } from './keys.js'
 
-export function getCtorParamTypes<TFunction>(target: TFunction): TokenSpec<unknown>[] {
+export function getParamTypes<TFunction>(target: TFunction): TokenSpec<unknown>[] {
   const paramsTypes: unknown[] = Reflect.getOwnMetadata('design:paramtypes', target) || []
   const params = [...paramsTypes]
 

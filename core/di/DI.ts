@@ -4,6 +4,7 @@ import { Ctor } from '../types/Ctor.js'
 import { Binding } from './Binding.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'
 import { DeferredCtor } from './DeferredCtor.js'
+import { Lifecycle } from './Lifecycle.js'
 import { providerFromToken } from './Provider.js'
 import { isNamedProvider } from './Provider.js'
 import { isFactoryProvider } from './Provider.js'
@@ -11,7 +12,7 @@ import { isValueProvider } from './Provider.js'
 import { isFunctionProvider } from './Provider.js'
 import { isClassProvider } from './Provider.js'
 import { Registry, RegistryEntry } from './Registry.js'
-import { Scope } from './Scope.js'
+import { ResolutionContext } from './ResolutionContext.js'
 import { isNamedToken, Token } from './Token.js'
 import { newTypeInfo, TypeInfo } from './TypeInfo.js'
 
@@ -26,22 +27,24 @@ export class DI {
     return new DI(namespace, parent)
   }
 
-  static configureInjectable<T>(token: Ctor<T>, opts?: Partial<TypeInfo>) {
-    const options = newTypeInfo(opts)
+  static configureInjectable<T>(token: Ctor<T> | Function | object, opts?: Partial<TypeInfo>) {
+    const tk = typeof token === 'object' ? token.constructor : token
+    const existing = DecoratedInjectables.instance().get(tk as Ctor<T>)
+    const options = newTypeInfo({ ...existing, ...opts })
 
     if (isNil(options.provider)) {
-      if (typeof token === 'function') {
-        options.provider = { useClass: token }
-      } else if (isNamedToken(token)) {
-        options.provider = { useName: token }
+      if (typeof tk === 'function') {
+        options.provider = { useClass: tk as Ctor<T> }
+      } else if (isNamedToken(tk)) {
+        options.provider = { useName: tk }
       }
     }
 
     if (!options.provider) {
-      throw new Error(`Could not set a provider for token: ${String(token)}`)
+      throw new Error(`Could not set a provider for token: ${String(tk)}`)
     }
 
-    DecoratedInjectables.instance().configure(token, options)
+    DecoratedInjectables.instance().configure(tk as Ctor<T>, options)
   }
 
   has<T>(token: Token<T>): boolean {
@@ -60,30 +63,36 @@ export class DI {
     return result
   }
 
-  resolve<T>(token: Token<T>): T {
-    const registration = this._registry.findSingle<T>(token)
-    return this.resolveBinding<T>(token, registration)
+  resolve<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
+    const registrations = this._registry.findMany<T>(token)
+
+    if (registrations.length > 1) {
+      throw new Error('More than one')
+    }
+
+    const registration = registrations[0]
+
+    return this.resolveBinding<T>(token, registration, context)
   }
 
-  resolveAll<T>(token: Token<T>): T[] {
+  resolveAll<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T[] {
     const bindings = this._registry.findMany(token)
 
     if (bindings.length === 0) {
       const d = this.scan(tk => typeof tk === 'function' && tk !== token && token.isPrototypeOf(tk))
-
-      const r = d.flatMap(x => x.registrations.map(y => this.resolveBinding(x.token, y))) as T[]
+      const r = d.flatMap(x => x.registrations.map(y => this.resolveBinding(x.token, y, context))) as T[]
 
       if (r.length === 0) {
         throw new Error('Nothing here')
       }
     }
 
-    const resolution = bindings.map(binding => this.resolveBinding(token, binding))
+    const resolution = bindings.map(binding => this.resolveBinding(token, binding, context))
 
     if (resolution.length === 0) {
       const d = this.scan(tk => typeof tk === 'function' && tk !== token && token.isPrototypeOf(tk))
 
-      return d.flatMap(x => x.registrations.map(y => this.resolveBinding(x.token, y))) as T[]
+      return d.flatMap(x => x.registrations.map(y => this.resolveBinding(x.token, y, context))) as T[]
     }
 
     return resolution
@@ -104,90 +113,98 @@ export class DI {
     )
   }
 
-  private resolveBinding<T>(token: Token<T>, registration?: Binding<T>): T {
-    if (registration) {
-      if (typeof registration.instance !== 'undefined') {
-        return registration.instance as T
+  private resolveBinding<T>(token: Token<T>, registration: Binding<T>, context: ResolutionContext): T {
+    if (registration.lifecycle === Lifecycle.RESOLUTION) {
+      if (context.resolutions.has(registration)) {
+        return context.resolutions.get(registration) as T
       }
+    }
 
-      const returnInstance = registration.lifecycle === Scope.SINGLETON || registration.lifecycle === Scope.CONTAINER
+    if (!isNil(registration.instance)) {
+      return registration.instance as T
+    }
 
-      if (returnInstance && !isNil(registration.instance)) {
-        return registration.instance as T
-      }
+    const returnInstance =
+      registration.lifecycle === Lifecycle.SINGLETON || registration.lifecycle === Lifecycle.CONTAINER
 
-      let resolved: T | undefined
+    if (returnInstance && !isNil(registration.instance)) {
+      return registration.instance as T
+    }
 
-      if (isValueProvider(registration.provider)) {
-        resolved = registration.provider.useValue as T
-      } else if (isNamedProvider(registration.provider)) {
-        resolved = (
-          returnInstance
-            ? (registration.instance = this.resolve(registration.provider.useName))
-            : this.resolve(registration.provider.useName)
-        ) as T
-      } else if (isClassProvider(registration.provider)) {
-        resolved = (
-          returnInstance
-            ? registration.instance || (registration.instance = this.newClassInstance(registration.provider.useClass))
-            : this.newClassInstance(registration.provider.useClass)
-        ) as T
-      } else if (isFunctionProvider(registration.provider)) {
-        if (returnInstance) {
-          if (!isNil(registration.instance)) {
-            resolved = registration.instance
-          } else {
-            const type = notNil(DecoratedInjectables.instance().get(token as Ctor), 'Non registered type')
-            const deps = type.dependencies.map(dep =>
-              dep.multiple ? this.resolveAll(dep.token) : this.resolve(dep.token)
-            )
+    let resolved: T | undefined
 
-            registration.instance = registration.provider.useFunction(...deps)
-            resolved = registration.instance as T
-          }
+    if (isValueProvider(registration.provider)) {
+      resolved = registration.provider.useValue as T
+    } else if (isNamedProvider(registration.provider)) {
+      resolved = (
+        returnInstance
+          ? (registration.instance = this.resolve(registration.provider.useName, context))
+          : this.resolve(registration.provider.useName, context)
+      ) as T
+    } else if (isClassProvider(registration.provider)) {
+      resolved = (
+        returnInstance
+          ? registration.instance ||
+            (registration.instance = this.newClassInstance(registration.provider.useClass, context))
+          : this.newClassInstance(registration.provider.useClass, context)
+      ) as T
+    } else if (isFunctionProvider(registration.provider)) {
+      if (returnInstance) {
+        if (!isNil(registration.instance)) {
+          resolved = registration.instance
         } else {
           const type = notNil(DecoratedInjectables.instance().get(token as Ctor), 'Non registered type')
           const deps = type.dependencies.map(dep =>
-            dep.multiple ? this.resolveAll(dep.token) : this.resolve(dep.token)
+            dep.multiple ? this.resolveAll(dep.token, context) : this.resolve(dep.token, context)
           )
-          resolved = registration.provider.useFunction(...deps) as T
+
+          registration.instance = registration.provider.useFunction(...deps)
+          resolved = registration.instance as T
         }
-      } else if (isFactoryProvider(registration.provider)) {
-        resolved = (
-          returnInstance
-            ? (registration.instance = registration.provider.useFactory(this))
-            : registration.provider.useFactory(this)
-        ) as T
+      } else {
+        const type = notNil(DecoratedInjectables.instance().get(token as Ctor), 'Non registered type')
+        const deps = type.dependencies.map(dep =>
+          dep.multiple ? this.resolveAll(dep.token, context) : this.resolve(dep.token, context)
+        )
+        resolved = registration.provider.useFunction(...deps) as T
+      }
+    } else if (isFactoryProvider(registration.provider)) {
+      resolved = (
+        returnInstance
+          ? (registration.instance = registration.provider.useFactory(this))
+          : registration.provider.useFactory(this)
+      ) as T
+    } else {
+      if (token instanceof DeferredCtor) {
+        resolved = this.newClassInstance<T>(token as DeferredCtor<T>, context)
       }
 
-      return resolved as T
-    }
+      if (typeof token === 'function') {
+        const d = this.scan(tk => typeof tk === 'function' && tk !== token && token.isPrototypeOf(tk))
 
-    if (token instanceof DeferredCtor) {
-      return this.newClassInstance<T>(token as DeferredCtor<T>)
-    }
+        if (d.length === 1) {
+          const tk = d[0].token
+          resolved = this.resolve<T>(tk as Token<T>, context)
+        } else if (d.length > 1) {
+          const primary = d.find(x => x.registrations.some(y => y.primary))
 
-    if (typeof token === 'function') {
-      const d = this.scan(tk => typeof tk === 'function' && tk !== token && token.isPrototypeOf(tk))
-
-      if (d.length === 1) {
-        const tk = d[0].token
-        return this.resolve<T>(tk as Token<T>)
-      } else if (d.length > 1) {
-        const primary = d.find(x => x.registrations.some(y => y.primary))
-
-        if (primary) {
-          return this.resolve<T>(primary.token as Token<T>)
+          if (primary) {
+            resolved = this.resolve<T>(primary.token as Token<T>, context)
+          } else {
+            throw new Error('More than one abstract ref.')
+          }
         }
-
-        throw new Error('More than one abstract ref.')
       }
     }
 
-    throw new Error('error')
+    if (registration.lifecycle === Lifecycle.RESOLUTION) {
+      context.resolutions.set(registration, resolved)
+    }
+
+    return resolved as T
   }
 
-  private newClassInstance<T>(ctor: Ctor<T> | DeferredCtor<T>): T {
+  private newClassInstance<T>(ctor: Ctor<T> | DeferredCtor<T>, context: ResolutionContext): T {
     if (ctor instanceof DeferredCtor) {
       return ctor.createProxy(target => this.resolve(target)) as T
     }
@@ -197,9 +214,9 @@ export class DI {
 
     const deps = dependencies.map(dep => {
       if (dep.multiple) {
-        return this.resolveAll(dep.token)
+        return this.resolveAll(dep.token, context)
       } else {
-        return this.resolve(dep.token)
+        return this.resolve(dep.token, context)
       }
     })
 

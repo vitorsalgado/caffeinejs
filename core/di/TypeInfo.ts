@@ -1,11 +1,11 @@
 import { Provider } from './Provider.js'
-import { Scope } from './Scope.js'
+import { Lifecycle } from './Lifecycle.js'
 import { TokenSpec } from './Token.js'
 
 export interface TypeInfo {
   dependencies: TokenSpec<unknown>[]
   namespace: string | symbol
-  scope: Scope
+  scope: Lifecycle
   qualifiers: (string | symbol)[]
   provider?: Provider<unknown>
   primary?: boolean
@@ -14,7 +14,7 @@ export interface TypeInfo {
 export function newTypeInfo(initial?: Partial<TypeInfo>): TypeInfo {
   return {
     dependencies: [],
-    scope: Scope.SINGLETON,
+    scope: Lifecycle.SINGLETON,
     namespace: '',
     qualifiers: [],
     ...initial
