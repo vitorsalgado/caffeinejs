@@ -19,12 +19,13 @@ import { newTypeInfo, TypeInfo } from './TypeInfo.js'
 export class DI {
   private readonly _registry: Registry = new Registry()
 
-  constructor(private readonly namespace = '', private readonly parent?: DI) {
-    this.setup()
-  }
+  protected constructor(readonly namespace = '', readonly parent?: DI) {}
 
   static setup(namespace = '', parent?: DI): DI {
-    return new DI(namespace, parent)
+    const di = new DI(namespace, parent)
+    di.setup()
+
+    return di
   }
 
   static configureInjectable<T>(token: Ctor<T> | Function | object, opts?: Partial<TypeInfo>) {
@@ -47,8 +48,8 @@ export class DI {
     DecoratedInjectables.instance().configure(tk as Ctor<T>, options)
   }
 
-  has<T>(token: Token<T>): boolean {
-    return this._registry.has(token)
+  has<T>(token: Token<T>, checkParent = false): boolean {
+    return this._registry.has(token) || (checkParent && (this.parent || false) && this.parent.has(token, true))
   }
 
   scan(predicate: (token: Token<unknown>, registration: Binding<unknown>[]) => boolean): RegistryEntry[] {
@@ -64,7 +65,7 @@ export class DI {
   }
 
   resolve<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
-    const registrations = this._registry.findMany<T>(token)
+    const registrations = this.getBindings<T>(token)
 
     if (registrations.length > 1) {
       throw new Error('More than one')
@@ -76,7 +77,7 @@ export class DI {
   }
 
   resolveAll<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T[] {
-    const bindings = this._registry.findMany(token)
+    const bindings = this.getBindings(token)
 
     if (bindings.length === 0) {
       const d = this.scan(tk => typeof tk === 'function' && tk !== token && token.isPrototypeOf(tk))
@@ -111,6 +112,41 @@ export class DI {
       token,
       new Binding(notNil(binding.lifecycle), notNil(binding.provider), notNil(binding.dependencies), binding.primary)
     )
+  }
+
+  child(namespace = ''): DI {
+    const childContainer = new DI(namespace, this)
+
+    for (const [token, registrations] of this._registry.entries()) {
+      if (registrations.some(options => options.lifecycle === Lifecycle.CONTAINER)) {
+        for (const registration of registrations) {
+          const newBinding =
+            registration.lifecycle === Lifecycle.CONTAINER
+              ? {
+                  provider: registration.provider,
+                  dependencies: registration.dependencies,
+                  primary: registration.primary,
+                  lifecycle: registration.lifecycle
+                }
+              : registration
+          childContainer._registry.register(token, newBinding)
+        }
+      }
+    }
+
+    return childContainer
+  }
+
+  private getBindings<T>(token: Token<T>): Binding<T>[] {
+    if (this.has(token)) {
+      return this._registry.findMany(token)
+    }
+
+    if (this.parent) {
+      return this.parent.getBindings(token)
+    }
+
+    return []
   }
 
   private resolveBinding<T>(token: Token<T>, registration: Binding<T>, context: ResolutionContext): T {
