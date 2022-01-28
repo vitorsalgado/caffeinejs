@@ -1,7 +1,7 @@
-import { Binding } from './Binding.js'
+import { TypeInfo } from './TypeInfo.js'
 
 export class ResolutionContext<T = unknown> {
   static INSTANCE: ResolutionContext = new ResolutionContext()
 
-  constructor(readonly resolutions: Map<Binding<T>, T> = new Map()) {}
+  constructor(readonly resolutions: Map<TypeInfo<T>, T> = new Map()) {}
 }

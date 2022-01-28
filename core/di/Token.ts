@@ -13,6 +13,6 @@ export function isTokenSpec<T>(spec: unknown): spec is TokenSpec<T> {
   return spec !== null && typeof spec === 'object' && 'token' in spec
 }
 
-export function isNamedToken(dep: Token<unknown>): dep is string | symbol {
+export function isNamedToken(dep: unknown): dep is string | symbol {
   return typeof dep === 'string' || typeof dep === 'symbol'
 }

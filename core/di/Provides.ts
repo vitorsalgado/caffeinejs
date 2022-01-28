@@ -1,6 +1,7 @@
 import { DiMetadata } from './DiMetadata.js'
 import { TokenSpec } from './Token.js'
 import { Token } from './Token.js'
+import { getParamTypes } from './utils/getParamTypes.js'
 
 export interface FactoryOptions {
   token: Token<unknown>
@@ -10,7 +11,7 @@ export interface FactoryOptions {
 
 export function Provides<T>(token: Token<T>): MethodDecorator {
   return (target, propertyKey, _descriptor) => {
-    const dependencies: unknown[] = Reflect.getMetadata('design:paramtypes', target, propertyKey) || []
+    const dependencies: unknown[] = getParamTypes(target, propertyKey)
     const factories: FactoryOptions[] = Reflect.getOwnMetadata(DiMetadata.FACTORIES, target.constructor) || []
 
     Reflect.defineMetadata(

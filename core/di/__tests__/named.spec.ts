@@ -42,4 +42,12 @@ describe('DI - Named Dependencies', function () {
     expect(root.byeService.bye()).toEqual('bye-bye')
     expect(root.ackService.ok()).toEqual('ok-bye-bye')
   })
+
+  it('should resolve same instance when using named and type', function () {
+    const di = DI.setup()
+    const bye = di.resolve(ByeService)
+    const byeNamed = di.resolve('bye')
+
+    expect(bye).toEqual(byeNamed)
+  })
 })

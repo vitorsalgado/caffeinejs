@@ -1,7 +1,7 @@
 import { isNil } from '../checks/isNil.js'
 import { notNil } from '../preconditions/notNil.js'
 import { Ctor } from '../types/Ctor.js'
-import { Binding } from './Binding.js'
+import { BindTo } from './BindTo.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'
 import { DeferredCtor } from './DeferredCtor.js'
 import { Lifecycle } from './Lifecycle.js'
@@ -18,6 +18,7 @@ import { newTypeInfo, TypeInfo } from './TypeInfo.js'
 
 export class DI {
   private readonly _registry: Registry = new Registry()
+  private readonly _q: Map<string | symbol, TypeInfo[]> = new Map()
 
   protected constructor(readonly namespace = '', readonly parent?: DI) {}
 
@@ -48,16 +49,25 @@ export class DI {
     DecoratedInjectables.instance().configure(tk as Ctor<T>, options)
   }
 
+  bind<T>(token: Token<T>): BindTo<T> {
+    const t = DecoratedInjectables.instance().get(token as Ctor)
+    const type = newTypeInfo(t)
+
+    this.register(token, type)
+
+    return new BindTo<T>(token, type as TypeInfo<T>)
+  }
+
   has<T>(token: Token<T>, checkParent = false): boolean {
     return this._registry.has(token) || (checkParent && (this.parent || false) && this.parent.has(token, true))
   }
 
-  scan(predicate: (token: Token<unknown>, registration: Binding<unknown>[]) => boolean): RegistryEntry[] {
+  scan(predicate: <T>(token: Token<T>, registration: TypeInfo) => boolean): RegistryEntry[] {
     const result: RegistryEntry[] = []
 
     for (const [token, registrations] of this._registry.entries()) {
       if (predicate(token, registrations)) {
-        result.push({ token, registrations })
+        result.push({ token, registration: registrations })
       }
     }
 
@@ -71,35 +81,34 @@ export class DI {
       throw new Error('More than one')
     }
 
-    const registration = registrations[0]
-
-    return this.resolveBinding<T>(token, registration, context)
+    return this.resolveBinding<T>(token, registrations[0], context)
   }
 
   resolveAll<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T[] {
     const bindings = this.getBindings(token)
 
     if (bindings.length === 0) {
-      const d = this.scan(tk => typeof tk === 'function' && tk !== token && token.isPrototypeOf(tk))
-      const r = d.flatMap(x => x.registrations.map(y => this.resolveBinding(x.token, y, context))) as T[]
+      let registrations: RegistryEntry[]
 
-      if (r.length === 0) {
+      if (isNamedToken(token)) {
+        registrations = this.scan((tk, r) => isNamedToken(tk) && r.qualifiers.includes(token))
+      } else {
+        registrations = this.scan(
+          tk => typeof tk === 'function' && tk.name !== (token as Function).name && token.isPrototypeOf(tk)
+        )
+      }
+
+      if (registrations.length === 0) {
         throw new Error('Nothing here')
       }
+
+      return registrations.map(r => this.resolveBinding(r.token, r.registration, context)) as T[]
     }
 
-    const resolution = bindings.map(binding => this.resolveBinding(token, binding, context))
-
-    if (resolution.length === 0) {
-      const d = this.scan(tk => typeof tk === 'function' && tk !== token && token.isPrototypeOf(tk))
-
-      return d.flatMap(x => x.registrations.map(y => this.resolveBinding(x.token, y, context))) as T[]
-    }
-
-    return resolution
+    return bindings.map(binding => this.resolveBinding(token, binding, context))
   }
 
-  register<T>(token: Token<T>, binding: Binding<T>) {
+  register<T>(token: Token<T>, binding: TypeInfo<T>) {
     const provider = providerFromToken(token, binding.provider)
 
     if (!provider) {
@@ -108,29 +117,27 @@ export class DI {
 
     binding.provider = provider
 
-    this._registry.register(
-      token,
-      new Binding(notNil(binding.lifecycle), notNil(binding.provider), notNil(binding.dependencies), binding.primary)
-    )
+    this._registry.register(token, binding)
   }
 
   child(namespace = ''): DI {
     const childContainer = new DI(namespace, this)
+    const entries = this._registry.collect()
 
-    for (const [token, registrations] of this._registry.entries()) {
-      if (registrations.some(options => options.lifecycle === Lifecycle.CONTAINER)) {
-        for (const registration of registrations) {
-          const newBinding =
-            registration.lifecycle === Lifecycle.CONTAINER
-              ? {
-                  provider: registration.provider,
-                  dependencies: registration.dependencies,
-                  primary: registration.primary,
-                  lifecycle: registration.lifecycle
-                }
-              : registration
-          childContainer._registry.register(token, newBinding)
-        }
+    if (entries.some(x => x.registration.lifecycle === Lifecycle.CONTAINER)) {
+      for (const { token, registration } of entries) {
+        const newBinding =
+          registration.lifecycle === Lifecycle.CONTAINER
+            ? {
+                provider: registration.provider,
+                dependencies: registration.dependencies,
+                primary: registration.primary,
+                lifecycle: registration.lifecycle,
+                qualifiers: registration.qualifiers,
+                namespace: registration.namespace
+              }
+            : registration
+        childContainer._registry.register(token, newBinding)
       }
     }
 
@@ -142,111 +149,123 @@ export class DI {
   }
 
   resetInstances(): void {
-    for (const [, registrations] of this._registry.entries()) {
-      for (const registration of registrations) {
-        registration.instance = undefined
-      }
+    for (const [, registration] of this._registry.entries()) {
+      registration.instance = undefined
     }
   }
 
-  private getBindings<T>(token: Token<T>): Binding<T>[] {
+  private getBindings<T>(token: Token<T>): TypeInfo<T>[] {
     if (this.has(token)) {
-      return this._registry.findMany(token)
+      return [this._registry.findMany(token)]
     }
 
     if (this.parent) {
       return this.parent.getBindings(token)
     }
 
+    const nm = this._q.get(token as string)
+
+    if (nm) {
+      return nm as TypeInfo<T>[]
+    }
+
     return []
   }
 
-  private resolveBinding<T>(token: Token<T>, registration: Binding<T>, context: ResolutionContext): T {
-    if (registration.lifecycle === Lifecycle.RESOLUTION) {
-      if (context.resolutions.has(registration)) {
-        return context.resolutions.get(registration) as T
+  private resolveBinding<T>(token: Token<T>, registration: TypeInfo<T> | undefined, context: ResolutionContext): T {
+    if (registration) {
+      if (registration.lifecycle === Lifecycle.RESOLUTION) {
+        if (context.resolutions.has(registration)) {
+          return context.resolutions.get(registration) as T
+        }
       }
-    }
 
-    if (!isNil(registration.instance)) {
-      return registration.instance as T
-    }
+      if (!isNil(registration.instance)) {
+        return registration.instance as T
+      }
 
-    const returnInstance =
-      registration.lifecycle === Lifecycle.SINGLETON || registration.lifecycle === Lifecycle.CONTAINER
+      const returnInstance =
+        registration.lifecycle === Lifecycle.SINGLETON || registration.lifecycle === Lifecycle.CONTAINER
 
-    if (returnInstance && !isNil(registration.instance)) {
-      return registration.instance as T
-    }
+      if (returnInstance && !isNil(registration.instance)) {
+        return registration.instance as T
+      }
 
-    let resolved: T | undefined
+      let resolved: T | undefined
 
-    if (isValueProvider(registration.provider)) {
-      resolved = registration.provider.useValue as T
-    } else if (isNamedProvider(registration.provider)) {
-      resolved = (
-        returnInstance
-          ? (registration.instance = this.resolve(registration.provider.useName, context))
-          : this.resolve(registration.provider.useName, context)
-      ) as T
-    } else if (isClassProvider(registration.provider)) {
-      resolved = (
-        returnInstance
-          ? registration.instance ||
-            (registration.instance = this.newClassInstance(registration.provider.useClass, context))
-          : this.newClassInstance(registration.provider.useClass, context)
-      ) as T
-    } else if (isFunctionProvider(registration.provider)) {
-      if (returnInstance) {
-        if (!isNil(registration.instance)) {
-          resolved = registration.instance
+      if (isValueProvider(registration.provider)) {
+        resolved = registration.provider.useValue as T
+      } else if (isNamedProvider(registration.provider)) {
+        resolved = (
+          returnInstance
+            ? (registration.instance = this.resolve(registration.provider.useName, context))
+            : this.resolve(registration.provider.useName, context)
+        ) as T
+      } else if (isClassProvider(registration.provider)) {
+        resolved = (
+          returnInstance
+            ? registration.instance ||
+              (registration.instance = this.newClassInstance(registration.provider.useClass, context))
+            : this.newClassInstance(registration.provider.useClass, context)
+        ) as T
+      } else if (isFunctionProvider(registration.provider)) {
+        if (returnInstance) {
+          if (!isNil(registration.instance)) {
+            resolved = registration.instance
+          } else {
+            const type = notNil(DecoratedInjectables.instance().get(token as Ctor), 'Non registered type')
+            const deps = type.dependencies.map(dep =>
+              dep.multiple ? this.resolveAll(dep.token, context) : this.resolve(dep.token, context)
+            )
+
+            registration.instance = registration.provider.useFunction(...deps)
+            resolved = registration.instance as T
+          }
         } else {
           const type = notNil(DecoratedInjectables.instance().get(token as Ctor), 'Non registered type')
           const deps = type.dependencies.map(dep =>
             dep.multiple ? this.resolveAll(dep.token, context) : this.resolve(dep.token, context)
           )
-
-          registration.instance = registration.provider.useFunction(...deps)
-          resolved = registration.instance as T
+          resolved = registration.provider.useFunction(...deps) as T
         }
-      } else {
-        const type = notNil(DecoratedInjectables.instance().get(token as Ctor), 'Non registered type')
-        const deps = type.dependencies.map(dep =>
-          dep.multiple ? this.resolveAll(dep.token, context) : this.resolve(dep.token, context)
-        )
-        resolved = registration.provider.useFunction(...deps) as T
-      }
-    } else if (isFactoryProvider(registration.provider)) {
-      resolved = (
-        returnInstance
-          ? (registration.instance = registration.provider.useFactory(this))
-          : registration.provider.useFactory(this)
-      ) as T
-    } else {
-      if (token instanceof DeferredCtor) {
-        resolved = this.newClassInstance<T>(token as DeferredCtor<T>, context)
+      } else if (isFactoryProvider(registration.provider)) {
+        resolved = (
+          returnInstance
+            ? (registration.instance = registration.provider.useFactory(this))
+            : registration.provider.useFactory(this)
+        ) as T
       }
 
-      if (typeof token === 'function') {
-        const d = this.scan(tk => typeof tk === 'function' && tk !== token && token.isPrototypeOf(tk))
-
-        if (d.length === 1) {
-          const tk = d[0].token
-          resolved = this.resolve<T>(tk as Token<T>, context)
-        } else if (d.length > 1) {
-          const primary = d.find(x => x.registrations.some(y => y.primary))
-
-          if (primary) {
-            resolved = this.resolve<T>(primary.token as Token<T>, context)
-          } else {
-            throw new Error('More than one abstract ref.')
-          }
-        }
+      if (registration?.lifecycle === Lifecycle.RESOLUTION) {
+        context.resolutions.set(registration, resolved)
       }
+
+      return resolved as T
     }
 
-    if (registration.lifecycle === Lifecycle.RESOLUTION) {
-      context.resolutions.set(registration, resolved)
+    let resolved: T | undefined
+
+    if (token instanceof DeferredCtor) {
+      resolved = this.newClassInstance<T>(token as DeferredCtor<T>, context)
+    }
+
+    if (typeof token === 'function') {
+      const d = this.scan(
+        tk => typeof tk === 'function' && tk.name !== (token as Function).name && token.isPrototypeOf(tk)
+      )
+
+      if (d.length === 1) {
+        const tk = d[0].token
+        resolved = this.resolve<T>(tk as Token<T>, context)
+      } else if (d.length > 1) {
+        const primary = d.find(x => x.registration.primary)
+
+        if (primary) {
+          resolved = this.resolve<T>(primary.token as Token<T>, context)
+        } else {
+          throw new Error('More than one abstract ref.')
+        }
+      }
     }
 
     return resolved as T
@@ -258,9 +277,7 @@ export class DI {
     }
 
     const type = notNil(DecoratedInjectables.instance().get(ctor), 'Non registered type')
-    const dependencies = type.dependencies
-
-    const deps = dependencies.map(dep => {
+    const deps = type.dependencies.map(dep => {
       if (dep.multiple) {
         return this.resolveAll(dep.token, context)
       } else {
@@ -285,11 +302,37 @@ export class DI {
         continue
       }
 
-      this.register(ctor, new Binding<unknown>(info.scope, info.provider, info.dependencies, info.primary))
-
-      for (const alias of info.qualifiers) {
-        this.register(alias, new Binding<unknown>(info.scope, info.provider, info.dependencies))
+      if (info.late) {
+        continue
       }
+
+      this.register(
+        ctor,
+        new TypeInfo(
+          info.dependencies,
+          info.namespace,
+          info.lifecycle,
+          info.qualifiers,
+          info.instance,
+          info.provider,
+          info.primary
+        )
+      )
+
+      for (const qualifier of info.qualifiers) {
+        this.setQ(qualifier, info)
+      }
+    }
+  }
+
+  private setQ(qualifier: string | symbol, typeInfo: TypeInfo): void {
+    const entry = this._q.get(qualifier)
+
+    if (!entry) {
+      this._q.set(qualifier, [typeInfo])
+    } else {
+      entry.push(typeInfo)
+      this._q.set(qualifier, entry)
     }
   }
 }
