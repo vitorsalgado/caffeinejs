@@ -137,6 +137,18 @@ export class DI {
     return childContainer
   }
 
+  clear(): void {
+    this._registry.clear()
+  }
+
+  resetInstances(): void {
+    for (const [, registrations] of this._registry.entries()) {
+      for (const registration of registrations) {
+        registration.instance = undefined
+      }
+    }
+  }
+
   private getBindings<T>(token: Token<T>): Binding<T>[] {
     if (this.has(token)) {
       return this._registry.findMany(token)

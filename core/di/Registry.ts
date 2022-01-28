@@ -45,6 +45,10 @@ export class Registry {
     return Array.from(this._data.entries()).map(([token, registrations]) => ({ token, registrations }))
   }
 
+  clear(): void {
+    this._data.clear()
+  }
+
   private entry(token: Token<unknown>): Binding<unknown>[] {
     const entry = this._data.get(token)
 
