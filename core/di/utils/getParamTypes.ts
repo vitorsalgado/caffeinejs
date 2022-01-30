@@ -14,9 +14,9 @@ export function getParamTypes<TFunction>(target: TFunction, propertyKey?: string
   for (let i = 0; i < params.length; i++) {
     const key = +i
     if (injectionTokens[key]) {
-      params[key] = injectionTokens[key]
+      params[key] = { ...injectionTokens[key], type: params[key] }
     } else {
-      params[key] = { token: params[key] }
+      params[key] = { token: params[key], type: params[key] }
     }
   }
 

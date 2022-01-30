@@ -90,7 +90,7 @@ describe('DI - Manual Binding', function () {
     const di = DI.setup()
 
     di.bind('val').toValue('test')
-    di.bind(sy).toFactory(di => `factory-${di.resolve('val')}`)
+    di.bind(sy).toFactory(({ di }) => `factory-${di.resolve('val')}`)
     di.bind(FromFactory).toSelf()
 
     const r = di.resolve(FromFactory)

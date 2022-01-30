@@ -1,16 +1,7 @@
 import { Lifecycle } from './Lifecycle.js'
 import { Provider } from './Provider.js'
+import { Resolver } from './Resolver.js'
 import { TokenSpec } from './Token.js'
-
-// export interface ITypeInfo<T = unknown> {
-//   dependencies: TokenSpec<unknown>[]
-//   namespace: string | symbol
-//   scope: Lifecycle
-//   qualifiers: (string | symbol)[]
-//   instance?: T
-//   provider?: Provider<T>
-//   primary?: boolean
-// }
 
 export class TypeInfo<T = unknown> {
   constructor(
@@ -21,7 +12,8 @@ export class TypeInfo<T = unknown> {
     public instance?: T,
     public provider?: Provider<T>,
     public primary?: boolean,
-    public late?: boolean
+    public late?: boolean,
+    public resolver?: Resolver<T>
   ) {}
 }
 

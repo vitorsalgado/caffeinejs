@@ -8,9 +8,9 @@ export interface RegistryEntry {
 }
 
 export class Registry {
-  private readonly _data: Map<Token<unknown>, TypeInfo> = new Map()
+  private readonly _data: Map<Token<unknown>, TypeInfo<any>> = new Map()
 
-  register(token: Token<unknown>, binding: TypeInfo): void {
+  register<T>(token: Token<T>, binding: TypeInfo<T>): void {
     const entry = this.entry(token)
 
     binding.primary = isNil(entry.primary) ? binding.primary : entry.primary
@@ -18,14 +18,14 @@ export class Registry {
     binding.lifecycle = isNil(entry.lifecycle) ? binding.lifecycle : entry.lifecycle
     binding.provider = isNil(entry.provider) ? binding.provider : entry.provider
     binding.dependencies = isNil(entry.dependencies) ? binding.dependencies : entry.dependencies
-    binding.instance = isNil(entry.primary) ? binding.primary : entry.primary
+    binding.instance = isNil(entry.instance) ? binding.instance : entry.instance
     binding.namespace = isNil(entry.namespace) ? binding.namespace : entry.namespace
 
     this._data.set(token, binding)
   }
 
   findMany<T>(token: Token<T>): TypeInfo<T> {
-    return (this._data.get(token) || []) as TypeInfo<T>
+    return this._data.get(token) as TypeInfo<T>
   }
 
   has(token: Token<unknown>): boolean {

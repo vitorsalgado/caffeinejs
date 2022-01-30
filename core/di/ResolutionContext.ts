@@ -1,6 +1,6 @@
 import { TypeInfo } from './TypeInfo.js'
 
-export class ResolutionContext<T = unknown> {
+export class ResolutionContext<T = any> {
   static INSTANCE: ResolutionContext = new ResolutionContext()
 
   constructor(readonly resolutions: Map<TypeInfo<T>, T> = new Map()) {}

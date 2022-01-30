@@ -13,10 +13,15 @@ import { isFunctionProvider } from './Provider.js'
 import { isClassProvider } from './Provider.js'
 import { Registry, RegistryEntry } from './Registry.js'
 import { ResolutionContext } from './ResolutionContext.js'
+import { FnResolver } from './Resolver.js'
+import { ResolverContext } from './Resolver.js'
+import { Resolver } from './Resolver.js'
+import { TokenSpec } from './Token.js'
 import { isNamedToken, Token } from './Token.js'
 import { newTypeInfo, TypeInfo } from './TypeInfo.js'
 
 export class DI {
+  private static CUSTOM_RESOLVERS: Map<Token<any>, Resolver<any>> = new Map()
   private readonly _registry: Registry = new Registry()
   private readonly _q: Map<string | symbol, TypeInfo[]> = new Map()
 
@@ -29,7 +34,7 @@ export class DI {
     return di
   }
 
-  static configureInjectable<T>(token: Ctor<T> | Function | object, opts?: Partial<TypeInfo>) {
+  static configureInjectable<T>(token: Ctor<T> | Function | object, opts?: Partial<TypeInfo>): void {
     const tk = typeof token === 'object' ? token.constructor : token
     const existing = DecoratedInjectables.instance().get(tk as Ctor<T>)
     const options = newTypeInfo({ ...existing, ...opts })
@@ -108,18 +113,6 @@ export class DI {
     return bindings.map(binding => this.resolveBinding(token, binding, context))
   }
 
-  register<T>(token: Token<T>, binding: TypeInfo<T>) {
-    const provider = providerFromToken(token, binding.provider)
-
-    if (!provider) {
-      throw new Error(`Could not set a provider for token: ${String(token)}`)
-    }
-
-    binding.provider = provider
-
-    this._registry.register(token, binding)
-  }
-
   child(namespace = ''): DI {
     const childContainer = new DI(namespace, this)
     const entries = this._registry.collect()
@@ -152,6 +145,28 @@ export class DI {
     for (const [, registration] of this._registry.entries()) {
       registration.instance = undefined
     }
+  }
+
+  registerResolver<T>(token: Token<T>, resolver: Resolver<T> | ((ctx: ResolverContext<T>) => T)): void {
+    if ('resolve' in resolver) {
+      DI.CUSTOM_RESOLVERS.set(token, resolver)
+    } else {
+      DI.CUSTOM_RESOLVERS.set(token, new FnResolver(resolver))
+    }
+  }
+
+  //region Internal
+
+  private register<T>(token: Token<T>, binding: TypeInfo<T>) {
+    const provider = providerFromToken(token, binding.provider)
+
+    if (!provider) {
+      throw new Error(`Could not set a provider for token: ${String(token)}`)
+    }
+
+    binding.provider = provider
+
+    this._registry.register(token, binding)
   }
 
   private getBindings<T>(token: Token<T>): TypeInfo<T>[] {
@@ -231,8 +246,11 @@ export class DI {
       } else if (isFactoryProvider(registration.provider)) {
         resolved = (
           returnInstance
-            ? (registration.instance = registration.provider.useFactory(this))
-            : registration.provider.useFactory(this)
+            ? (registration.instance = registration.provider.useFactory({
+                di: this,
+                token
+              }) as T)
+            : registration.provider.useFactory({ di: this, token })
         ) as T
       }
 
@@ -246,13 +264,11 @@ export class DI {
     let resolved: T | undefined
 
     if (token instanceof DeferredCtor) {
-      resolved = this.newClassInstance<T>(token as DeferredCtor<T>, context)
+      resolved = this.newClassInstance<T>(token, context)
     }
 
     if (typeof token === 'function') {
-      const d = this.scan(
-        tk => typeof tk === 'function' && tk.name !== (token as Function).name && token.isPrototypeOf(tk)
-      )
+      const d = this.scan(tk => typeof tk === 'function' && tk.name !== token.name && token.isPrototypeOf(tk))
 
       if (d.length === 1) {
         const tk = d[0].token
@@ -277,13 +293,7 @@ export class DI {
     }
 
     const type = notNil(DecoratedInjectables.instance().get(ctor), 'Non registered type')
-    const deps = type.dependencies.map(dep => {
-      if (dep.multiple) {
-        return this.resolveAll(dep.token, context)
-      } else {
-        return this.resolve(dep.token, context)
-      }
-    })
+    const deps = type.dependencies.map(dep => this.resolveParam(dep, context))
 
     if (deps.length === 0) {
       if (ctor.length === 0) {
@@ -294,6 +304,33 @@ export class DI {
     }
 
     return new ctor(...deps) as T
+  }
+
+  private resolveParam<T>(dep: TokenSpec<T>, context: ResolutionContext): T {
+    let resolution
+
+    if (dep.multiple) {
+      resolution = this.resolveAll(dep.token, context)
+    } else {
+      resolution = this.resolve(dep.token, context)
+    }
+
+    if (isNil(resolution)) {
+      const byType = this._registry.findMany(dep.type)
+      if (byType) {
+        resolution = this.resolveBinding(dep.token, byType, context)
+      }
+    }
+
+    if (!isNil(resolution)) {
+      return resolution
+    }
+
+    if (dep.optional) {
+      return null as unknown as T
+    }
+
+    throw new Error('Unable to resolve parameter')
   }
 
   private setup() {
@@ -335,4 +372,6 @@ export class DI {
       this._q.set(qualifier, entry)
     }
   }
+
+  //endregion
 }

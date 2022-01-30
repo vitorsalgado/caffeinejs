@@ -1,6 +1,7 @@
 import { Ctor } from '../types/Ctor.js'
 import { DeferredCtor } from './DeferredCtor.js'
 import { DI } from './DI.js'
+import { ResolverContext } from './Resolver.js'
 import { Token } from './Token.js'
 import { isNamedToken } from './Token.js'
 
@@ -25,7 +26,7 @@ export interface DeferredProvider<T> {
 }
 
 export interface FactoryProvider<T> {
-  useFactory: (di: DI) => T
+  useFactory: (ctx: ResolverContext<T>) => T
 }
 
 export type Provider<T> =

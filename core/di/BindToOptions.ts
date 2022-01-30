@@ -1,4 +1,7 @@
 import { Lifecycle } from './Lifecycle.js'
+import { FnResolver } from './Resolver.js'
+import { ResolverContext } from './Resolver.js'
+import { Resolver } from './Resolver.js'
 import { Token } from './Token.js'
 import { TypeInfo } from './TypeInfo.js'
 
@@ -24,5 +27,15 @@ export class BindToOptions<T> {
 
   resolutionScoped(): void {
     this.typeInfo.lifecycle = Lifecycle.RESOLUTION
+  }
+
+  resolvedBy(resolver: Resolver<T> | ((ctx: ResolverContext<T>) => T)): BindToOptions<T> {
+    if ('resolve' in resolver) {
+      this.typeInfo.resolver = resolver
+    } else {
+      this.typeInfo.resolver = new FnResolver(resolver)
+    }
+
+    return this
   }
 }

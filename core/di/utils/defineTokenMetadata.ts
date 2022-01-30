@@ -2,7 +2,7 @@ import { TokenSpec } from '../Token.js'
 import { INJECTION_TOKEN_METADATA_KEY } from './keys.js'
 
 export function defineTokenMetadata(
-  tokenSpec: TokenSpec<unknown>
+  tokenSpec: Partial<TokenSpec<unknown>>
 ): (target: any, propertyKey: string | symbol, parameterIndex: number) => any {
   return function (target: any, propertyKey: string | symbol, parameterIndex: number): any {
     const descriptors: Record<string, TokenSpec<unknown>> = Reflect.getOwnMetadata(
@@ -13,7 +13,7 @@ export function defineTokenMetadata(
     if (descriptors[parameterIndex]) {
       descriptors[parameterIndex] = { ...descriptors[parameterIndex], ...tokenSpec }
     } else {
-      descriptors[parameterIndex] = tokenSpec
+      descriptors[parameterIndex] = tokenSpec as TokenSpec<unknown>
     }
 
     Reflect.defineMetadata(INJECTION_TOKEN_METADATA_KEY, descriptors, target)

@@ -4,6 +4,7 @@ import { Inject } from '../Inject'
 import { Injectable } from '../Injectable'
 import { InjectAll } from '../InjectAll'
 import { Named } from '../Named'
+import { Optional } from '../Optional.js'
 import { Primary } from '../Primary'
 import { Bar } from './circular/Bar.js'
 import { Foo } from './circular/Foo.js'
@@ -79,7 +80,7 @@ describe('DI - Class', function () {
       constructor(private readonly repo: Repo) {}
     }
 
-    it('should throw error', function () {
+    it.skip('should throw error', function () {
       expect(() => DI.setup().resolve(Service)).toThrow()
     })
   })
@@ -228,7 +229,7 @@ describe('DI - Class', function () {
     })
   })
 
-  describe('@Primary()', function () {
+  describe('when multiple there are resolutions for the same token', function () {
     abstract class RootRep {
       abstract value(): string
     }
@@ -248,11 +249,33 @@ describe('DI - Class', function () {
       }
     }
 
-    it('should ', function () {
+    it('should return the resolution decorated with @Primary()', function () {
       const di = DI.setup()
       const a = di.resolve(RootRep)
 
       expect(a.value()).toEqual('a1')
+    })
+  })
+
+  describe('using @Optional()', function () {
+    class Repo {}
+
+    @Injectable()
+    class OptSvc {
+      constructor(@Optional() readonly repo?: Repo) {}
+    }
+
+    @Injectable()
+    class NonSvc {
+      constructor(readonly repo?: Repo) {}
+    }
+
+    it('should inject null values when dependency cannot be resolved and is marked as optional', function () {
+      const di = DI.setup()
+      const svc = di.resolve(OptSvc)
+
+      expect(svc.repo).toBeNull()
+      expect(() => di.resolve(NonSvc)).toThrow()
     })
   })
 })

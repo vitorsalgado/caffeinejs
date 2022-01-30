@@ -2,6 +2,7 @@ import { Ctor } from '../types/Ctor.js'
 import { BindToOptions } from './BindToOptions.js'
 import { DI } from './DI.js'
 import { Lifecycle } from './Lifecycle.js'
+import { ResolverContext } from './Resolver.js'
 import { Token } from './Token.js'
 import { TypeInfo } from './TypeInfo.js'
 
@@ -24,7 +25,7 @@ export class BindTo<T> {
     return new BindToOptions<T>(this.token, this.typeInfo)
   }
 
-  toFactory(factory: (di: DI) => T): BindToOptions<T> {
+  toFactory(factory: (ctx: ResolverContext<T>) => T): BindToOptions<T> {
     this.typeInfo.provider = { useFactory: factory }
     this.typeInfo.lifecycle = Lifecycle.SINGLETON
 
