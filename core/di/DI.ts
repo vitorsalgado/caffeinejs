@@ -113,26 +113,22 @@ export class DI {
     return bindings.map(binding => this.resolveBinding(token, binding, context))
   }
 
-  child(namespace = ''): DI {
-    const childContainer = new DI(namespace, this)
-    const entries = this._registry.collect()
+  child(): DI {
+    const childContainer = new DI(this.namespace, this)
 
-    if (entries.some(x => x.registration.lifecycle === Lifecycle.CONTAINER)) {
-      for (const { token, registration } of entries) {
-        const newBinding =
-          registration.lifecycle === Lifecycle.CONTAINER
-            ? {
-                provider: registration.provider,
-                dependencies: registration.dependencies,
-                primary: registration.primary,
-                lifecycle: registration.lifecycle,
-                qualifiers: registration.qualifiers,
-                namespace: registration.namespace
-              }
-            : registration
-        childContainer._registry.register(token, newBinding)
-      }
-    }
+    this._registry
+      .collect()
+      .filter(x => x.registration.lifecycle === Lifecycle.CONTAINER)
+      .forEach(({ token, registration }) => {
+        childContainer._registry.register(token, {
+          provider: registration.provider,
+          dependencies: registration.dependencies,
+          primary: registration.primary,
+          lifecycle: registration.lifecycle,
+          qualifiers: registration.qualifiers,
+          namespace: registration.namespace
+        })
+      })
 
     return childContainer
   }

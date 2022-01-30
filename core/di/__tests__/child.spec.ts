@@ -1,6 +1,7 @@
 import { v4 } from 'uuid'
 import { DI } from '../DI.js'
 import { Injectable } from '../Injectable.js'
+import { LateInjectable } from '../LateInjectable.js'
 import { Lifecycle } from '../Lifecycle.js'
 import { Scope } from '../Scope.js'
 
@@ -8,37 +9,74 @@ describe('DI - Child', function () {
   describe('when creating a child container', function () {
     @Injectable()
     @Scope(Lifecycle.CONTAINER)
-    class Cont {
+    class ContainerSvc {
       readonly id: string = v4()
     }
 
     @Injectable()
-    class NonCont {
+    class Svc {
       readonly id: string = v4()
     }
 
-    it.skip('should resolve a instance per per container when lifecycle is CONTAINER', function () {
-      const di = DI.setup()
-      const cont1 = di.resolve(Cont)
-      const nonCont1 = di.resolve(NonCont)
-      const child = di.child()
-      const cont2 = child.resolve(Cont)
-      const nonCont2 = child.resolve(NonCont)
+    it('should resolve a instance per container when lifecycle is CONTAINER', function () {
+      const parent = DI.setup()
+      const svc1 = parent.resolve(ContainerSvc)
+      const svcCont1 = parent.resolve(Svc)
+      const child = parent.child()
+      const svc2 = child.resolve(ContainerSvc)
+      const svcCont2 = child.resolve(Svc)
 
-      const cont3 = di.resolve(Cont)
-      const cont4 = child.resolve(Cont)
-      const nonCont3 = di.resolve(NonCont)
+      const svc3 = parent.resolve(ContainerSvc)
+      const svc4 = child.resolve(ContainerSvc)
+      const svcCont3 = parent.resolve(Svc)
 
-      expect(di.has(Cont)).toBeTruthy()
-      expect(di.has(NonCont)).toBeTruthy()
-      expect(child.has(Cont)).toBeTruthy()
-      expect(child.has(NonCont)).toBeFalsy()
-      expect(child.has(NonCont, true)).toBeTruthy()
-      expect(cont1).not.toEqual(cont2)
-      expect(cont1).toEqual(cont3)
-      expect(cont2).toEqual(cont4)
-      expect(nonCont1).toEqual(nonCont2)
-      expect(nonCont2).toEqual(nonCont3)
+      expect(parent.has(ContainerSvc)).toBeTruthy()
+      expect(parent.has(Svc)).toBeTruthy()
+      expect(child.has(ContainerSvc)).toBeTruthy()
+      expect(child.has(Svc)).toBeFalsy()
+      expect(child.has(Svc, true)).toBeTruthy()
+      expect(svc1).not.toEqual(svc2)
+      expect(svc1).toEqual(svc3)
+      expect(svc2).toEqual(svc4)
+      expect(svcCont1).toEqual(svcCont2)
+      expect(svcCont2).toEqual(svcCont3)
+    })
+  })
+
+  describe('when child contains root', function () {
+    describe('and parent contains injection dependency', function () {
+      @LateInjectable()
+      class Dep {
+        readonly id: string = v4()
+      }
+
+      @LateInjectable()
+      class Svc {
+        constructor(readonly dep: Dep) {}
+      }
+
+      it('should resolve requested type', function () {
+        const parent = DI.setup()
+        const child = parent.child()
+
+        parent.bind(Dep).toSelf()
+        child.bind(Svc).toSelf()
+
+        const parentDep = parent.resolve(Dep)
+        const childDep = child.resolve(Dep)
+        const svc = child.resolve(Svc)
+
+        expect(parent.has(Dep)).toBeTruthy()
+        expect(parent.has(Svc)).toBeFalsy()
+        expect(child.has(Dep)).toBeFalsy()
+        expect(child.has(Svc)).toBeTruthy()
+        expect(child.has(Dep, true)).toBeTruthy()
+        expect(child.has(Svc, true)).toBeTruthy()
+        expect(parentDep).toBeInstanceOf(Dep)
+        expect(svc).toBeInstanceOf(Svc)
+        expect(svc.dep).toBeInstanceOf(Dep)
+        expect(parentDep).toEqual(childDep)
+      })
     })
   })
 })
