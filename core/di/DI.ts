@@ -153,6 +153,16 @@ export class DI {
     }
   }
 
+  parse(): void {
+    for (const [token, binding] of this._registry.entries()) {
+      if (binding.lazy) {
+        continue
+      }
+
+      this.resolveBinding(token, binding, ResolutionContext.INSTANCE)
+    }
+  }
+
   //region Internal
 
   private internalResolve<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
@@ -372,24 +382,22 @@ export class DI {
           binding.qualifiers,
           binding.instance,
           binding.provider,
-          binding.primary
+          binding.primary,
+          binding.late,
+          binding.lazy
         )
       )
 
       for (const qualifier of binding.qualifiers) {
-        this.linkNamedToBinding(qualifier, binding)
+        const entry = this._namedLinks.get(qualifier)
+
+        if (!entry) {
+          this._namedLinks.set(qualifier, [binding])
+        } else {
+          entry.push(binding)
+          this._namedLinks.set(qualifier, entry)
+        }
       }
-    }
-  }
-
-  private linkNamedToBinding(qualifier: string | symbol, binding: Binding): void {
-    const entry = this._namedLinks.get(qualifier)
-
-    if (!entry) {
-      this._namedLinks.set(qualifier, [binding])
-    } else {
-      entry.push(binding)
-      this._namedLinks.set(qualifier, entry)
     }
   }
 

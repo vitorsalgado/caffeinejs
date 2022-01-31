@@ -1,7 +1,7 @@
 import { isNil } from '../checks/isNil.js'
 import { notNil } from '../preconditions/notNil.js'
-import { Token } from './Token.js'
 import { Binding } from './Binding.js'
+import { Token } from './Token.js'
 
 export interface BindingEntry {
   token: Token
@@ -25,6 +25,7 @@ export class BindingRegistry {
     binding.instance = isNil(entry.instance) ? binding.instance : entry.instance
     binding.namespace = isNil(entry.namespace) ? binding.namespace : entry.namespace
     binding.qualifiers = isNil(entry.qualifiers) ? binding.qualifiers : entry.qualifiers
+    binding.lazy = isNil(entry.lazy) ? binding.lazy : entry.lazy
 
     this._types.set(token, binding)
   }

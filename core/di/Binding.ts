@@ -11,19 +11,27 @@ export class Binding<T = any> {
     public instance?: T,
     public provider?: Provider<T>,
     public primary?: boolean,
-    public late?: boolean
+    public late?: boolean,
+    public lazy?: boolean
   ) {}
 
   static newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
+    const lifecycle = initial.lifecycle === undefined ? Lifecycle.SINGLETON : initial.lifecycle
+    const lazy =
+      initial.lazy === undefined
+        ? !(lifecycle === Lifecycle.SINGLETON || lifecycle === Lifecycle.CONTAINER)
+        : initial.lazy
+
     return new Binding(
       initial.dependencies || [],
       initial.namespace || '',
-      initial.lifecycle || Lifecycle.SINGLETON,
+      lifecycle,
       initial.qualifiers || [],
       initial.instance,
       initial.provider,
       initial.primary,
-      initial.late
+      initial.late,
+      lazy
     )
   }
 }
