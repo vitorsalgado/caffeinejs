@@ -1,5 +1,5 @@
-import { DI } from './DI.js'
-import { getParamTypes } from './utils/getParamTypes.js'
+import { DI } from '../DI.js'
+import { getParamTypes } from '../utils/getParamTypes.js'
 
 export function Injectable<T>(): ClassDecorator {
   return function (target) {

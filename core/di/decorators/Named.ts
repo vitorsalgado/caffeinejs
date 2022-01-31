@@ -1,5 +1,5 @@
-import { Ctor } from '../types/Ctor.js'
-import { DI } from './DI.js'
+import { Ctor } from '../../types/Ctor.js'
+import { DI } from '../DI.js'
 
 export function Named<T>(name: string | symbol): ClassDecorator {
   return function (target) {

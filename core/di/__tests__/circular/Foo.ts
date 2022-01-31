@@ -1,5 +1,5 @@
-import { Injectable } from '../../Injectable.js'
-import { Defer } from '../../Defer.js'
+import { Injectable } from '../../decorators/Injectable.js'
+import { Defer } from '../../decorators/Defer.js'
 import { Bar } from './Bar.js'
 
 @Injectable()

@@ -1,7 +1,7 @@
-import { Configuration } from '../Configuration'
+import { Configuration } from '../decorators/Configuration.js'
 import { DI } from '../DI'
-import { Provides } from '../Provides'
-import { Injectable } from '../Injectable'
+import { Provides } from '../decorators/Provides.js'
+import { Injectable } from '../decorators/Injectable.js'
 
 describe('DI - Factory', function () {
   describe('using java @Bean like registration with @Configuration() class', function () {

@@ -1,6 +1,6 @@
 import { DI } from '../DI.js'
-import { Inject } from '../Inject.js'
-import { Injectable } from '../Injectable.js'
+import { Inject } from '../decorators/Inject.js'
+import { Injectable } from '../decorators/Injectable.js'
 
 describe('DI - Custom Resolver', function () {
   abstract class Base {

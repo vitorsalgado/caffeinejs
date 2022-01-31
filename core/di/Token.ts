@@ -2,17 +2,13 @@ import { AbstractCtor } from '../types/AbstractCtor.js'
 import { Ctor } from '../types/Ctor.js'
 import { DeferredCtor } from './DeferredCtor.js'
 
-export type Token<T> = Ctor<T> | DeferredCtor<T> | AbstractCtor<T> | string | symbol | Function
+export type Token<T = any> = Ctor<T> | DeferredCtor<T> | AbstractCtor<T> | string | symbol | Function
 
-export interface TokenSpec<T> {
+export interface TokenSpec<T = any> {
   token: Token<T>
+  tokenType: Token<T>
   multiple?: boolean
-  optional: boolean
-  type: Token<T>
-}
-
-export function isTokenSpec<T>(spec: unknown): spec is TokenSpec<T> {
-  return spec !== null && typeof spec === 'object' && 'token' in spec
+  optional?: boolean
 }
 
 export function isNamedToken(dep: unknown): dep is string | symbol {

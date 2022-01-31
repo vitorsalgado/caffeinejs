@@ -1,8 +1,8 @@
 import { v4 } from 'uuid'
 import { DI } from '../DI.js'
-import { Inject } from '../Inject.js'
-import { LateInjectable } from '../LateInjectable.js'
-import { Named } from '../Named.js'
+import { Inject } from '../decorators/Inject.js'
+import { LateInjectable } from '../decorators/LateInjectable.js'
+import { Named } from '../decorators/Named.js'
 
 describe('DI - Manual Binding', function () {
   abstract class Abs {

@@ -1,4 +1,4 @@
-import { DI } from './DI.js'
+import { DI } from '../DI.js'
 
 export function Primary() {
   return function (target: Function | object, _propertyKey?: string | symbol) {

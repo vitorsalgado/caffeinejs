@@ -1,13 +1,13 @@
 import { v4 } from 'uuid'
 import { DI } from '../DI.js'
-import { Injectable } from '../Injectable.js'
+import { Injectable } from '../decorators/Injectable.js'
 import { Lifecycle } from '../Lifecycle.js'
 import { ResolutionContext } from '../ResolutionContext.js'
-import { Scope } from '../Scope.js'
+import { Scope } from '../decorators/Scope.js'
 
 describe('DI - Context Scoped', function () {
   @Injectable()
-  @Scope(Lifecycle.RESOLUTION)
+  @Scope(Lifecycle.RESOLUTION_CONTEXT)
   class ResScopedDep {
     readonly id: string
 

@@ -19,7 +19,7 @@ export class DeferredCtor<T> {
 
   constructor(private readonly callback: () => Token<T>) {}
 
-  public createProxy(creator: (ctor: Token<T>) => T): T {
+  createProxy(creator: (ctor: Token<T>) => T): T {
     let init = false
     let value: T
 

@@ -1,6 +1,6 @@
 import { v4 } from 'uuid'
 import { DI } from '../DI.js'
-import { Injectable } from '../Injectable.js'
+import { Injectable } from '../decorators/Injectable.js'
 
 describe('DI - Basic', function () {
   describe('calling .clear()', function () {

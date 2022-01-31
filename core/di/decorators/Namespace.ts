@@ -1,4 +1,4 @@
-import { DI } from './DI.js'
+import { DI } from '../DI.js'
 
 export function Namespace<T>(namespace: string): ClassDecorator {
   return function (target) {
