@@ -1,4 +1,3 @@
-import { valueOr } from '../_internal/valueOr.js'
 import { notNil } from '../preconditions/notNil.js'
 import { Ctor } from '../types/Ctor.js'
 import { Binding } from './Binding.js'
@@ -21,7 +20,7 @@ export class DecoratedInjectables {
     const entry = this._entries.get(ctor)
 
     if (entry) {
-      this._entries.set(ctor, { ...entry, ...info, qualifiers: [...entry.qualifiers, ...valueOr(info.qualifiers, [])] })
+      this._entries.set(ctor, { ...entry, ...info })
     } else {
       const i = Binding.newBinding(info)
       this._entries.set(ctor, i)

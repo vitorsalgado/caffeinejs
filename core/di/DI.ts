@@ -6,6 +6,11 @@ import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
 import { BindTo } from './BindTo.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'
 import { DeferredCtor } from './DeferredCtor.js'
+import { NoResolutionForTokenError } from './errors.js'
+import { UnresolvableConstructorArguments } from './errors.js'
+import { TypeNotRegisteredForInjectionError } from './errors.js'
+import { NoUniqueInjectionForTokenError } from './errors.js'
+import { NoProviderForTokenError } from './errors.js'
 import { Lifecycle } from './Lifecycle.js'
 import { providerFromToken } from './Provider.js'
 import { isNamedProvider } from './Provider.js'
@@ -21,7 +26,9 @@ export class DI {
   private readonly _registry: BindingRegistry = new BindingRegistry()
   private readonly _namedLinks: Map<string | symbol, Binding[]> = new Map()
 
-  protected constructor(readonly namespace = '', readonly parent?: DI) {}
+  protected constructor(readonly namespace = '', readonly parent?: DI) {
+    notNil(namespace)
+  }
 
   static setup(namespace = '', parent?: DI): DI {
     const di = new DI(namespace, parent)
@@ -46,7 +53,7 @@ export class DI {
     }
 
     if (!binding.provider) {
-      throw new Error(`Could not set a provider for token: ${String(tk)}`)
+      throw new NoProviderForTokenError(tk)
     }
 
     DecoratedInjectables.instance().configure(tk as Ctor<T>, binding)
@@ -83,7 +90,13 @@ export class DI {
     const bindings = this.getBindings<T>(token)
 
     if (bindings.length > 1) {
-      throw new Error('More than one')
+      const primary = bindings.find(x => x.primary)
+
+      if (primary) {
+        return this.resolveBinding<T>(token, primary, context)
+      }
+
+      throw new NoUniqueInjectionForTokenError(token)
     }
 
     return this.resolveBinding<T>(token, bindings[0], context)
@@ -104,7 +117,7 @@ export class DI {
       }
 
       if (entries.length === 0) {
-        throw new Error('Nothing here')
+        return []
       }
 
       return entries.map(r => this.resolveBinding(r.token, r.binding, context)) as T[]
@@ -119,7 +132,7 @@ export class DI {
     this._registry
       .collect()
       .filter(x => x.binding.lifecycle === Lifecycle.CONTAINER)
-      .forEach(({ token, binding }) => {
+      .forEach(({ token, binding }) =>
         child._registry.register(token, {
           provider: binding.provider,
           dependencies: binding.dependencies,
@@ -128,7 +141,7 @@ export class DI {
           qualifiers: binding.qualifiers,
           namespace: binding.namespace
         })
-      })
+      )
 
     return child
   }
@@ -149,7 +162,7 @@ export class DI {
     const provider = providerFromToken(token, binding.provider)
 
     if (!provider) {
-      throw new Error(`Could not set a provider for token: ${String(token)}`)
+      throw new NoProviderForTokenError(token)
     }
 
     binding.provider = provider
@@ -265,7 +278,7 @@ export class DI {
         if (primary) {
           resolved = this.resolve<T>(primary.token as Token<T>, context)
         } else {
-          throw new Error('More than one abstract ref.')
+          throw new NoUniqueInjectionForTokenError(token)
         }
       }
     }
@@ -278,14 +291,18 @@ export class DI {
       return ctor.createProxy(target => this.resolve(target))
     }
 
-    const type = notNil(DecoratedInjectables.instance().get(ctor), 'Non registered type')
+    const type = DecoratedInjectables.instance().get(ctor)
+    if (!type) {
+      throw new TypeNotRegisteredForInjectionError(ctor)
+    }
+
     const deps = type.dependencies.map(dep => this.resolveParam(dep, context))
 
     if (deps.length === 0) {
       if (ctor.length === 0) {
         return new ctor()
       } else {
-        throw new Error(`Class ${ctor.name} contains unresolvable constructor arguments.`)
+        throw new UnresolvableConstructorArguments(ctor)
       }
     }
 
@@ -316,7 +333,7 @@ export class DI {
       return null as unknown as T
     }
 
-    throw new Error('Unable to resolve parameter')
+    throw new NoResolutionForTokenError(dep)
   }
 
   private setup() {

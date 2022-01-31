@@ -24,6 +24,7 @@ export class BindingRegistry {
     binding.dependencies = isNil(entry.dependencies) ? binding.dependencies : entry.dependencies
     binding.instance = isNil(entry.instance) ? binding.instance : entry.instance
     binding.namespace = isNil(entry.namespace) ? binding.namespace : entry.namespace
+    binding.qualifiers = isNil(entry.qualifiers) ? binding.qualifiers : entry.qualifiers
 
     this._types.set(token, binding)
   }

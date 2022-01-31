@@ -1,11 +1,12 @@
 import { v4 } from 'uuid'
-import { DI } from '../DI'
 import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { InjectAll } from '../decorators/InjectAll.js'
 import { Named } from '../decorators/Named.js'
 import { Optional } from '../decorators/Optional.js'
 import { Primary } from '../decorators/Primary.js'
+import { DI } from '../DI'
+import { NoUniqueInjectionForTokenError } from '../errors.js'
 import { Bar } from './circular/Bar.js'
 import { Foo } from './circular/Foo.js'
 
@@ -85,7 +86,7 @@ describe('DI - Class', function () {
     })
   })
 
-  describe('when extending abstract classes', function () {
+  describe('using abstract classes as token', function () {
     describe('and referencing the abstract class on constructor without naming', function () {
       abstract class Base {
         common() {
@@ -142,7 +143,7 @@ describe('DI - Class', function () {
       }
 
       @Injectable()
-      class Service {
+      class DbService {
         constructor(@Inject(mongo) readonly repo: Repo) {}
 
         list() {
@@ -151,14 +152,14 @@ describe('DI - Class', function () {
       }
 
       it('should resolve dependency', function () {
-        const service = DI.setup().resolve<Service>(Service)
+        const service = DI.setup().resolve<DbService>(DbService)
         expect(service.repo).toBeInstanceOf(MongoRepo)
         expect(service.list()).toEqual('mongodb')
       })
     })
   })
 
-  describe('when there is a circular class dependency', function () {
+  describe('circular reference', function () {
     describe('and dependencies are decorated with @Lazy()', function () {
       it('should resolve dependencies', function () {
         const foo = DI.setup().resolve(Foo)
@@ -170,7 +171,7 @@ describe('DI - Class', function () {
     })
   })
 
-  describe('when injecting many', function () {
+  describe('injecting many', function () {
     const identifier = Symbol.for('testId')
 
     abstract class Base {
@@ -229,35 +230,109 @@ describe('DI - Class', function () {
     })
   })
 
-  describe('when multiple there are resolutions for the same token', function () {
-    abstract class RootRep {
-      abstract value(): string
-    }
-
-    @Injectable()
-    @Primary()
-    class A1 extends RootRep {
-      value(): string {
-        return 'a1'
+  describe('resolving multiple for same token', function () {
+    describe('when token is an abstract class', function () {
+      abstract class RootRep {
+        abstract value(): string
       }
-    }
 
-    @Injectable()
-    class A2 extends RootRep {
-      value(): string {
-        return 'a2'
+      @Injectable()
+      @Primary()
+      class A1 extends RootRep {
+        value(): string {
+          return 'a1'
+        }
       }
-    }
 
-    it('should return the resolution decorated with @Primary()', function () {
-      const di = DI.setup()
-      const a = di.resolve(RootRep)
+      @Injectable()
+      class A2 extends RootRep {
+        value(): string {
+          return 'a2'
+        }
+      }
 
-      expect(a.value()).toEqual('a1')
+      it('should return the resolution decorated with @Primary()', function () {
+        const di = DI.setup()
+        const a = di.resolve(RootRep)
+
+        expect(a.value()).toEqual('a1')
+      })
+    })
+
+    describe('when abstract class has multiple implementations', function () {
+      describe('and none is primary', function () {
+        abstract class Abs {}
+
+        @Injectable()
+        class Impl1 extends Abs {}
+
+        @Injectable()
+        class Impl2 extends Abs {}
+
+        it('should throw error for no single match', function () {
+          const di = DI.setup()
+
+          expect(() => di.resolve(Abs)).toThrow(NoUniqueInjectionForTokenError)
+        })
+      })
+    })
+
+    describe('when multiple resolutions exists for a named token', function () {
+      const name = 'svc'
+
+      @Injectable()
+      @Named(name)
+      class Svc1 {
+        name() {
+          return 'svc1'
+        }
+      }
+
+      @Injectable()
+      @Named(name)
+      @Primary()
+      class Svc2 {
+        name() {
+          return 'svc2'
+        }
+      }
+
+      it('should resolve the primary one', function () {
+        const di = DI.setup()
+        const dep = di.resolve<Svc2>(name)
+
+        expect(dep.name()).toEqual('svc2')
+      })
+    })
+
+    describe('when no single match', function () {
+      const name = 'svc-no-single'
+
+      @Injectable()
+      @Named(name)
+      class Svc1 {}
+
+      @Injectable()
+      @Named(name)
+      class Svc2 {}
+
+      it('should throw error', function () {
+        const di = DI.setup()
+
+        expect(() => di.resolve(name)).toThrow(NoUniqueInjectionForTokenError)
+      })
+    })
+
+    describe('when resolving multiple of non existent', function () {
+      it('should return empty array', function () {
+        const di = DI.setup()
+
+        expect(di.resolveAll('nonexistent')).toEqual([])
+      })
     })
   })
 
-  describe('using @Optional()', function () {
+  describe('optional injections', function () {
     class Repo {}
 
     @Injectable()
