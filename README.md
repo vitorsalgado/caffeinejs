@@ -17,7 +17,3 @@
     <img src="https://img.shields.io/badge/Conventional%20Commits-1.0.0-blue.svg?logo=git" alt="Conventional Commits"/>
   </a>
 </p>
-
-## License
-
-Drizzle HTTP is [MIT Licensed](LICENSE).
