@@ -31,6 +31,8 @@ export class DI {
   }
 
   static configureInjectable<T>(token: Ctor<T> | Function | object, opts?: Partial<Binding>): void {
+    notNil(token)
+
     const tk = typeof token === 'object' ? token.constructor : token
     const existing = DecoratedInjectables.instance().get(tk as Ctor<T>)
     const binding = Binding.newBinding({ ...existing, ...opts })
@@ -51,6 +53,8 @@ export class DI {
   }
 
   bind<T>(token: Token<T>): BindTo<T> {
+    notNil(token)
+
     const type = DecoratedInjectables.instance().get(token as Ctor)
     const binding = Binding.newBinding(type)
 
@@ -250,13 +254,13 @@ export class DI {
     }
 
     if (typeof token === 'function') {
-      const d = this.scan(tk => typeof tk === 'function' && tk.name !== token.name && token.isPrototypeOf(tk))
+      const entries = this.scan(tk => typeof tk === 'function' && tk.name !== token.name && token.isPrototypeOf(tk))
 
-      if (d.length === 1) {
-        const tk = d[0].token
+      if (entries.length === 1) {
+        const tk = entries[0].token
         resolved = this.resolve<T>(tk as Token<T>, context)
-      } else if (d.length > 1) {
-        const primary = d.find(x => x.binding.primary)
+      } else if (entries.length > 1) {
+        const primary = entries.find(x => x.binding.primary)
 
         if (primary) {
           resolved = this.resolve<T>(primary.token as Token<T>, context)

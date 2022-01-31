@@ -1,4 +1,5 @@
 import { valueOr } from '../_internal/valueOr.js'
+import { notNil } from '../preconditions/notNil.js'
 import { Ctor } from '../types/Ctor.js'
 import { Binding } from './Binding.js'
 
@@ -15,6 +16,8 @@ export class DecoratedInjectables {
   }
 
   configure<T>(ctor: Ctor<T>, info: Partial<Binding>): DecoratedInjectables {
+    notNil(ctor)
+
     const entry = this._entries.get(ctor)
 
     if (entry) {

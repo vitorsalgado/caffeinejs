@@ -1,11 +1,14 @@
+import { notNil } from '../preconditions/notNil.js'
+import { Binding } from './Binding.js'
 import { Lifecycle } from './Lifecycle.js'
 import { Token } from './Token.js'
-import { Binding } from './Binding.js'
 
 export class BindToOptions<T> {
   constructor(private readonly token: Token<T>, private readonly typeInfo: Binding<T>) {}
 
   as(lifecycle: Lifecycle): BindToOptions<T> {
+    notNil(lifecycle)
+
     this.typeInfo.lifecycle = lifecycle
     return this
   }

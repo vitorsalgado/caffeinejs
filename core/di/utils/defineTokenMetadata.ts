@@ -3,8 +3,8 @@ import { INJECTION_TOKEN_METADATA_KEY } from './keys.js'
 
 export function defineTokenMetadata(
   tokenSpec: Partial<TokenSpec<unknown>>
-): (target: any, propertyKey: string | symbol, parameterIndex: number) => any {
-  return function (target: any, propertyKey: string | symbol, parameterIndex: number): any {
+): <TFunction>(target: TFunction, propertyKey: string | symbol, parameterIndex: number) => void {
+  return function (target: any, propertyKey: string | symbol, parameterIndex: number): void {
     const descriptors: Record<string, TokenSpec<unknown>> = Reflect.getOwnMetadata(
       INJECTION_TOKEN_METADATA_KEY,
       target
