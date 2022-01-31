@@ -6,6 +6,7 @@ import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
 import { BindTo } from './BindTo.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'
 import { DeferredCtor } from './DeferredCtor.js'
+import { CircularReferenceError } from './errors.js'
 import { NoResolutionForTokenError } from './errors.js'
 import { UnresolvableConstructorArguments } from './errors.js'
 import { TypeNotRegisteredForInjectionError } from './errors.js'
@@ -296,7 +297,7 @@ export class DI {
       throw new TypeNotRegisteredForInjectionError(ctor)
     }
 
-    const deps = type.dependencies.map(dep => this.resolveParam(dep, context))
+    const deps = type.dependencies.map(dep => this.resolveParam(ctor, dep, context))
 
     if (deps.length === 0) {
       if (ctor.length === 0) {
@@ -309,7 +310,11 @@ export class DI {
     return new ctor(...deps)
   }
 
-  private resolveParam<T>(dep: TokenSpec<T>, context: ResolutionContext): T {
+  private resolveParam<T>(ctor: Ctor<T>, dep: TokenSpec<T>, context: ResolutionContext): T {
+    if (isNil(dep.token)) {
+      throw new CircularReferenceError(ctor)
+    }
+
     let resolution
 
     if (dep.multiple) {

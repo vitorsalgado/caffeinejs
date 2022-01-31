@@ -7,8 +7,6 @@ import { Optional } from '../decorators/Optional.js'
 import { Primary } from '../decorators/Primary.js'
 import { DI } from '../DI'
 import { NoUniqueInjectionForTokenError } from '../errors.js'
-import { Bar } from './circular/Bar.js'
-import { Foo } from './circular/Foo.js'
 
 describe('DI - Class', function () {
   describe('when using dependencies with default configurations', function () {
@@ -155,18 +153,6 @@ describe('DI - Class', function () {
         const service = DI.setup().resolve<DbService>(DbService)
         expect(service.repo).toBeInstanceOf(MongoRepo)
         expect(service.list()).toEqual('mongodb')
-      })
-    })
-  })
-
-  describe('circular reference', function () {
-    describe('and dependencies are decorated with @Lazy()', function () {
-      it('should resolve dependencies', function () {
-        const foo = DI.setup().resolve(Foo)
-        const bar = DI.setup().resolve(Bar)
-
-        expect(foo.test()).toEqual('foo-bar')
-        expect(bar.test()).toEqual('bar-foo')
       })
     })
   })

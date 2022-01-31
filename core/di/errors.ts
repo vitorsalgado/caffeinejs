@@ -53,3 +53,16 @@ export class NoResolutionForTokenError extends CaffeineError {
     this.name = 'NoResolutionError'
   }
 }
+
+export class CircularReferenceError extends CaffeineError {
+  constructor(ctor: Ctor) {
+    super(
+      `Attempt to resolve a undefined injection token. This could mean that the class ${ctor.name} has a ` +
+        'circular reference. If this was intentional, make sure to decorate your circular references with @Defer to correctly resolve ' +
+        'this class dependencies',
+      'DI_CIRCULAR_REFERENCE'
+    )
+    Error.captureStackTrace(this, CircularReferenceError)
+    this.name = 'CircularReferenceError'
+  }
+}
