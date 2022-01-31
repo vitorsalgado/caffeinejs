@@ -88,19 +88,17 @@ export class DI {
   }
 
   resolve<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
-    const bindings = this.getBindings<T>(token)
+    const resolution = this.internalResolve(token, context)
 
-    if (bindings.length > 1) {
-      const primary = bindings.find(x => x.primary)
-
-      if (primary) {
-        return this.resolveBinding<T>(token, primary, context)
-      }
-
-      throw new NoUniqueInjectionForTokenError(token)
+    if (isNil(resolution)) {
+      throw new NoResolutionForTokenError({ token })
     }
 
-    return this.resolveBinding<T>(token, bindings[0], context)
+    return resolution
+  }
+
+  resolveLax<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
+    return this.internalResolve(token, context)
   }
 
   resolveAll<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T[] {
@@ -112,9 +110,7 @@ export class DI {
       if (isNamedToken(token)) {
         entries = this.scan((tk, r) => isNamedToken(tk) && r.qualifiers.includes(token))
       } else {
-        entries = this.scan(
-          tk => typeof tk === 'function' && tk.name !== (token as Function).name && token.isPrototypeOf(tk)
-        )
+        entries = this.scan(tk => typeof tk === 'function' && tk !== token && token.isPrototypeOf(tk))
       }
 
       if (entries.length === 0) {
@@ -158,6 +154,22 @@ export class DI {
   }
 
   //region Internal
+
+  private internalResolve<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
+    const bindings = this.getBindings<T>(token)
+
+    if (bindings.length > 1) {
+      const primary = bindings.find(x => x.primary)
+
+      if (primary) {
+        return this.resolveBinding<T>(token, primary, context)
+      }
+
+      throw new NoUniqueInjectionForTokenError(token)
+    }
+
+    return this.resolveBinding<T>(token, bindings[0], context)
+  }
 
   private register<T>(token: Token<T>, binding: Binding<T>) {
     const provider = providerFromToken(token, binding.provider)
@@ -214,8 +226,8 @@ export class DI {
       } else if (isNamedProvider(binding.provider)) {
         resolved = (
           returnInstance
-            ? (binding.instance = this.resolve(binding.provider.useName, context))
-            : this.resolve(binding.provider.useName, context)
+            ? (binding.instance = this.internalResolve(binding.provider.useName, context))
+            : this.internalResolve(binding.provider.useName, context)
         ) as T
       } else if (isClassProvider(binding.provider)) {
         resolved = (
@@ -230,7 +242,7 @@ export class DI {
           } else {
             const type = notNil(DecoratedInjectables.instance().get(token as Ctor), 'Non registered type')
             const deps = type.dependencies.map(dep =>
-              dep.multiple ? this.resolveAll(dep.token, context) : this.resolve(dep.token, context)
+              dep.multiple ? this.resolveAll(dep.token, context) : this.internalResolve(dep.token, context)
             )
 
             binding.instance = binding.provider.useFunction(...deps)
@@ -239,7 +251,7 @@ export class DI {
         } else {
           const type = notNil(DecoratedInjectables.instance().get(token as Ctor), 'Non registered type')
           const deps = type.dependencies.map(dep =>
-            dep.multiple ? this.resolveAll(dep.token, context) : this.resolve(dep.token, context)
+            dep.multiple ? this.resolveAll(dep.token, context) : this.internalResolve(dep.token, context)
           )
           resolved = binding.provider.useFunction(...deps) as T
         }
@@ -272,12 +284,12 @@ export class DI {
 
       if (entries.length === 1) {
         const tk = entries[0].token
-        resolved = this.resolve<T>(tk as Token<T>, context)
+        resolved = this.internalResolve<T>(tk as Token<T>, context)
       } else if (entries.length > 1) {
         const primary = entries.find(x => x.binding.primary)
 
         if (primary) {
-          resolved = this.resolve<T>(primary.token as Token<T>, context)
+          resolved = this.internalResolve<T>(primary.token as Token<T>, context)
         } else {
           throw new NoUniqueInjectionForTokenError(token)
         }
@@ -289,7 +301,7 @@ export class DI {
 
   private newClassInstance<T>(ctor: Ctor<T> | DeferredCtor<T>, context: ResolutionContext): T {
     if (ctor instanceof DeferredCtor) {
-      return ctor.createProxy(target => this.resolve(target))
+      return ctor.createProxy(target => this.internalResolve(target))
     }
 
     const type = DecoratedInjectables.instance().get(ctor)
@@ -311,7 +323,7 @@ export class DI {
   }
 
   private resolveParam<T>(ctor: Ctor<T>, dep: TokenSpec<T>, context: ResolutionContext): T {
-    if (isNil(dep.token)) {
+    if (isNil(dep.token) && isNil(dep.tokenType)) {
       throw new CircularReferenceError(ctor)
     }
 
@@ -320,7 +332,7 @@ export class DI {
     if (dep.multiple) {
       resolution = this.resolveAll(dep.token, context)
     } else {
-      resolution = this.resolve(dep.token, context)
+      resolution = this.internalResolve(dep.token, context)
     }
 
     if (isNil(resolution)) {

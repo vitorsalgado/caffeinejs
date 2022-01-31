@@ -1,11 +1,12 @@
 import { CaffeineError } from '../CaffeineError.js'
 import { Ctor } from '../types/Ctor.js'
+import { tokenStr } from './Token.js'
 import { TokenSpec } from './Token.js'
 import { Token } from './Token.js'
 
 export class NoProviderForTokenError extends CaffeineError {
   constructor(token: Token) {
-    super(`Could not determine a provider for token: ${String(token)}`, 'DI_NO_PROVIDER')
+    super(`Could not determine a provider for token: ${tokenStr(token)}`, 'DI_NO_PROVIDER')
     Error.captureStackTrace(this, NoProviderForTokenError)
     this.name = 'NoProviderForTokenError'
   }
@@ -14,7 +15,7 @@ export class NoProviderForTokenError extends CaffeineError {
 export class NoUniqueInjectionForTokenError extends CaffeineError {
   constructor(token: Token) {
     super(
-      `Found more than one injection for token "${String(token)}" when a single matching was expected. ` +
+      `Found more than one injection for token "${tokenStr(token)}" when a single matching was expected. ` +
         'Use @Named(), @Primary() or conditionals to ensure a single match or make sure your component can receive multiple injections.',
       'DI_NO_UNIQUE_INJECTION'
     )
@@ -26,7 +27,7 @@ export class NoUniqueInjectionForTokenError extends CaffeineError {
 export class TypeNotRegisteredForInjectionError extends CaffeineError {
   constructor(token: Token) {
     super(
-      `Type "${String(token)}" is not managed by the DI container. ` +
+      `Type "${tokenStr(token)}" is not managed by the DI container. ` +
         'Make sure the type is decorated with @Injectable() or any other injection decorators.',
       'DI_TYPE_NOT_REGISTERED'
     )
@@ -44,13 +45,15 @@ export class UnresolvableConstructorArguments extends CaffeineError {
 }
 
 export class NoResolutionForTokenError extends CaffeineError {
-  constructor(spec: TokenSpec) {
+  constructor(spec: { token: Token; tokenType?: Token }) {
     super(
-      `Unable to resolve required injection for token "${String(spec.token)}" of type "${String(spec.tokenType)}"`,
+      `Unable to resolve required injection for token "${tokenStr(spec.token)}"${
+        spec.token !== spec.tokenType && spec.tokenType ? ' of type ' + tokenStr(spec.tokenType) : ''
+      }`,
       'DI_NO_RESOLUTION_FOR_TOKEN'
     )
     Error.captureStackTrace(this, NoResolutionForTokenError)
-    this.name = 'NoResolutionError'
+    this.name = 'NoResolutionForTokenError'
   }
 }
 

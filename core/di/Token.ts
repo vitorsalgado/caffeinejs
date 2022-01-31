@@ -14,3 +14,7 @@ export interface TokenSpec<T = any> {
 export function isNamedToken(dep: unknown): dep is string | symbol {
   return typeof dep === 'string' || typeof dep === 'symbol'
 }
+
+export function tokenStr(token: Token): string {
+  return typeof token === 'function' ? token.name : String(token)
+}

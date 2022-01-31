@@ -6,6 +6,7 @@ import { Named } from '../decorators/Named.js'
 import { Optional } from '../decorators/Optional.js'
 import { Primary } from '../decorators/Primary.js'
 import { DI } from '../DI'
+import { NoResolutionForTokenError } from '../errors.js'
 import { NoUniqueInjectionForTokenError } from '../errors.js'
 
 describe('DI - Class', function () {
@@ -79,8 +80,12 @@ describe('DI - Class', function () {
       constructor(private readonly repo: Repo) {}
     }
 
-    it.skip('should throw error', function () {
-      expect(() => DI.setup().resolve(Service)).toThrow()
+    it('should throw error', function () {
+      const di = DI.setup()
+
+      expect(() => di.resolve(Service)).toThrow(NoResolutionForTokenError)
+      expect(() => di.resolve(Repo)).toThrow(NoResolutionForTokenError)
+      expect(di.resolveLax(Repo)).toBeUndefined()
     })
   })
 
@@ -337,6 +342,52 @@ describe('DI - Class', function () {
 
       expect(svc.repo).toBeNull()
       expect(() => di.resolve(NonSvc)).toThrow()
+    })
+  })
+
+  describe('nested resolution graph', function () {
+    describe('and using singleton scope for all', function () {
+      @Injectable()
+      class Dep {
+        readonly id: string = v4()
+      }
+
+      @Injectable()
+      class Repo {
+        readonly id: string = v4()
+
+        constructor(readonly dep: Dep) {}
+      }
+
+      @Injectable()
+      class Service {
+        readonly id: string = v4()
+
+        constructor(readonly repo: Repo, readonly dep: Dep) {}
+      }
+
+      @Injectable()
+      class Controller {
+        readonly id: string = v4()
+
+        constructor(readonly dep: Dep, readonly service: Service, readonly repo: Repo) {}
+      }
+
+      it('should resolve with same instance from previous resolutions', function () {
+        const di = DI.setup()
+
+        const controller = di.resolve(Controller)
+        const service = di.resolve(Service)
+        const repo = di.resolve(Repo)
+        const dep = di.resolve(Dep)
+
+        expect(controller.dep).toEqual(dep)
+        expect(controller.repo).toEqual(repo)
+        expect(controller.service).toEqual(service)
+        expect(service.dep).toEqual(dep)
+        expect(service.repo).toEqual(repo)
+        expect(repo.dep).toEqual(dep)
+      })
     })
   })
 })
