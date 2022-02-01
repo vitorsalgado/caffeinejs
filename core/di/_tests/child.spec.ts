@@ -22,7 +22,7 @@ describe('DI - Child', function () {
       const parent = DI.setup()
       const svc1 = parent.resolve(ContainerSvc)
       const svcCont1 = parent.resolve(Svc)
-      const child = parent.child()
+      const child = parent.newChild()
       const svc2 = child.resolve(ContainerSvc)
       const svcCont2 = child.resolve(Svc)
 
@@ -57,7 +57,7 @@ describe('DI - Child', function () {
 
       it('should resolve requested type', function () {
         const parent = DI.setup()
-        const child = parent.child()
+        const child = parent.newChild()
 
         parent.bind(Dep).toSelf()
         child.bind(Svc).toSelf()

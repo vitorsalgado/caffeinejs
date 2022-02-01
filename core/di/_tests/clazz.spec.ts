@@ -82,9 +82,9 @@ describe('DI - Class', function () {
     it('should throw error', function () {
       const di = DI.setup()
 
-      expect(() => di.resolve(Service)).toThrow(NoResolutionForTokenError)
-      expect(() => di.resolve(Repo)).toThrow(NoResolutionForTokenError)
-      expect(di.resolveLax(Repo)).toBeUndefined()
+      expect(() => di.resolveRequired(Service)).toThrow(NoResolutionForTokenError)
+      expect(() => di.resolveRequired(Repo)).toThrow(NoResolutionForTokenError)
+      expect(di.resolve(Repo)).toBeUndefined()
     })
   })
 
