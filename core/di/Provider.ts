@@ -1,4 +1,5 @@
 import { Ctor } from '../types/Ctor.js'
+import { DeferredCtor } from './DeferredCtor.js'
 import { DI } from './DI.js'
 import { Token } from './Token.js'
 import { isNamedToken } from './Token.js'
@@ -28,6 +29,10 @@ export interface FactoryProvider<T> {
   useFactory: (ctx: ProviderContext<T>) => T
 }
 
+export interface DeferredProvider<T> {
+  useDefer: DeferredCtor<T>
+}
+
 export type Provider<T> =
   | Ctor<T>
   | ValueProvider<T>
@@ -35,6 +40,7 @@ export type Provider<T> =
   | FunctionProvider<T>
   | NamedProvider
   | FactoryProvider<T>
+  | DeferredProvider<T>
 
 export function isValueProvider<T>(provider: unknown): provider is ValueProvider<T> {
   return (provider as ValueProvider<T>).useValue != undefined
@@ -54,6 +60,10 @@ export function isFunctionProvider<T>(provider: unknown): provider is FunctionPr
 
 export function isFactoryProvider<T>(provider: unknown): provider is FactoryProvider<T> {
   return !!(provider as FactoryProvider<T>).useFactory
+}
+
+export function isDeferredProvider<T>(provider: unknown): provider is DeferredProvider<T> {
+  return !!(provider as DeferredProvider<T>).useDefer
 }
 
 export function providerFromToken<T>(token: Token<T>, provider?: Provider<T>): Provider<T> | undefined {

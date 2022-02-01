@@ -13,6 +13,7 @@ import { TypeNotRegisteredForInjectionError } from './errors.js'
 import { NoUniqueInjectionForTokenError } from './errors.js'
 import { NoProviderForTokenError } from './errors.js'
 import { Lifecycle } from './Lifecycle.js'
+import { isDeferredProvider } from './Provider.js'
 import { providerFromToken } from './Provider.js'
 import { isNamedProvider } from './Provider.js'
 import { isFactoryProvider } from './Provider.js'
@@ -225,10 +226,6 @@ export class DI {
 
       const returnInstance = binding.lifecycle === Lifecycle.SINGLETON || binding.lifecycle === Lifecycle.CONTAINER
 
-      if (returnInstance && !isNil(binding.instance)) {
-        return binding.instance as T
-      }
-
       let resolved: T | undefined
 
       if (isValueProvider(binding.provider)) {
@@ -274,6 +271,12 @@ export class DI {
               }) as T)
             : binding.provider.useFactory({ di: this, token })
         ) as T
+      } else if (isDeferredProvider(binding.provider)) {
+        resolved = (
+          returnInstance
+            ? binding.instance || (binding.instance = this.newClassInstance(binding.provider.useDefer, context))
+            : this.newClassInstance(binding.provider.useDefer, context)
+        ) as T
       }
 
       if (binding?.lifecycle === Lifecycle.RESOLUTION_CONTEXT) {
@@ -287,6 +290,15 @@ export class DI {
 
     if (token instanceof DeferredCtor) {
       resolved = this.newClassInstance<T>(token, context)
+
+      this.register(
+        token,
+        Binding.newBinding({
+          provider: { useDefer: token },
+          namespace: this.namespace,
+          instance: resolved
+        })
+      )
     }
 
     if (typeof token === 'function') {

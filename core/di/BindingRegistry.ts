@@ -26,6 +26,7 @@ export class BindingRegistry {
     binding.namespace = isNil(entry.namespace) ? binding.namespace : entry.namespace
     binding.qualifiers = isNil(entry.qualifiers) ? binding.qualifiers : entry.qualifiers
     binding.lazy = isNil(entry.lazy) ? binding.lazy : entry.lazy
+    binding.plan = isNil(entry.plan) ? binding.plan : entry.plan
 
     this._types.set(token, binding)
   }
