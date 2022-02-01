@@ -1,5 +1,4 @@
 import { Lifecycle } from './Lifecycle.js'
-import { Plan } from './Plan.js'
 import { Provider } from './Provider.js'
 import { TokenSpec } from './Token.js'
 
@@ -13,8 +12,7 @@ export class Binding<T = any> {
     public provider?: Provider<T>,
     public primary?: boolean,
     public late?: boolean,
-    public lazy?: boolean,
-    public plan?: Plan<T>
+    public lazy?: boolean
   ) {}
 
   static newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
@@ -33,8 +31,7 @@ export class Binding<T = any> {
       initial.provider,
       initial.primary,
       initial.late,
-      lazy,
-      initial.plan
+      lazy
     )
   }
 }

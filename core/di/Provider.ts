@@ -33,6 +33,10 @@ export interface DeferredProvider<T> {
   useDefer: DeferredCtor<T>
 }
 
+export default interface TokenProvider<T> {
+  useToken: Token<T>
+}
+
 export type Provider<T> =
   | Ctor<T>
   | ValueProvider<T>
@@ -41,6 +45,7 @@ export type Provider<T> =
   | NamedProvider
   | FactoryProvider<T>
   | DeferredProvider<T>
+  | TokenProvider<T>
 
 export function isValueProvider<T>(provider: unknown): provider is ValueProvider<T> {
   return (provider as ValueProvider<T>).useValue != undefined
@@ -64,6 +69,10 @@ export function isFactoryProvider<T>(provider: unknown): provider is FactoryProv
 
 export function isDeferredProvider<T>(provider: unknown): provider is DeferredProvider<T> {
   return !!(provider as DeferredProvider<T>).useDefer
+}
+
+export function isTokenProvider<T>(provider: unknown): provider is TokenProvider<T> {
+  return !!(provider as TokenProvider<T>).useToken
 }
 
 export function providerFromToken<T>(token: Token<T>, provider?: Provider<T>): Provider<T> | undefined {

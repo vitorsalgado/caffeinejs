@@ -13,6 +13,7 @@ import { TypeNotRegisteredForInjectionError } from './errors.js'
 import { NoUniqueInjectionForTokenError } from './errors.js'
 import { NoProviderForTokenError } from './errors.js'
 import { Lifecycle } from './Lifecycle.js'
+import { isTokenProvider } from './Provider.js'
 import { isDeferredProvider } from './Provider.js'
 import { providerFromToken } from './Provider.js'
 import { isNamedProvider } from './Provider.js'
@@ -229,19 +230,19 @@ export class DI {
       let resolved: T | undefined
 
       if (isValueProvider(binding.provider)) {
-        resolved = binding.provider.useValue as T
+        resolved = binding.provider.useValue
       } else if (isNamedProvider(binding.provider)) {
-        resolved = (
-          returnInstance
-            ? (binding.instance = this.internalResolve(binding.provider.useName, context))
-            : this.internalResolve(binding.provider.useName, context)
-        ) as T
+        resolved = returnInstance
+          ? (binding.instance = this.internalResolve(binding.provider.useName, context))
+          : this.internalResolve(binding.provider.useName, context)
       } else if (isClassProvider(binding.provider)) {
-        resolved = (
-          returnInstance
-            ? binding.instance || (binding.instance = this.newClassInstance(binding.provider.useClass, context))
-            : this.newClassInstance(binding.provider.useClass, context)
-        ) as T
+        resolved = returnInstance
+          ? binding.instance || (binding.instance = this.newClassInstance(binding.provider.useClass, context))
+          : this.newClassInstance(binding.provider.useClass, context)
+      } else if (isTokenProvider(binding.provider)) {
+        resolved = returnInstance
+          ? binding.instance || (binding.instance = this.resolve(binding.provider.useToken, context))
+          : this.resolve(binding.provider.useToken, context)
       } else if (isFunctionProvider(binding.provider)) {
         if (returnInstance) {
           if (!isNil(binding.instance)) {
@@ -253,14 +254,14 @@ export class DI {
             )
 
             binding.instance = binding.provider.useFunction(...deps)
-            resolved = binding.instance as T
+            resolved = binding.instance
           }
         } else {
           const type = notNil(DecoratedInjectables.instance().get(token as Ctor), 'Non registered type')
           const deps = type.dependencies.map(dep =>
             dep.multiple ? this.resolveAll(dep.token, context) : this.internalResolve(dep.token, context)
           )
-          resolved = binding.provider.useFunction(...deps) as T
+          resolved = binding.provider.useFunction(...deps)
         }
       } else if (isFactoryProvider(binding.provider)) {
         resolved = (
@@ -272,14 +273,12 @@ export class DI {
             : binding.provider.useFactory({ di: this, token })
         ) as T
       } else if (isDeferredProvider(binding.provider)) {
-        resolved = (
-          returnInstance
-            ? binding.instance || (binding.instance = this.newClassInstance(binding.provider.useDefer, context))
-            : this.newClassInstance(binding.provider.useDefer, context)
-        ) as T
+        resolved = returnInstance
+          ? binding.instance || (binding.instance = this.newClassInstance(binding.provider.useDefer, context))
+          : this.newClassInstance(binding.provider.useDefer, context)
       }
 
-      if (binding?.lifecycle === Lifecycle.RESOLUTION_CONTEXT) {
+      if (binding.lifecycle === Lifecycle.RESOLUTION_CONTEXT) {
         context.resolutions.set(binding, resolved)
       }
 
@@ -290,15 +289,6 @@ export class DI {
 
     if (token instanceof DeferredCtor) {
       resolved = this.newClassInstance<T>(token, context)
-
-      this.register(
-        token,
-        Binding.newBinding({
-          provider: { useDefer: token },
-          namespace: this.namespace,
-          instance: resolved
-        })
-      )
     }
 
     if (typeof token === 'function') {
@@ -307,11 +297,15 @@ export class DI {
       if (entries.length === 1) {
         const tk = entries[0].token
         resolved = this.internalResolve<T>(tk as Token<T>, context)
+
+        this.register(token, Binding.newBinding({ provider: { useToken: tk }, namespace: this.namespace }))
       } else if (entries.length > 1) {
         const primary = entries.find(x => x.binding.primary)
 
         if (primary) {
           resolved = this.internalResolve<T>(primary.token as Token<T>, context)
+
+          this.register(token, Binding.newBinding({ provider: { useToken: primary.token }, ...primary }))
         } else {
           throw new NoUniqueInjectionForTokenError(token)
         }
@@ -327,6 +321,7 @@ export class DI {
     }
 
     const type = DecoratedInjectables.instance().get(ctor)
+
     if (!type) {
       throw new TypeNotRegisteredForInjectionError(ctor)
     }
@@ -359,6 +354,7 @@ export class DI {
 
     if (isNil(resolution)) {
       const byType = this._registry.find(dep.tokenType)
+
       if (byType) {
         resolution = this.resolveBinding(dep.token, byType, context)
       }

@@ -1,5 +1,4 @@
 import { v4 } from 'uuid'
-import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { InjectAll } from '../decorators/InjectAll.js'
 import { Named } from '../decorators/Named.js'
@@ -86,79 +85,6 @@ describe('DI - Class', function () {
       expect(() => di.resolve(Service)).toThrow(NoResolutionForTokenError)
       expect(() => di.resolve(Repo)).toThrow(NoResolutionForTokenError)
       expect(di.resolveLax(Repo)).toBeUndefined()
-    })
-  })
-
-  describe('using abstract classes as token', function () {
-    describe('and referencing the abstract class on constructor without naming', function () {
-      abstract class Base {
-        common() {
-          return 'base'
-        }
-
-        abstract specific(): string
-      }
-
-      @Injectable()
-      class Concrete extends Base {
-        specific(): string {
-          return 'concrete'
-        }
-      }
-
-      @Injectable()
-      class Service {
-        constructor(readonly dep: Base) {}
-
-        value() {
-          return this.dep.specific()
-        }
-      }
-
-      it('should inject instance based on prototype', function () {
-        const service = DI.setup().resolve<Service>(Service)
-        expect(service.dep.common()).toEqual('base')
-        expect(service.value()).toEqual('concrete')
-      })
-    })
-
-    describe('and referencing dependencies by name', function () {
-      const mongo = Symbol('mongodb')
-
-      abstract class Repo {
-        abstract list(): string
-      }
-
-      @Injectable()
-      @Named('sql')
-      class MySqlRepo extends Repo {
-        list(): string {
-          return 'mysql'
-        }
-      }
-
-      @Injectable()
-      @Named(mongo)
-      class MongoRepo extends Repo {
-        list(): string {
-          return 'mongodb'
-        }
-      }
-
-      @Injectable()
-      class DbService {
-        constructor(@Inject(mongo) readonly repo: Repo) {}
-
-        list() {
-          return this.repo.list()
-        }
-      }
-
-      it('should resolve dependency', function () {
-        const service = DI.setup().resolve<DbService>(DbService)
-        expect(service.repo).toBeInstanceOf(MongoRepo)
-        expect(service.list()).toEqual('mongodb')
-      })
     })
   })
 

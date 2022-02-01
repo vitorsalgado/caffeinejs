@@ -15,6 +15,9 @@ describe('DI - Circular References', function () {
       const foo2 = di.resolve(Foo)
       const bar2 = di.resolve(Bar)
 
+      di.resolve(Foo)
+      di.resolve(Bar)
+
       expect(foo.test()).toEqual('foo-bar')
       expect(bar.test()).toEqual('bar-foo')
 
