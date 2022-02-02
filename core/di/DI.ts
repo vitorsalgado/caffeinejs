@@ -12,7 +12,9 @@ import { UnresolvableConstructorArguments } from './errors.js'
 import { TypeNotRegisteredForInjectionError } from './errors.js'
 import { NoUniqueInjectionForTokenError } from './errors.js'
 import { NoProviderForTokenError } from './errors.js'
+import { DiError } from './errors/DiError.js'
 import { Lifecycle } from './Lifecycle.js'
+import { TokenProvider } from './Provider.js'
 import { isTokenProvider } from './Provider.js'
 import { isDeferredProvider } from './Provider.js'
 import { providerFromToken } from './Provider.js'
@@ -22,6 +24,7 @@ import { isValueProvider } from './Provider.js'
 import { isFunctionProvider } from './Provider.js'
 import { isClassProvider } from './Provider.js'
 import { ResolutionContext } from './ResolutionContext.js'
+import { tokenStr } from './Token.js'
 import { TokenSpec } from './Token.js'
 import { isNamedToken, Token } from './Token.js'
 
@@ -56,7 +59,10 @@ export class DI {
     }
 
     if (!binding.provider) {
-      throw new NoProviderForTokenError(tk)
+      throw new DiError(
+        `Could not determine a provider for token: ${tokenStr(token as Token)}`,
+        DiError.CODE_NO_PROVIDER
+      )
     }
 
     DecoratedInjectables.instance().configure(tk as Ctor<T>, binding)
@@ -177,19 +183,42 @@ export class DI {
     }
   }
 
-  //region Internal
-
-  private register<T>(token: Token<T>, binding: Binding<T>) {
+  register<T>(token: Token<T>, binding: Binding<T>) {
     const provider = providerFromToken(token, binding.provider)
 
     if (!provider) {
       throw new NoProviderForTokenError(token)
     }
 
+    if (isTokenProvider(provider)) {
+      const path = [token]
+      let tokenProvider: TokenProvider<T> | null = provider
+
+      while (tokenProvider !== null) {
+        const currentToken: Token = tokenProvider.useToken
+
+        if (path.includes(currentToken)) {
+          throw new Error(`Token registration cycle detected! ${[...path, currentToken].join(' -> ')}`)
+        }
+
+        path.push(currentToken)
+
+        const binding: Binding | undefined = this._registry.find(currentToken)
+
+        if (binding && isTokenProvider(binding.provider)) {
+          tokenProvider = binding.provider
+        } else {
+          tokenProvider = null
+        }
+      }
+    }
+
     binding.provider = provider
 
     this._registry.register(token, binding)
   }
+
+  //region Internal
 
   private getBindings<T>(token: Token<T>): Binding<T>[] {
     if (this.has(token)) {

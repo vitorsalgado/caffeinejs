@@ -33,7 +33,7 @@ export interface DeferredProvider<T> {
   useDefer: DeferredCtor<T>
 }
 
-export default interface TokenProvider<T> {
+export interface TokenProvider<T> {
   useToken: Token<T>
 }
 

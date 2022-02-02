@@ -1,7 +1,6 @@
 import { CaffeineError } from '../CaffeineError.js'
 import { Ctor } from '../types/Ctor.js'
 import { tokenStr } from './Token.js'
-import { TokenSpec } from './Token.js'
 import { Token } from './Token.js'
 
 export class NoProviderForTokenError extends CaffeineError {

@@ -3,8 +3,8 @@ import { Ctor } from '../types/Ctor.js'
 import { Binding } from './Binding.js'
 
 export class DecoratedInjectables {
-  private static INSTANCE: DecoratedInjectables = new DecoratedInjectables()
-  private readonly _entries: Map<Ctor, Binding> = new Map()
+  private static INSTANCE = new DecoratedInjectables()
+  private readonly _entries = new Map<Ctor, Binding>()
 
   private constructor() {
     // internal

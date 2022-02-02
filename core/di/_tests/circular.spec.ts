@@ -1,3 +1,4 @@
+import { Binding } from '../Binding.js'
 import { DI } from '../DI.js'
 import { CircularReferenceError } from '../errors.js'
 import { Bar } from './circular/Bar.js'
@@ -30,6 +31,16 @@ describe('DI - Circular References', function () {
     it('should throw error explaining the circular reference', function () {
       expect(() => DI.setup().resolve(FooFail)).toThrow(CircularReferenceError)
       expect(() => DI.setup().resolve(BarFail)).toThrow(CircularReferenceError)
+    })
+  })
+
+  describe('attempt to register a injection pointing to itself', function () {
+    it('should throw error', function () {
+      const di = DI.setup()
+
+      di.register('foo', Binding.newBinding({ provider: { useToken: 'foo' } }))
+
+      expect(() => di.register('foo', Binding.newBinding({ provider: { useToken: 'foo' } }))).toThrow()
     })
   })
 })

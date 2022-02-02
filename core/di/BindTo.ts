@@ -28,6 +28,12 @@ export class BindTo<T> {
     return new BindToOptions<T>(this.token, this.typeInfo)
   }
 
+  toToken(token: string | symbol): BindToOptions<T> {
+    this.typeInfo.provider = { useToken: token }
+
+    return new BindToOptions<T>(this.token, this.typeInfo)
+  }
+
   toFactory(factory: (ctx: ProviderContext<T>) => T): BindToOptions<T> {
     notNil(factory)
     isFn(factory)
