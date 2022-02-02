@@ -68,34 +68,7 @@ export class DI {
     DecoratedInjectables.instance().configure(tk as Ctor<T>, binding)
   }
 
-  bind<T>(token: Token<T>): BindTo<T> {
-    notNil(token)
-
-    const type = DecoratedInjectables.instance().get(token as Ctor)
-    const binding = Binding.newBinding(type)
-
-    this.register(token, binding)
-
-    return new BindTo<T>(token, binding)
-  }
-
-  has<T>(token: Token<T>, checkParent = false): boolean {
-    return this._registry.has(token) || (checkParent && (this.parent || false) && this.parent.has(token, true))
-  }
-
-  search(predicate: <T>(token: Token<T>, registration: Binding) => boolean): BindingEntry[] {
-    const result: BindingEntry[] = []
-
-    for (const [token, registrations] of this._registry.entries()) {
-      if (predicate(token, registrations)) {
-        result.push({ token, binding: registrations })
-      }
-    }
-
-    return result
-  }
-
-  resolve<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
+  get<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
     const bindings = this.getBindings<T>(token)
 
     if (bindings.length > 1) {
@@ -111,8 +84,8 @@ export class DI {
     return this.resolveBinding<T>(token, bindings[0], context)
   }
 
-  resolveRequired<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
-    const result = this.resolve(token, context)
+  getRequired<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
+    const result = this.get(token, context)
 
     if (isNil(result)) {
       throw new NoResolutionForTokenError({ token })
@@ -121,7 +94,7 @@ export class DI {
     return result
   }
 
-  resolveAll<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T[] {
+  getMany<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T[] {
     const bindings = this.getBindings(token)
 
     if (bindings.length === 0) {
@@ -141,6 +114,42 @@ export class DI {
     }
 
     return bindings.map(binding => this.resolveBinding(token, binding, context))
+  }
+
+  has<T>(token: Token<T>, checkParent = false): boolean {
+    return this._registry.has(token) || (checkParent && (this.parent || false) && this.parent.has(token, true))
+  }
+
+  search(predicate: <T>(token: Token<T>, registration: Binding) => boolean): BindingEntry[] {
+    const result: BindingEntry[] = []
+
+    for (const [token, registrations] of this._registry.entries()) {
+      if (predicate(token, registrations)) {
+        result.push({ token, binding: registrations })
+      }
+    }
+
+    return result
+  }
+
+  bind<T>(token: Token<T>): BindTo<T> {
+    notNil(token)
+
+    const type = DecoratedInjectables.instance().get(token as Ctor)
+    const binding = Binding.newBinding(type)
+
+    this.registerBinding(token, binding)
+
+    return new BindTo<T>(token, binding)
+  }
+
+  unbind<T>(token: Token<T>): void {
+    this._registry.remove(token)
+  }
+
+  rebind<T>(token: Token<T>): BindTo<T> {
+    this.unbind(token)
+    return this.bind(token)
   }
 
   newChild(): DI {
@@ -163,27 +172,7 @@ export class DI {
     return child
   }
 
-  clear(): void {
-    this._registry.clear()
-  }
-
-  resetInstances(): void {
-    for (const [, binding] of this._registry.entries()) {
-      binding.instance = undefined
-    }
-  }
-
-  parse(): void {
-    for (const [token, binding] of this._registry.entries()) {
-      if (binding.lazy) {
-        continue
-      }
-
-      this.resolveBinding(token, binding, ResolutionContext.INSTANCE)
-    }
-  }
-
-  register<T>(token: Token<T>, binding: Binding<T>) {
+  registerBinding<T>(token: Token<T>, binding: Binding<T>) {
     const provider = providerFromToken(token, binding.provider)
 
     if (!provider) {
@@ -216,6 +205,26 @@ export class DI {
     binding.provider = provider
 
     this._registry.register(token, binding)
+  }
+
+  clear(): void {
+    this._registry.clear()
+  }
+
+  resetInstances(): void {
+    for (const [, binding] of this._registry.entries()) {
+      binding.instance = undefined
+    }
+  }
+
+  init(): void {
+    for (const [token, binding] of this._registry.entries()) {
+      if (binding.lazy) {
+        continue
+      }
+
+      this.resolveBinding(token, binding, ResolutionContext.INSTANCE)
+    }
   }
 
   //region Internal
@@ -258,16 +267,16 @@ export class DI {
         resolved = binding.provider.useValue
       } else if (isNamedProvider(binding.provider)) {
         resolved = returnInstance
-          ? (binding.instance = this.resolve(binding.provider.useName, context))
-          : this.resolve(binding.provider.useName, context)
+          ? (binding.instance = this.get(binding.provider.useName, context))
+          : this.get(binding.provider.useName, context)
       } else if (isClassProvider(binding.provider)) {
         resolved = returnInstance
           ? binding.instance || (binding.instance = this.newClassInstance(binding.provider.useClass, context))
           : this.newClassInstance(binding.provider.useClass, context)
       } else if (isTokenProvider(binding.provider)) {
         resolved = returnInstance
-          ? binding.instance || (binding.instance = this.resolve(binding.provider.useToken, context))
-          : this.resolve(binding.provider.useToken, context)
+          ? binding.instance || (binding.instance = this.get(binding.provider.useToken, context))
+          : this.get(binding.provider.useToken, context)
       } else if (isFunctionProvider(binding.provider)) {
         if (returnInstance) {
           if (!isNil(binding.instance)) {
@@ -275,7 +284,7 @@ export class DI {
           } else {
             const type = notNil(DecoratedInjectables.instance().get(token as Ctor), 'Non registered type')
             const deps = type.dependencies.map(dep =>
-              dep.multiple ? this.resolveAll(dep.token, context) : this.resolve(dep.token, context)
+              dep.multiple ? this.getMany(dep.token, context) : this.get(dep.token, context)
             )
 
             binding.instance = binding.provider.useFunction(...deps)
@@ -284,7 +293,7 @@ export class DI {
         } else {
           const type = notNil(DecoratedInjectables.instance().get(token as Ctor), 'Non registered type')
           const deps = type.dependencies.map(dep =>
-            dep.multiple ? this.resolveAll(dep.token, context) : this.resolve(dep.token, context)
+            dep.multiple ? this.getMany(dep.token, context) : this.get(dep.token, context)
           )
           resolved = binding.provider.useFunction(...deps)
         }
@@ -321,16 +330,16 @@ export class DI {
 
       if (entries.length === 1) {
         const tk = entries[0].token
-        resolved = this.resolve<T>(tk as Token<T>, context)
+        resolved = this.get<T>(tk as Token<T>, context)
 
-        this.register(token, Binding.newBinding({ provider: { useToken: tk }, namespace: this.namespace }))
+        this.registerBinding(token, Binding.newBinding({ provider: { useToken: tk }, namespace: this.namespace }))
       } else if (entries.length > 1) {
         const primary = entries.find(x => x.binding.primary)
 
         if (primary) {
-          resolved = this.resolve<T>(primary.token as Token<T>, context)
+          resolved = this.get<T>(primary.token as Token<T>, context)
 
-          this.register(token, Binding.newBinding({ provider: { useToken: primary.token }, ...primary }))
+          this.registerBinding(token, Binding.newBinding({ provider: { useToken: primary.token }, ...primary }))
         } else {
           throw new NoUniqueInjectionForTokenError(token)
         }
@@ -342,7 +351,7 @@ export class DI {
 
   private newClassInstance<T>(ctor: Ctor<T> | DeferredCtor<T>, context: ResolutionContext): T {
     if (ctor instanceof DeferredCtor) {
-      return ctor.createProxy(target => this.resolve(target))
+      return ctor.createProxy(target => this.get(target))
     }
 
     const type = DecoratedInjectables.instance().get(ctor)
@@ -372,9 +381,9 @@ export class DI {
     let resolution
 
     if (dep.multiple) {
-      resolution = this.resolveAll(dep.token, context)
+      resolution = this.getMany(dep.token, context)
     } else {
-      resolution = this.resolve(dep.token, context)
+      resolution = this.get(dep.token, context)
     }
 
     if (isNil(resolution)) {
@@ -406,7 +415,7 @@ export class DI {
         continue
       }
 
-      this.register(
+      this.registerBinding(
         type,
         new Binding(
           binding.dependencies,

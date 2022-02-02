@@ -54,10 +54,10 @@ describe('DI - Init Singleton and Container Scoped', function () {
   it('should init all injectables except ones marked as lazy', function () {
     const di = DI.setup()
 
-    di.parse()
+    di.init()
 
-    const dep1 = di.resolve(Dep1)
-    const dep2 = di.resolve(Dep2)
+    const dep1 = di.get(Dep1)
+    const dep2 = di.get(Dep2)
 
     expect(spy1).toHaveBeenCalledTimes(1)
     expect(spy2).toHaveBeenCalledTimes(1)

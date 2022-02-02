@@ -11,13 +11,13 @@ describe('DI - Circular References', function () {
     it('should resolve dependencies', function () {
       const di = DI.setup()
 
-      const foo = di.resolve(Foo)
-      const bar = di.resolve(Bar)
-      const foo2 = di.resolve(Foo)
-      const bar2 = di.resolve(Bar)
+      const foo = di.get(Foo)
+      const bar = di.get(Bar)
+      const foo2 = di.get(Foo)
+      const bar2 = di.get(Bar)
 
-      di.resolve(Foo)
-      di.resolve(Bar)
+      di.get(Foo)
+      di.get(Bar)
 
       expect(foo.test()).toEqual('foo-bar')
       expect(bar.test()).toEqual('bar-foo')
@@ -29,8 +29,8 @@ describe('DI - Circular References', function () {
 
   describe('circular references wrongly configured', function () {
     it('should throw error explaining the circular reference', function () {
-      expect(() => DI.setup().resolve(FooFail)).toThrow(CircularReferenceError)
-      expect(() => DI.setup().resolve(BarFail)).toThrow(CircularReferenceError)
+      expect(() => DI.setup().get(FooFail)).toThrow(CircularReferenceError)
+      expect(() => DI.setup().get(BarFail)).toThrow(CircularReferenceError)
     })
   })
 
@@ -38,9 +38,9 @@ describe('DI - Circular References', function () {
     it('should throw error', function () {
       const di = DI.setup()
 
-      di.register('foo', Binding.newBinding({ provider: { useToken: 'foo' } }))
+      di.registerBinding('foo', Binding.newBinding({ provider: { useToken: 'foo' } }))
 
-      expect(() => di.register('foo', Binding.newBinding({ provider: { useToken: 'foo' } }))).toThrow()
+      expect(() => di.registerBinding('foo', Binding.newBinding({ provider: { useToken: 'foo' } }))).toThrow()
     })
   })
 })

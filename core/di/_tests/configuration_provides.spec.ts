@@ -49,7 +49,7 @@ describe('DI - Factory', function () {
       }
 
       it('should return instance from method decorated with @Provides() based on class ref', function () {
-        const service = DI.setup().resolve(Service)
+        const service = DI.setup().get(Service)
 
         expect(service).toBeDefined()
         expect(service.repo.list()).toEqual('listed')

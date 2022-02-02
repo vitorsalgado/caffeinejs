@@ -45,7 +45,7 @@ describe('DI - Manual Binding', function () {
     di.bind(Late).to(Late).singleton()
 
     const after = di.has(Late)
-    const late = di.resolve(Late)
+    const late = di.get(Late)
 
     expect(before).toBeFalsy()
     expect(after).toBeTruthy()
@@ -57,7 +57,7 @@ describe('DI - Manual Binding', function () {
 
     di.bind('test').to(Late)
 
-    const r = di.resolve<Late>('test')
+    const r = di.get<Late>('test')
 
     expect(r).toBeInstanceOf(Late)
     expect(r.test()).toEqual('hi')
@@ -68,7 +68,7 @@ describe('DI - Manual Binding', function () {
 
     di.bind(Abs).to(Impl).singleton()
 
-    const impl = di.resolve(Abs)
+    const impl = di.get(Abs)
 
     expect(impl.msg()).toEqual('impl')
   })
@@ -79,8 +79,8 @@ describe('DI - Manual Binding', function () {
     di.bind('val').toValue('test')
     di.bind(StrValue).toSelf()
 
-    const r = di.resolve(StrValue)
-    const v = di.resolve('val')
+    const r = di.get(StrValue)
+    const v = di.get('val')
 
     expect(r.val).toEqual('test')
     expect(v).toEqual('test')
@@ -90,11 +90,11 @@ describe('DI - Manual Binding', function () {
     const di = DI.setup()
 
     di.bind('val').toValue('test')
-    di.bind(sy).toFactory(({ di }) => `factory-${di.resolve('val')}`)
+    di.bind(sy).toFactory(({ di }) => `factory-${di.get('val')}`)
     di.bind(FromFactory).toSelf()
 
-    const r = di.resolve(FromFactory)
-    const v = di.resolve(sy)
+    const r = di.get(FromFactory)
+    const v = di.get(sy)
 
     expect(r.val).toEqual('factory-test')
     expect(v).toEqual('factory-test')
@@ -106,10 +106,40 @@ describe('DI - Manual Binding', function () {
 
       di.bind(Late).toSelf().transient()
 
-      const r1 = di.resolve(Late)
-      const r2 = di.resolve(Late)
+      const r1 = di.get(Late)
+      const r2 = di.get(Late)
 
       expect(r1.id).not.toEqual(r2.id)
+    })
+  })
+
+  describe('unbinding', function () {
+    it('should unbinding registered component when calling .unbind', function () {
+      const di = DI.setup()
+
+      di.bind(Late).toSelf()
+
+      expect(di.has(Late)).toBeTruthy()
+
+      di.unbind(Late)
+
+      expect(di.has(Late)).toBeFalsy()
+    })
+  })
+
+  describe('rebinding', function () {
+    it('should rebinding component with a different configuration', function () {
+      const di = DI.setup()
+
+      di.bind(Late).toSelf()
+
+      const dep1 = di.get(Late)
+
+      di.rebind(Late).toFactory(ctx => new Late())
+
+      const dep2 = di.get(Late)
+
+      expect(dep1).not.toEqual(dep2)
     })
   })
 })

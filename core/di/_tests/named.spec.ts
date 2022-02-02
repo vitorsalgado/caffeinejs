@@ -37,7 +37,7 @@ describe('DI - Named Dependencies', function () {
   }
 
   it('should resolve based on dependency qualifier', function () {
-    const root = DI.setup().resolve(Root)
+    const root = DI.setup().get(Root)
 
     expect(root.byeService.bye()).toEqual('bye-bye')
     expect(root.ackService.ok()).toEqual('ok-bye-bye')
@@ -45,8 +45,8 @@ describe('DI - Named Dependencies', function () {
 
   it('should resolve same instance when using named and type', function () {
     const di = DI.setup()
-    const bye = di.resolve(ByeService)
-    const byeNamed = di.resolve('bye')
+    const bye = di.get(ByeService)
+    const byeNamed = di.get('bye')
 
     expect(bye).toEqual(byeNamed)
   })

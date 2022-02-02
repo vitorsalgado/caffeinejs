@@ -43,16 +43,16 @@ describe('DI - Abstract Classes', function () {
       const di = DI.setup()
 
       it('should inject instance based on prototype', function () {
-        const service = di.resolve<Service>(Service)
+        const service = di.get<Service>(Service)
 
         expect(service.dep.common()).toEqual('base')
         expect(service.value()).toEqual('concrete')
       })
 
       it('should construct concrete class implementation one time when it is singleton', function () {
-        const service = di.resolve<Service>(Service)
-        di.resolve<Service>(Service)
-        di.resolve<Service>(Service)
+        const service = di.get<Service>(Service)
+        di.get<Service>(Service)
+        di.get<Service>(Service)
 
         expect(service).toBeInstanceOf(Service)
         expect(spy).toHaveBeenCalledTimes(1)
@@ -92,7 +92,7 @@ describe('DI - Abstract Classes', function () {
       }
 
       it('should resolve dependency', function () {
-        const service = DI.setup().resolve<DbService>(DbService)
+        const service = DI.setup().get<DbService>(DbService)
         expect(service.repo).toBeInstanceOf(MongoRepo)
         expect(service.list()).toEqual('mongodb')
       })

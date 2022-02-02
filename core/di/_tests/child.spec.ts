@@ -20,15 +20,15 @@ describe('DI - Child', function () {
 
     it('should resolve a instance per container when lifecycle is CONTAINER', function () {
       const parent = DI.setup()
-      const svc1 = parent.resolve(ContainerSvc)
-      const svcCont1 = parent.resolve(Svc)
+      const svc1 = parent.get(ContainerSvc)
+      const svcCont1 = parent.get(Svc)
       const child = parent.newChild()
-      const svc2 = child.resolve(ContainerSvc)
-      const svcCont2 = child.resolve(Svc)
+      const svc2 = child.get(ContainerSvc)
+      const svcCont2 = child.get(Svc)
 
-      const svc3 = parent.resolve(ContainerSvc)
-      const svc4 = child.resolve(ContainerSvc)
-      const svcCont3 = parent.resolve(Svc)
+      const svc3 = parent.get(ContainerSvc)
+      const svc4 = child.get(ContainerSvc)
+      const svcCont3 = parent.get(Svc)
 
       expect(parent.has(ContainerSvc)).toBeTruthy()
       expect(parent.has(Svc)).toBeTruthy()
@@ -62,9 +62,9 @@ describe('DI - Child', function () {
         parent.bind(Dep).toSelf()
         child.bind(Svc).toSelf()
 
-        const parentDep = parent.resolve(Dep)
-        const childDep = child.resolve(Dep)
-        const svc = child.resolve(Svc)
+        const parentDep = parent.get(Dep)
+        const childDep = child.get(Dep)
+        const svc = child.get(Svc)
 
         expect(parent.has(Dep)).toBeTruthy()
         expect(parent.has(Svc)).toBeFalsy()

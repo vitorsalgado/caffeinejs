@@ -29,12 +29,12 @@ describe('DI - Context Scoped', function () {
   it('should return instance stored in the resolution context when one is provided', function () {
     const context = new ResolutionContext()
     const di = DI.setup()
-    const result1 = di.resolve(ResScopedRoot, context)
-    const result2 = di.resolve(ResScopedRoot, context)
+    const result1 = di.get(ResScopedRoot, context)
+    const result2 = di.get(ResScopedRoot, context)
 
     context.resolutions.clear()
 
-    const result3 = di.resolve(ResScopedRoot, context)
+    const result3 = di.get(ResScopedRoot, context)
 
     expect(result1).toEqual(result2)
     expect(result1).not.toEqual(result3)

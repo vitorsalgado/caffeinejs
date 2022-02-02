@@ -26,12 +26,12 @@ describe('DI - Basic', function () {
 
     it('should reset instances', function () {
       const di = DI.setup()
-      const dep1 = di.resolve(Dep)
-      const dep2 = di.resolve(Dep)
+      const dep1 = di.get(Dep)
+      const dep2 = di.get(Dep)
 
       di.resetInstances()
 
-      const dep3 = di.resolve(Dep)
+      const dep3 = di.get(Dep)
 
       expect(dep1).toEqual(dep2)
       expect(dep3).not.toEqual(dep1)

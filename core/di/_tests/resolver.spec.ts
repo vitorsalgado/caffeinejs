@@ -46,8 +46,8 @@ describe('DI - Custom Resolver', function () {
 
     di.bind(Repo).toFactory(() => new Repo())
 
-    const service = di.resolve(Service)
-    const repo = di.resolve(Repo)
+    const service = di.get(Service)
+    const repo = di.get(Repo)
 
     expect(service.repo.find()).toEqual('test-empty')
     expect(repo.find()).toEqual('test-empty')
@@ -64,7 +64,7 @@ describe('DI - Custom Resolver', function () {
       return undefined
     })
 
-    const userService = di.resolve(UserService)
+    const userService = di.get(UserService)
 
     expect(userService.repository.entity.id).toEqual('user-entity')
     expect(userService.repository.entity.name()).toEqual('user')

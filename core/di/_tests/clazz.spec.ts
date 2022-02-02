@@ -50,7 +50,7 @@ describe('DI - Class', function () {
     const di = DI.setup()
 
     it('should register class and resolve it when requested', function () {
-      const root = di.resolve(Root)
+      const root = di.get(Root)
 
       expect(root).toBeDefined()
       expect(DI.setup().has(Root)).toBeTruthy()
@@ -59,8 +59,8 @@ describe('DI - Class', function () {
     })
 
     it('should return singleton instance as default', function () {
-      const root1 = di.resolve(Root)
-      const root2 = di.resolve(Root)
+      const root1 = di.get(Root)
+      const root2 = di.get(Root)
 
       expect(root1).toEqual(root2)
       expect(root1.id).toEqual(root2.id)
@@ -82,9 +82,9 @@ describe('DI - Class', function () {
     it('should throw error', function () {
       const di = DI.setup()
 
-      expect(() => di.resolveRequired(Service)).toThrow(NoResolutionForTokenError)
-      expect(() => di.resolveRequired(Repo)).toThrow(NoResolutionForTokenError)
-      expect(di.resolve(Repo)).toBeUndefined()
+      expect(() => di.getRequired(Service)).toThrow(NoResolutionForTokenError)
+      expect(() => di.getRequired(Repo)).toThrow(NoResolutionForTokenError)
+      expect(di.get(Repo)).toBeUndefined()
     })
   })
 
@@ -123,7 +123,7 @@ describe('DI - Class', function () {
 
     it('should resolve class dependency array with all named with the same value', function () {
       const di = DI.setup()
-      const lang = di.resolve(Lang)
+      const lang = di.get(Lang)
 
       expect(lang.all).toHaveLength(2)
       expect(lang.all[0].hello()).toEqual('hi')
@@ -132,7 +132,7 @@ describe('DI - Class', function () {
 
     it('should resolve class dependency array with all types that inherits from provided abstract class token type', function () {
       const di = DI.setup()
-      const lang = di.resolve(LangByType)
+      const lang = di.get(LangByType)
 
       expect(lang.all).toHaveLength(2)
       expect(lang.all[0].hello()).toEqual('hi')
@@ -141,7 +141,7 @@ describe('DI - Class', function () {
 
     it('should resolve all instances that inherits from provided abstract class token type', function () {
       const di = DI.setup()
-      const all = di.resolveAll(Base)
+      const all = di.getMany(Base)
 
       expect(all).toHaveLength(2)
     })
@@ -170,7 +170,7 @@ describe('DI - Class', function () {
 
       it('should return the resolution decorated with @Primary()', function () {
         const di = DI.setup()
-        const a = di.resolve(RootRep)
+        const a = di.get(RootRep)
 
         expect(a.value()).toEqual('a1')
       })
@@ -189,7 +189,7 @@ describe('DI - Class', function () {
         it('should throw error for no single match', function () {
           const di = DI.setup()
 
-          expect(() => di.resolve(Abs)).toThrow(NoUniqueInjectionForTokenError)
+          expect(() => di.get(Abs)).toThrow(NoUniqueInjectionForTokenError)
         })
       })
     })
@@ -216,7 +216,7 @@ describe('DI - Class', function () {
 
       it('should resolve the primary one', function () {
         const di = DI.setup()
-        const dep = di.resolve<Svc2>(name)
+        const dep = di.get<Svc2>(name)
 
         expect(dep.name()).toEqual('svc2')
       })
@@ -236,7 +236,7 @@ describe('DI - Class', function () {
       it('should throw error', function () {
         const di = DI.setup()
 
-        expect(() => di.resolve(name)).toThrow(NoUniqueInjectionForTokenError)
+        expect(() => di.get(name)).toThrow(NoUniqueInjectionForTokenError)
       })
     })
 
@@ -244,7 +244,7 @@ describe('DI - Class', function () {
       it('should return empty array', function () {
         const di = DI.setup()
 
-        expect(di.resolveAll('nonexistent')).toEqual([])
+        expect(di.getMany('nonexistent')).toEqual([])
       })
     })
   })
@@ -264,10 +264,10 @@ describe('DI - Class', function () {
 
     it('should inject null values when dependency cannot be resolved and is marked as optional', function () {
       const di = DI.setup()
-      const svc = di.resolve(OptSvc)
+      const svc = di.get(OptSvc)
 
       expect(svc.repo).toBeNull()
-      expect(() => di.resolve(NonSvc)).toThrow()
+      expect(() => di.get(NonSvc)).toThrow()
     })
   })
 
@@ -302,10 +302,10 @@ describe('DI - Class', function () {
       it('should resolve with same instance from previous resolutions', function () {
         const di = DI.setup()
 
-        const controller = di.resolve(Controller)
-        const service = di.resolve(Service)
-        const repo = di.resolve(Repo)
-        const dep = di.resolve(Dep)
+        const controller = di.get(Controller)
+        const service = di.get(Service)
+        const repo = di.get(Repo)
+        const dep = di.get(Dep)
 
         expect(controller.dep).toEqual(dep)
         expect(controller.repo).toEqual(repo)

@@ -46,6 +46,10 @@ export class BindingRegistry {
     return Array.from(this._types.entries()).map(([token, registration]) => ({ token, binding: registration }))
   }
 
+  remove(token: Token): boolean {
+    return this._types.delete(token)
+  }
+
   clear(): void {
     this._types.clear()
   }
