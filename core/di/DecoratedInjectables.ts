@@ -1,10 +1,11 @@
 import { notNil } from '../preconditions/notNil.js'
 import { Ctor } from '../types/Ctor.js'
+import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 
 export class DecoratedInjectables {
   private static INSTANCE = new DecoratedInjectables()
-  private readonly _entries = new Map<Ctor, Binding>()
+  private readonly _entries = new Map<Ctor | Function, Binding>()
 
   private constructor() {
     // internal
@@ -14,7 +15,7 @@ export class DecoratedInjectables {
     return DecoratedInjectables.INSTANCE
   }
 
-  configure<T>(ctor: Ctor<T>, info: Partial<Binding>): DecoratedInjectables {
+  configure<T>(ctor: Ctor<T> | Function, info: Partial<Binding>): DecoratedInjectables {
     notNil(ctor)
 
     const entry = this._entries.get(ctor)
@@ -22,7 +23,7 @@ export class DecoratedInjectables {
     if (entry) {
       this._entries.set(ctor, { ...entry, ...info })
     } else {
-      const i = Binding.newBinding(info)
+      const i = newBinding(info)
       this._entries.set(ctor, i)
     }
 
@@ -33,7 +34,7 @@ export class DecoratedInjectables {
     return this._entries.get(ctor)
   }
 
-  entries(): IterableIterator<[Ctor, Binding]> {
+  entries(): IterableIterator<[Ctor | Function, Binding]> {
     return this._entries.entries()
   }
 }

@@ -1,6 +1,7 @@
 import { isNil } from '../checks/isNil.js'
 import { notNil } from '../preconditions/notNil.js'
 import { Ctor } from '../types/Ctor.js'
+import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
 import { BindTo } from './BindTo.js'
@@ -48,7 +49,7 @@ export class DI {
 
     const tk = typeof token === 'object' ? token.constructor : token
     const existing = DecoratedInjectables.instance().get(tk as Ctor<T>)
-    const binding = Binding.newBinding({ ...existing, ...opts })
+    const binding = newBinding({ ...existing, ...opts })
 
     if (isNil(binding.provider)) {
       if (typeof tk === 'function') {
@@ -136,7 +137,7 @@ export class DI {
     notNil(token)
 
     const type = DecoratedInjectables.instance().get(token as Ctor)
-    const binding = Binding.newBinding(type)
+    const binding = newBinding(type)
 
     this.registerBinding(token, binding)
 
@@ -225,6 +226,20 @@ export class DI {
 
       this.resolveBinding(token, binding, ResolutionContext.INSTANCE)
     }
+  }
+
+  async finalize(): Promise<void> {
+    for (const [, binding] of this._registry.entries()) {
+      if (
+        binding.onDestroy &&
+        binding.instance &&
+        (binding.lifecycle === Lifecycle.SINGLETON || binding.lifecycle === Lifecycle.CONTAINER)
+      ) {
+        await binding.instance[binding.onDestroy]()
+      }
+    }
+
+    this.clear()
   }
 
   //region Internal
@@ -332,14 +347,14 @@ export class DI {
         const tk = entries[0].token
         resolved = this.get<T>(tk as Token<T>, context)
 
-        this.registerBinding(token, Binding.newBinding({ provider: { useToken: tk }, namespace: this.namespace }))
+        this.registerBinding(token, newBinding({ provider: { useToken: tk }, namespace: this.namespace }))
       } else if (entries.length > 1) {
         const primary = entries.find(x => x.binding.primary)
 
         if (primary) {
           resolved = this.get<T>(primary.token as Token<T>, context)
 
-          this.registerBinding(token, Binding.newBinding({ provider: { useToken: primary.token }, ...primary }))
+          this.registerBinding(token, newBinding({ provider: { useToken: primary.token }, ...primary }))
         } else {
           throw new NoUniqueInjectionForTokenError(token)
         }
@@ -415,20 +430,7 @@ export class DI {
         continue
       }
 
-      this.registerBinding(
-        type,
-        new Binding(
-          binding.dependencies,
-          binding.namespace,
-          binding.lifecycle,
-          binding.qualifiers,
-          binding.instance,
-          binding.provider,
-          binding.primary,
-          binding.late,
-          binding.lazy
-        )
-      )
+      this.registerBinding(type, { ...binding })
 
       for (const qualifier of binding.qualifiers) {
         const entry = this._qualifiersMap.get(qualifier)
