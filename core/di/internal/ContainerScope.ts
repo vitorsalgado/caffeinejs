@@ -1,5 +1,5 @@
-import { Provider } from './internal/Provider.js'
-import { Scope } from './Scope.js'
+import { Scope } from '../Scope.js'
+import { Provider } from './Provider.js'
 import { SingletonScopeProvider } from './SingletonScope.js'
 
 export class ContainerScope<T> extends Scope<T> {

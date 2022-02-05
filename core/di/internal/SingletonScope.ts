@@ -1,6 +1,6 @@
-import { ProviderContext } from './internal/Provider.js'
-import { Provider } from './internal/Provider.js'
-import { Scope } from './Scope.js'
+import { Scope } from '../Scope.js'
+import { ProviderContext } from './Provider.js'
+import { Provider } from './Provider.js'
 
 export class SingletonScopeProvider<T> extends Provider<T> {
   constructor(private readonly unscoped: Provider<T>) {

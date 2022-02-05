@@ -1,7 +1,7 @@
 import { Provider } from './internal/Provider.js'
 import { Lifecycle } from './Lifecycle.js'
 import { Scope } from './Scope.js'
-import { SingletonScope } from './SingletonScope.js'
+import { SingletonScope } from './internal/SingletonScope.js'
 import { TokenSpec } from './Token.js'
 
 export interface Binding<T = any> {

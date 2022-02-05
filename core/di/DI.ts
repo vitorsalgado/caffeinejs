@@ -5,7 +5,7 @@ import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
 import { BindTo } from './BindTo.js'
-import { ContainerScope } from './ContainerScope.js'
+import { ContainerScope } from './internal/ContainerScope.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'
 import { DeferredCtor } from './DeferredCtor.js'
 import { CircularReferenceError } from './errors.js'
@@ -21,13 +21,13 @@ import { providerFromToken } from './internal/ProviderFromToken.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { Lifecycle } from './Lifecycle.js'
 import { ResolutionContext } from './ResolutionContext.js'
-import { ResolutionContextScope } from './ResolutionContextScope.js'
+import { ResolutionContextScope } from './internal/ResolutionContextScope.js'
 import { Scope } from './Scope.js'
-import { SingletonScope } from './SingletonScope.js'
+import { SingletonScope } from './internal/SingletonScope.js'
 import { tokenStr } from './Token.js'
 import { TokenSpec } from './Token.js'
 import { isNamedToken, Token } from './Token.js'
-import { TransientScope } from './TransientScope.js'
+import { TransientScope } from './internal/TransientScope.js'
 
 export class DI {
   private static readonly Scopes = new Map<string | symbol, Scope<unknown>>()
@@ -302,7 +302,7 @@ export class DI {
 
   //region Internal
 
-  private getBindings<T>(token: Token<T>): Binding<T>[] {
+  getBindings<T>(token: Token<T>): Binding<T>[] {
     if (this.has(token)) {
       return [this._registry.find(token) as Binding<T>]
     }

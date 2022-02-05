@@ -1,7 +1,7 @@
 import { ClazzDecorator } from '../../types/ClazzDecorator.js'
 import { Ctor } from '../../types/Ctor.js'
 import { DI } from '../DI.js'
-import { DiMetadata } from '../DiMetadata.js'
+import { DiVars } from '../DiVars.js'
 import { FactoryProvider } from '../internal/FactoryProvider.js'
 import { ConfigurationProviderOptions } from './ConfigurationProviderOptions.js'
 import { Injectable } from './Injectable.js'
@@ -10,15 +10,17 @@ export function Configuration<T>(): ClazzDecorator<T> {
   return function (target) {
     Injectable()(target)
 
-    const factories: ConfigurationProviderOptions[] = Reflect.getOwnMetadata(DiMetadata.FACTORIES, target) || []
+    const factories: Map<string | symbol, ConfigurationProviderOptions> =
+      Reflect.getOwnMetadata(DiVars.BEAN_METHOD, target) || []
 
-    for (const factory of factories) {
+    for (const [method, factory] of factories) {
       DI.configureInjectable(factory.token as Ctor, {
+        qualifiers: factory.name ? [factory.name] : [],
         provider: new FactoryProvider(({ di }) => {
           const clazz = di.get<{ [key: symbol | string]: (...args: unknown[]) => T }>(target)
           const deps = factory.dependencies.map(dep => (dep.multiple ? di.getMany(dep.token) : di.get(dep.token)))
 
-          return clazz[factory.method](...deps)
+          return clazz[method](...deps)
         }),
         dependencies: factory.dependencies
       })
