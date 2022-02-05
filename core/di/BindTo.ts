@@ -3,18 +3,25 @@ import { notNil } from '../preconditions/notNil.js'
 import { Ctor } from '../types/Ctor.js'
 import { Binding } from './Binding.js'
 import { BindToOptions } from './BindToOptions.js'
+import { DI } from './DI.js'
+import { ClassProvider } from './internal/ClassProvider.js'
+import { FactoryProvider } from './internal/FactoryProvider.js'
+import { ProviderContext } from './internal/Provider.js'
+import { TokenProvider } from './internal/TokenProvider.js'
+import { ValueProvider } from './internal/ValueProvider.js'
 import { Lifecycle } from './Lifecycle.js'
-import { ProviderContext } from './Provider.js'
 import { Token } from './Token.js'
 
 export class BindTo<T> {
-  constructor(private readonly token: Token<T>, private readonly typeInfo: Binding<T>) {}
+  constructor(private readonly di: DI, private readonly token: Token<T>, private readonly binding: Binding<T>) {}
 
   to(ctor: Ctor<T>): BindToOptions<T> {
     notNil(ctor)
 
-    this.typeInfo.provider = { useClass: ctor }
-    return new BindToOptions<T>(this.token, this.typeInfo)
+    this.binding.provider = new ClassProvider(ctor)
+    this.di.registerBinding(this.token, this.binding)
+
+    return new BindToOptions<T>(this.di, this.token, this.binding)
   }
 
   toSelf(): BindToOptions<T> {
@@ -22,25 +29,31 @@ export class BindTo<T> {
   }
 
   toValue(value: T): BindToOptions<T> {
-    this.typeInfo.provider = { useValue: value }
-    this.typeInfo.lifecycle = Lifecycle.SINGLETON
+    this.binding.provider = new ValueProvider(value)
+    this.binding.lifecycle = Lifecycle.SINGLETON
 
-    return new BindToOptions<T>(this.token, this.typeInfo)
+    this.di.registerBinding(this.token, this.binding)
+
+    return new BindToOptions<T>(this.di, this.token, this.binding)
   }
 
   toToken(token: string | symbol): BindToOptions<T> {
-    this.typeInfo.provider = { useToken: token }
+    notNil(token)
 
-    return new BindToOptions<T>(this.token, this.typeInfo)
+    this.binding.provider = new TokenProvider(token)
+    this.di.registerBinding(this.token, this.binding)
+
+    return new BindToOptions<T>(this.di, this.token, this.binding)
   }
 
-  toFactory(factory: (ctx: ProviderContext<T>) => T): BindToOptions<T> {
+  toFactory(factory: (ctx: ProviderContext) => T): BindToOptions<T> {
     notNil(factory)
     isFn(factory)
 
-    this.typeInfo.provider = { useFactory: factory }
-    this.typeInfo.lifecycle = Lifecycle.SINGLETON
+    this.binding.provider = new FactoryProvider(factory)
+    this.binding.lifecycle = Lifecycle.SINGLETON
+    this.di.registerBinding(this.token, this.binding)
 
-    return new BindToOptions<T>(this.token, this.typeInfo)
+    return new BindToOptions<T>(this.di, this.token, this.binding)
   }
 }

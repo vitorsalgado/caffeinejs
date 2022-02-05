@@ -1,31 +1,38 @@
 import { notNil } from '../preconditions/notNil.js'
 import { Binding } from './Binding.js'
+import { DI } from './DI.js'
 import { Lifecycle } from './Lifecycle.js'
 import { Token } from './Token.js'
 
 export class BindToOptions<T> {
-  constructor(private readonly token: Token<T>, private readonly typeInfo: Binding<T>) {}
+  constructor(private readonly di: DI, private readonly token: Token<T>, private readonly binding: Binding<T>) {}
 
-  as(lifecycle: Lifecycle): BindToOptions<T> {
+  as(lifecycle: string | symbol): BindToOptions<T> {
     notNil(lifecycle)
 
-    this.typeInfo.lifecycle = lifecycle
+    this.binding.lifecycle = lifecycle
+    this.di.registerBinding(this.token, this.binding)
+
     return this
   }
 
   singleton(): void {
-    this.typeInfo.lifecycle = Lifecycle.SINGLETON
+    this.binding.lifecycle = Lifecycle.SINGLETON
+    this.di.registerBinding(this.token, this.binding)
   }
 
   transient(): void {
-    this.typeInfo.lifecycle = Lifecycle.TRANSIENT
+    this.binding.lifecycle = Lifecycle.TRANSIENT
+    this.di.registerBinding(this.token, this.binding)
   }
 
   containerScoped(): void {
-    this.typeInfo.lifecycle = Lifecycle.CONTAINER
+    this.binding.lifecycle = Lifecycle.CONTAINER
+    this.di.registerBinding(this.token, this.binding)
   }
 
   resolutionScoped(): void {
-    this.typeInfo.lifecycle = Lifecycle.RESOLUTION_CONTEXT
+    this.binding.lifecycle = Lifecycle.RESOLUTION_CONTEXT
+    this.di.registerBinding(this.token, this.binding)
   }
 }

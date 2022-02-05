@@ -1,4 +1,4 @@
-import { Injectable } from '../../decorators/Injectable.js'
+import { Injectable } from '../../../decorators/Injectable.js'
 import { FooFail } from './FooFail.js'
 
 @Injectable()

@@ -1,14 +1,14 @@
 import { v4 } from 'uuid'
-import { DI } from '../DI.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { LateInjectable } from '../decorators/LateInjectable.js'
+import { Scoped } from '../decorators/Scoped.js'
+import { DI } from '../DI.js'
 import { Lifecycle } from '../Lifecycle.js'
-import { Scope } from '../decorators/Scope.js'
 
 describe('DI - Child', function () {
   describe('when creating a child container', function () {
     @Injectable()
-    @Scope(Lifecycle.CONTAINER)
+    @Scoped(Lifecycle.CONTAINER)
     class ContainerSvc {
       readonly id: string = v4()
     }

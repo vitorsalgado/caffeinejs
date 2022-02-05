@@ -1,6 +1,6 @@
 import { Injectable } from '../decorators/Injectable.js'
 import { OnDestroy } from '../decorators/OnDestroy.js'
-import { Scope } from '../decorators/Scope.js'
+import { Scoped } from '../decorators/Scoped.js'
 import { DI } from '../DI.js'
 import { Lifecycle } from '../Lifecycle.js'
 
@@ -19,7 +19,7 @@ describe('DI - Hooks', function () {
     }
 
     @Injectable()
-    @Scope(Lifecycle.CONTAINER)
+    @Scoped(Lifecycle.CONTAINER)
     class ContainerDep {
       @OnDestroy()
       destroy() {

@@ -1,14 +1,18 @@
+import { Provider } from './internal/Provider.js'
 import { Lifecycle } from './Lifecycle.js'
-import { Provider } from './Provider.js'
+import { Scope } from './Scope.js'
+import { SingletonScope } from './SingletonScope.js'
 import { TokenSpec } from './Token.js'
 
 export interface Binding<T = any> {
   dependencies: TokenSpec<unknown>[]
   namespace: string | symbol
-  lifecycle: Lifecycle
+  lifecycle: string | symbol
   qualifiers: (string | symbol)[]
+  scope: Scope<T>
   instance?: T
-  provider?: Provider<T>
+  provider?: Provider<unknown>
+  scopedProvider?: Provider<unknown>
   primary?: boolean
   late?: boolean
   lazy?: boolean
@@ -32,6 +36,9 @@ export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
     primary: initial.primary,
     late: initial.late,
     lazy,
-    onDestroy: initial.onDestroy
+    onDestroy: initial.onDestroy,
+
+    scopedProvider: initial.scopedProvider,
+    scope: initial.scope || new SingletonScope()
   }
 }

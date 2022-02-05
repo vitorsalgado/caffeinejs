@@ -1,7 +1,7 @@
 import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
-import { Scope } from '../decorators/Scope.js'
+import { Scoped } from '../decorators/Scoped.js'
 import { DI } from '../DI.js'
 import { Lifecycle } from '../Lifecycle.js'
 
@@ -31,7 +31,7 @@ describe('DI - Abstract Classes', function () {
       }
 
       @Injectable()
-      @Scope(Lifecycle.TRANSIENT)
+      @Scoped(Lifecycle.TRANSIENT)
       class Service {
         constructor(readonly dep: Base) {}
 

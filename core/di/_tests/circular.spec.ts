@@ -1,10 +1,11 @@
-import { Binding } from '../Binding.js'
+import { newBinding } from '../Binding.js'
 import { DI } from '../DI.js'
 import { CircularReferenceError } from '../errors.js'
-import { Bar } from './circular/Bar.js'
-import { BarFail } from './circular/BarFail.js'
-import { Foo } from './circular/Foo.js'
-import { FooFail } from './circular/FooFail.js'
+import { TokenProvider } from '../internal/TokenProvider.js'
+import { Bar } from './fixtures/circular/Bar.js'
+import { BarFail } from './fixtures/circular/BarFail.js'
+import { Foo } from './fixtures/circular/Foo.js'
+import { FooFail } from './fixtures/circular/FooFail.js'
 
 describe('DI - Circular References', function () {
   describe('dependencies with deferred constructor', function () {
@@ -38,9 +39,9 @@ describe('DI - Circular References', function () {
     it('should throw error', function () {
       const di = DI.setup()
 
-      di.registerBinding('foo', Binding.newBinding({ provider: { useToken: 'foo' } }))
+      di.registerBinding('foo', newBinding({ provider: new TokenProvider('foo') }))
 
-      expect(() => di.registerBinding('foo', Binding.newBinding({ provider: { useToken: 'foo' } }))).toThrow()
+      expect(() => di.registerBinding('foo', newBinding({ provider: new TokenProvider('foo') }))).toThrow()
     })
   })
 })

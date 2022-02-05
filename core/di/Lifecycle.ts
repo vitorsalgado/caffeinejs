@@ -1,6 +1,6 @@
-export enum Lifecycle {
-  SINGLETON,
-  TRANSIENT,
-  CONTAINER,
-  RESOLUTION_CONTEXT
+export const Lifecycle = {
+  SINGLETON: 'singleton',
+  TRANSIENT: 'transient',
+  CONTAINER: 'container',
+  RESOLUTION_CONTEXT: 'resolution_context'
 }

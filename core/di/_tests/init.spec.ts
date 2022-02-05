@@ -1,6 +1,6 @@
 import { Injectable } from '../decorators/Injectable.js'
 import { Lazy } from '../decorators/Lazy.js'
-import { Scope } from '../decorators/Scope.js'
+import { Scoped } from '../decorators/Scoped.js'
 import { DI } from '../DI.js'
 import { Lifecycle } from '../Lifecycle.js'
 
@@ -19,7 +19,7 @@ describe('DI - Init Singleton and Container Scoped', function () {
   }
 
   @Injectable()
-  @Scope(Lifecycle.CONTAINER)
+  @Scoped(Lifecycle.CONTAINER)
   class Dep2 {
     constructor() {
       spy2()
@@ -27,7 +27,7 @@ describe('DI - Init Singleton and Container Scoped', function () {
   }
 
   @Injectable()
-  @Scope(Lifecycle.TRANSIENT)
+  @Scoped(Lifecycle.TRANSIENT)
   class Dep3 {
     constructor() {
       spy3()
@@ -43,7 +43,7 @@ describe('DI - Init Singleton and Container Scoped', function () {
   }
 
   @Injectable()
-  @Scope(Lifecycle.TRANSIENT)
+  @Scoped(Lifecycle.TRANSIENT)
   @Lazy(false)
   class Dep5 {
     constructor() {
@@ -54,7 +54,7 @@ describe('DI - Init Singleton and Container Scoped', function () {
   it('should init all injectables except ones marked as lazy', function () {
     const di = DI.setup()
 
-    di.init()
+    di.bootstrap()
 
     const dep1 = di.get(Dep1)
     const dep2 = di.get(Dep2)
