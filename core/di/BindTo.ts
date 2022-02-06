@@ -30,7 +30,7 @@ export class BindTo<T> {
 
   toValue(value: T): BindToOptions<T> {
     this.binding.provider = new ValueProvider(value)
-    this.binding.lifecycle = Scopes.SINGLETON
+    this.binding.scopeId = Scopes.SINGLETON
 
     this.di.configureBinding(this.token, this.binding)
 
@@ -51,7 +51,7 @@ export class BindTo<T> {
     isFn(factory)
 
     this.binding.provider = new FactoryProvider(factory)
-    this.binding.lifecycle = Scopes.SINGLETON
+    this.binding.scopeId = Scopes.SINGLETON
     this.di.configureBinding(this.token, this.binding)
 
     return new BindToOptions<T>(this.di, this.token, this.binding)

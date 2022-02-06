@@ -1,11 +1,11 @@
 import { Defer } from '../../../decorators/Defer.js'
 import { Injectable } from '../../../decorators/Injectable.js'
-import { Scoped } from '../../../decorators/Scoped.js'
+import { ScopedAs } from '../../../decorators/ScopedAs.js'
 import { Scopes } from '../../../Scopes.js'
 import { Foo } from './Foo.js'
 
 @Injectable()
-@Scoped(Scopes.TRANSIENT)
+@ScopedAs(Scopes.TRANSIENT)
 export class Bar {
   constructor(@Defer(() => Foo) readonly foo: Foo) {}
 

@@ -10,29 +10,29 @@ export class BindToOptions<T> {
   as(lifecycle: string | symbol): BindToOptions<T> {
     notNil(lifecycle)
 
-    this.binding.lifecycle = lifecycle
+    this.binding.scopeId = lifecycle
     this.di.configureBinding(this.token, this.binding)
 
     return this
   }
 
   singleton(): void {
-    this.binding.lifecycle = Scopes.SINGLETON
+    this.binding.scopeId = Scopes.SINGLETON
     this.di.configureBinding(this.token, this.binding)
   }
 
   transient(): void {
-    this.binding.lifecycle = Scopes.TRANSIENT
+    this.binding.scopeId = Scopes.TRANSIENT
     this.di.configureBinding(this.token, this.binding)
   }
 
   containerScoped(): void {
-    this.binding.lifecycle = Scopes.CONTAINER
+    this.binding.scopeId = Scopes.CONTAINER
     this.di.configureBinding(this.token, this.binding)
   }
 
   resolutionScoped(): void {
-    this.binding.lifecycle = Scopes.RESOLUTION_CONTEXT
+    this.binding.scopeId = Scopes.RESOLUTION_CONTEXT
     this.di.configureBinding(this.token, this.binding)
   }
 }

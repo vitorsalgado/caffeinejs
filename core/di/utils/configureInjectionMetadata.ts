@@ -1,7 +1,7 @@
 import { DiVars } from '../DiVars.js'
 import { TokenSpec } from '../Token.js'
 
-export function defineTokenMetadata(
+export function configureInjectionMetadata(
   tokenSpec: Partial<TokenSpec<unknown>>
 ): <TFunction>(target: TFunction, propertyKey: string | symbol, parameterIndex: number) => void {
   return function (target: any, propertyKey: string | symbol, parameterIndex: number): void {

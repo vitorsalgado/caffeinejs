@@ -1,7 +1,7 @@
 import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
-import { Scoped } from '../decorators/Scoped.js'
+import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
 import { Scopes } from '../Scopes.js'
 
@@ -31,7 +31,7 @@ describe('DI - Abstract Classes', function () {
       }
 
       @Injectable()
-      @Scoped(Scopes.TRANSIENT)
+      @ScopedAs(Scopes.TRANSIENT)
       class Service {
         constructor(readonly dep: Base) {}
 

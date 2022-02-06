@@ -1,7 +1,7 @@
 import { DiVars } from '../../DiVars.js'
 import { ConfigurationProviderOptions } from '../ConfigurationProviderOptions.js'
 
-export function defineBean(
+export function configureBean(
   target: Function,
   method: string | symbol,
   configurations: Partial<ConfigurationProviderOptions>

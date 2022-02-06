@@ -8,7 +8,7 @@ import { TokenSpec } from './Token.js'
 export interface Binding<T = any> {
   dependencies: TokenSpec<unknown>[]
   namespace: Identifier
-  lifecycle: Identifier
+  scopeId: Identifier
   names: Identifier[]
   scope: Scope<T>
   instance?: T
@@ -21,13 +21,13 @@ export interface Binding<T = any> {
 }
 
 export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
-  const lifecycle = initial.lifecycle === undefined ? Scopes.SINGLETON : initial.lifecycle
+  const lifecycle = initial.scopeId === undefined ? Scopes.SINGLETON : initial.scopeId
   const lazy =
     initial.lazy === undefined ? !(lifecycle === Scopes.SINGLETON || lifecycle === Scopes.CONTAINER) : initial.lazy
 
   return {
     lazy,
-    lifecycle,
+    scopeId: lifecycle,
     dependencies: initial.dependencies || [],
     namespace: initial.namespace || '',
     names: initial.names || [],

@@ -1,6 +1,7 @@
 import { v4 } from 'uuid'
 import { Inject } from '../decorators/Inject.js'
-import { LateInjectable } from '../decorators/LateInjectable.js'
+import { Injectable } from '../decorators/Injectable.js'
+import { LateBind } from '../decorators/LateBind.js'
 import { Named } from '../decorators/Named.js'
 import { DI } from '../DI.js'
 
@@ -9,14 +10,16 @@ describe('DI - Manual Binding', function () {
     abstract msg(): string
   }
 
-  @LateInjectable()
+  @LateBind()
+  @Injectable()
   class Impl extends Abs {
     msg(): string {
       return 'impl'
     }
   }
 
-  @LateInjectable()
+  @LateBind()
+  @Injectable()
   @Named('test')
   class Late {
     readonly id: string = v4()
@@ -26,14 +29,16 @@ describe('DI - Manual Binding', function () {
     }
   }
 
-  @LateInjectable()
+  @LateBind()
+  @Injectable()
   class StrValue {
     constructor(@Inject('val') readonly val: string) {}
   }
 
   const sy = Symbol.for('test')
 
-  @LateInjectable()
+  @LateBind()
+  @Injectable()
   class FromFactory {
     constructor(@Inject(sy) readonly val: string) {}
   }

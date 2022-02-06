@@ -1,6 +1,6 @@
 import { Injectable } from '../decorators/Injectable.js'
 import { Lazy } from '../decorators/Lazy.js'
-import { Scoped } from '../decorators/Scoped.js'
+import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
 import { Scopes } from '../Scopes.js'
 
@@ -19,7 +19,7 @@ describe('DI - Init Singleton and Container Scoped', function () {
   }
 
   @Injectable()
-  @Scoped(Scopes.CONTAINER)
+  @ScopedAs(Scopes.CONTAINER)
   class Dep2 {
     constructor() {
       spy2()
@@ -27,7 +27,7 @@ describe('DI - Init Singleton and Container Scoped', function () {
   }
 
   @Injectable()
-  @Scoped(Scopes.TRANSIENT)
+  @ScopedAs(Scopes.TRANSIENT)
   class Dep3 {
     constructor() {
       spy3()
@@ -43,7 +43,7 @@ describe('DI - Init Singleton and Container Scoped', function () {
   }
 
   @Injectable()
-  @Scoped(Scopes.TRANSIENT)
+  @ScopedAs(Scopes.TRANSIENT)
   @Lazy(false)
   class Dep5 {
     constructor() {

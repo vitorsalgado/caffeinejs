@@ -1,7 +1,7 @@
 import { DeferredCtor } from '../DeferredCtor.js'
 import { Token } from '../Token.js'
-import { defineTokenMetadata } from '../utils/defineTokenMetadata.js'
+import { configureInjectionMetadata } from '../utils/configureInjectionMetadata.js'
 
 export function Defer(tokenFn: () => Token<unknown>): ParameterDecorator {
-  return defineTokenMetadata({ token: new DeferredCtor(tokenFn) })
+  return configureInjectionMetadata({ token: new DeferredCtor(tokenFn) })
 }

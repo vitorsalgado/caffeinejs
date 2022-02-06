@@ -1,14 +1,14 @@
 import { v4 } from 'uuid'
 import { Injectable } from '../decorators/Injectable.js'
-import { LateInjectable } from '../decorators/LateInjectable.js'
-import { Scoped } from '../decorators/Scoped.js'
+import { LateBind } from '../decorators/LateBind.js'
+import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
 import { Scopes } from '../Scopes.js'
 
 describe('DI - Child', function () {
   describe('when creating a child container', function () {
     @Injectable()
-    @Scoped(Scopes.CONTAINER)
+    @ScopedAs(Scopes.CONTAINER)
     class ContainerSvc {
       readonly id: string = v4()
     }
@@ -45,12 +45,14 @@ describe('DI - Child', function () {
 
   describe('when child contains root', function () {
     describe('and parent contains injection dependency', function () {
-      @LateInjectable()
+      @Injectable()
+      @LateBind()
       class Dep {
         readonly id: string = v4()
       }
 
-      @LateInjectable()
+      @Injectable()
+      @LateBind()
       class Svc {
         constructor(readonly dep: Dep) {}
       }

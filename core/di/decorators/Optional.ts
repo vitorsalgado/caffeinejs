@@ -1,5 +1,5 @@
-import { defineTokenMetadata } from '../utils/defineTokenMetadata.js'
+import { configureInjectionMetadata } from '../utils/configureInjectionMetadata.js'
 
 export function Optional(): ParameterDecorator {
-  return defineTokenMetadata({ optional: true })
+  return configureInjectionMetadata({ optional: true })
 }

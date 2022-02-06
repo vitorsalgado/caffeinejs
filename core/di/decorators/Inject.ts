@@ -1,6 +1,6 @@
 import { Token } from '../Token.js'
-import { defineTokenMetadata } from '../utils/defineTokenMetadata.js'
+import { configureInjectionMetadata } from '../utils/configureInjectionMetadata.js'
 
 export function Inject(token: Token<unknown>): ParameterDecorator {
-  return defineTokenMetadata({ token })
+  return configureInjectionMetadata({ token })
 }

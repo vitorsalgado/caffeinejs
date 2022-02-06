@@ -3,11 +3,11 @@ import { DI } from '../DI.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Scopes } from '../Scopes.js'
 import { ResolutionContext } from '../ResolutionContext.js'
-import { Scoped } from '../decorators/Scoped.js'
+import { ScopedAs } from '../decorators/ScopedAs.js'
 
 describe('DI - Context Scoped', function () {
   @Injectable()
-  @Scoped(Scopes.RESOLUTION_CONTEXT)
+  @ScopedAs(Scopes.RESOLUTION_CONTEXT)
   class ResScopedDep {
     readonly id: string
 
@@ -21,7 +21,7 @@ describe('DI - Context Scoped', function () {
   }
 
   @Injectable()
-  @Scoped(Scopes.TRANSIENT)
+  @ScopedAs(Scopes.TRANSIENT)
   class ResScopedRoot {
     constructor(readonly dep: ResScopedDep) {}
   }

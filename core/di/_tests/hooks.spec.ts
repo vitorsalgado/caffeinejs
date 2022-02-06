@@ -1,6 +1,6 @@
 import { Injectable } from '../decorators/Injectable.js'
 import { PreDestroy } from '../decorators/PreDestroy.js'
-import { Scoped } from '../decorators/Scoped.js'
+import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
 import { Scopes } from '../Scopes.js'
 
@@ -19,7 +19,7 @@ describe('Hooks', function () {
     }
 
     @Injectable()
-    @Scoped(Scopes.CONTAINER)
+    @ScopedAs(Scopes.CONTAINER)
     class ContainerDep {
       @PreDestroy()
       destroy() {

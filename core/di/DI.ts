@@ -102,8 +102,10 @@ export class DI {
       let entries: BindingEntry[]
 
       if (isNamedToken(token)) {
+        //TODO: change this to nameMap
         entries = this.search((tk, b) => isNamedToken(tk) && b.names.includes(token))
       } else {
+        //TODO: create ref cache
         entries = this.search(tk => typeof tk === 'function' && tk !== token && token.isPrototypeOf(tk))
       }
 
@@ -166,13 +168,13 @@ export class DI {
 
     this.bindingRegistry
       .toArray()
-      .filter(x => x.binding.lifecycle === BuiltInScopes.CONTAINER)
+      .filter(x => x.binding.scopeId === BuiltInScopes.CONTAINER)
       .forEach(({ token, binding }) => {
         const copiedBinding = {
           provider: binding.provider,
           dependencies: binding.dependencies,
           primary: binding.primary,
-          lifecycle: binding.lifecycle,
+          scopeId: binding.scopeId,
           names: binding.names,
           namespace: binding.namespace,
           scope: binding.scope
@@ -217,7 +219,7 @@ export class DI {
     }
 
     binding.provider = provider as Provider<T>
-    binding.scope = DI.Scopes.get(binding.lifecycle) as Scope<T>
+    binding.scope = DI.Scopes.get(binding.scopeId) as Scope<T>
     binding.scopedProvider = binding.scope.wrap(binding.provider as Provider)
 
     this.bindingRegistry.register(token, binding)
@@ -271,7 +273,7 @@ export class DI {
           ({ binding }) =>
             binding.onDestroy &&
             binding.instance &&
-            (binding.lifecycle === BuiltInScopes.SINGLETON || binding.lifecycle === BuiltInScopes.CONTAINER)
+            (binding.scopeId === BuiltInScopes.SINGLETON || binding.scopeId === BuiltInScopes.CONTAINER)
         )
         .map(({ binding }) => binding.instance[binding.onDestroy as Identifier]())
     ).then(() => this.clear())
