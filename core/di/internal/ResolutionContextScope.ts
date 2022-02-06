@@ -9,7 +9,7 @@ class ResolutionContextScopeProvider<T> extends Provider<T> {
 
   provide(ctx: ProviderContext): T {
     if (ctx.resolutionContext.resolutions.has(ctx.binding)) {
-      return ctx.resolutionContext.resolutions.get(ctx.binding) as T
+      return ctx.resolutionContext.resolutions.get(ctx.binding)
     }
 
     const resolved = this.unscoped.provide(ctx)

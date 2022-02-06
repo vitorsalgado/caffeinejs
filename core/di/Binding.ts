@@ -1,14 +1,15 @@
+import { BuiltInLifecycles } from './BuiltInLifecycles.js'
+import { Identifier } from './Identifier.js'
 import { Provider } from './internal/Provider.js'
 import { SingletonScope } from './internal/SingletonScope.js'
-import { BuiltInLifecycles } from './BuiltInLifecycles.js'
 import { Scope } from './Scope.js'
 import { TokenSpec } from './Token.js'
 
 export interface Binding<T = any> {
   dependencies: TokenSpec<unknown>[]
-  namespace: string | symbol
-  lifecycle: string | symbol
-  names: (string | symbol)[]
+  namespace: Identifier
+  lifecycle: Identifier
+  names: Identifier[]
   scope: Scope<T>
   instance?: T
   provider?: Provider<unknown>
@@ -16,7 +17,7 @@ export interface Binding<T = any> {
   primary?: boolean
   late?: boolean
   lazy?: boolean
-  onDestroy?: string | symbol
+  onDestroy?: Identifier
 }
 
 export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {

@@ -11,6 +11,7 @@ import { CircularReferenceError } from './DiError.js'
 import { NoProviderForTokenError } from './DiError.js'
 import { NoUniqueInjectionForTokenError } from './DiError.js'
 import { NoResolutionForTokenError } from './DiError.js'
+import { Identifier } from './Identifier.js'
 import { ClassProvider } from './internal/ClassProvider.js'
 import { ContainerScope } from './internal/ContainerScope.js'
 import { Provider } from './internal/Provider.js'
@@ -26,14 +27,14 @@ import { tokenStr } from './Token.js'
 import { isNamedToken, Token } from './Token.js'
 
 export class DI {
-  private static readonly Scopes = new Map<string | symbol, Scope<unknown>>()
+  private static readonly Scopes = new Map<Identifier, Scope<unknown>>()
     .set(BuiltInLifecycles.SINGLETON, new SingletonScope())
     .set(BuiltInLifecycles.CONTAINER, new ContainerScope())
     .set(BuiltInLifecycles.RESOLUTION_CONTEXT, new ResolutionContextScope())
     .set(BuiltInLifecycles.TRANSIENT, new TransientScope())
 
   private readonly bindingRegistry: BindingRegistry = new BindingRegistry()
-  private readonly bindingNames: Map<string | symbol, Binding[]> = new Map()
+  private readonly bindingNames: Map<Identifier, Binding[]> = new Map()
 
   protected constructor(readonly namespace = '', readonly parent?: DI) {
     notNil(namespace)
@@ -272,7 +273,7 @@ export class DI {
             binding.instance &&
             (binding.lifecycle === BuiltInLifecycles.SINGLETON || binding.lifecycle === BuiltInLifecycles.CONTAINER)
         )
-        .map(({ binding }) => binding.instance[binding.onDestroy as string | symbol]())
+        .map(({ binding }) => binding.instance[binding.onDestroy as Identifier]())
     ).then(() => this.clear())
   }
 
