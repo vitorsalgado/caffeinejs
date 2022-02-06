@@ -1,6 +1,6 @@
 import { DecoratedInjectables } from '../DecoratedInjectables.js'
 
-export function OnDestroy(): MethodDecorator {
+export function PreDestroy(): MethodDecorator {
   return function (target, propertyKey) {
     DecoratedInjectables.instance().configure(target.constructor, { onDestroy: propertyKey })
   }

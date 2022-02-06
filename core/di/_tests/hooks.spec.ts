@@ -1,18 +1,18 @@
 import { Injectable } from '../decorators/Injectable.js'
-import { OnDestroy } from '../decorators/OnDestroy.js'
+import { PreDestroy } from '../decorators/PreDestroy.js'
 import { Scoped } from '../decorators/Scoped.js'
 import { DI } from '../DI.js'
 import { Lifecycle } from '../Lifecycle.js'
 
-describe('DI - Hooks', function () {
-  describe('onDestroy', function () {
+describe('Hooks', function () {
+  describe('Pre Destroy', function () {
     const destroySpy = jest.fn()
     const destroyAsyncSpy = jest.fn()
     const destroyContainerScopedSpy = jest.fn()
 
     @Injectable()
     class Dep {
-      @OnDestroy()
+      @PreDestroy()
       destroy() {
         destroySpy()
       }
@@ -21,7 +21,7 @@ describe('DI - Hooks', function () {
     @Injectable()
     @Scoped(Lifecycle.CONTAINER)
     class ContainerDep {
-      @OnDestroy()
+      @PreDestroy()
       destroy() {
         destroyContainerScopedSpy()
       }
@@ -29,7 +29,7 @@ describe('DI - Hooks', function () {
 
     @Injectable()
     class AsyncDep {
-      @OnDestroy()
+      @PreDestroy()
       destroy(): Promise<void> {
         return new Promise(resolve =>
           setTimeout(() => {

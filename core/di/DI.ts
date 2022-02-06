@@ -286,18 +286,18 @@ export class DI {
     }
   }
 
-  async finalize(): Promise<void> {
-    for (const [, binding] of this._registry.entries()) {
-      if (
-        binding.onDestroy &&
-        binding.instance &&
-        (binding.lifecycle === Lifecycle.SINGLETON || binding.lifecycle === Lifecycle.CONTAINER)
-      ) {
-        await binding.instance[binding.onDestroy]()
-      }
-    }
-
-    this.clear()
+  finalize(): Promise<void> {
+    return Promise.all(
+      this._registry
+        .collect()
+        .filter(
+          ({ binding }) =>
+            binding.onDestroy &&
+            binding.instance &&
+            (binding.lifecycle === Lifecycle.SINGLETON || binding.lifecycle === Lifecycle.CONTAINER)
+        )
+        .map(({ binding }) => binding.instance[binding.onDestroy as string | symbol]())
+    ).then(() => this.clear())
   }
 
   //region Internal
