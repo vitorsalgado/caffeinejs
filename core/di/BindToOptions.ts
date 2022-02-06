@@ -11,28 +11,28 @@ export class BindToOptions<T> {
     notNil(lifecycle)
 
     this.binding.lifecycle = lifecycle
-    this.di.registerBinding(this.token, this.binding)
+    this.di.register(this.token, this.binding)
 
     return this
   }
 
   singleton(): void {
     this.binding.lifecycle = Lifecycle.SINGLETON
-    this.di.registerBinding(this.token, this.binding)
+    this.di.register(this.token, this.binding)
   }
 
   transient(): void {
     this.binding.lifecycle = Lifecycle.TRANSIENT
-    this.di.registerBinding(this.token, this.binding)
+    this.di.register(this.token, this.binding)
   }
 
   containerScoped(): void {
     this.binding.lifecycle = Lifecycle.CONTAINER
-    this.di.registerBinding(this.token, this.binding)
+    this.di.register(this.token, this.binding)
   }
 
   resolutionScoped(): void {
     this.binding.lifecycle = Lifecycle.RESOLUTION_CONTEXT
-    this.di.registerBinding(this.token, this.binding)
+    this.di.register(this.token, this.binding)
   }
 }

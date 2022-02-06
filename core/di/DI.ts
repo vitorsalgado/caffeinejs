@@ -6,11 +6,7 @@ import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
 import { BindTo } from './BindTo.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'
-import { DeferredCtor } from './DeferredCtor.js'
-import { CircularReferenceError } from './errors.js'
 import { NoResolutionForTokenError } from './errors.js'
-import { UnresolvableConstructorArguments } from './errors.js'
-import { TypeNotRegisteredForInjectionError } from './errors.js'
 import { NoUniqueInjectionForTokenError } from './errors.js'
 import { NoProviderForTokenError } from './errors.js'
 import { DiError } from './errors/DiError.js'
@@ -24,9 +20,9 @@ import { TokenProvider } from './internal/TokenProvider.js'
 import { TransientScope } from './internal/TransientScope.js'
 import { Lifecycle } from './Lifecycle.js'
 import { ResolutionContext } from './ResolutionContext.js'
+import { Resolver } from './Resolver.js'
 import { Scope } from './Scope.js'
 import { tokenStr } from './Token.js'
-import { TokenSpec } from './Token.js'
 import { isNamedToken, Token } from './Token.js'
 
 export class DI {
@@ -82,13 +78,13 @@ export class DI {
       const primary = bindings.find(x => x.primary)
 
       if (primary) {
-        return this.resolveBinding<T>(token, primary, context)
+        return Resolver.resolveBinding<T>(this, token, primary, context)
       }
 
       throw new NoUniqueInjectionForTokenError(token)
     }
 
-    return this.resolveBinding<T>(token, bindings[0], context)
+    return Resolver.resolveBinding<T>(this, token, bindings[0], context)
   }
 
   getRequired<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
@@ -117,10 +113,10 @@ export class DI {
         return []
       }
 
-      return entries.map(r => this.resolveBinding(r.token, r.binding, context)) as T[]
+      return entries.map(r => Resolver.resolveBinding(this, r.token, r.binding, context)) as T[]
     }
 
-    return bindings.map(binding => this.resolveBinding(token, binding, context))
+    return bindings.map(binding => Resolver.resolveBinding(this, token, binding, context))
   }
 
   has<T>(token: Token<T>, checkParent = false): boolean {
@@ -139,13 +135,17 @@ export class DI {
     return result
   }
 
+  searchBy<T>(token: Token<T>): Binding<T> | undefined {
+    return this._registry.find(token)
+  }
+
   bind<T>(token: Token<T>): BindTo<T> {
     notNil(token)
 
     const type = DecoratedInjectables.instance().get(token as Ctor)
     const binding = newBinding(type)
 
-    this.registerBinding(token, binding)
+    this.register(token, binding)
 
     return new BindTo<T>(this, token, { ...binding })
   }
@@ -183,7 +183,7 @@ export class DI {
     return child
   }
 
-  registerBinding<T>(token: Token<T>, binding: Binding<T>) {
+  register<T>(token: Token<T>, binding: Binding<T>): void {
     const provider = providerFromToken(token, binding.provider)
 
     if (!provider) {
@@ -221,87 +221,6 @@ export class DI {
     this._registry.register(token, binding)
   }
 
-  resolveBinding<T>(token: Token<T>, binding: Binding<T> | undefined, context: ResolutionContext): T {
-    if (binding) {
-      if (!isNil(binding.instance)) {
-        return binding.instance as T
-      }
-
-      const resolved = binding.scopedProvider?.provide({ di: this, token, binding, resolutionContext: context })
-
-      return resolved as T
-    }
-
-    let resolved: T | undefined
-
-    if (token instanceof DeferredCtor) {
-      resolved = this.newClassInstance<T>(token, context)
-    }
-
-    if (typeof token === 'function') {
-      const entries = this.search(tk => typeof tk === 'function' && tk.name !== token.name && token.isPrototypeOf(tk))
-
-      if (entries.length === 1) {
-        const tk = entries[0].token
-        resolved = this.get<T>(tk as Token<T>, context)
-
-        this.registerBinding(token, newBinding({ provider: new TokenProvider(tk), namespace: this.namespace }))
-      } else if (entries.length > 1) {
-        const primary = entries.find(x => x.binding.primary)
-
-        if (primary) {
-          resolved = this.get<T>(primary.token as Token<T>, context)
-
-          this.registerBinding(token, newBinding({ ...primary, provider: new TokenProvider(primary.token) }))
-        } else {
-          throw new NoUniqueInjectionForTokenError(token)
-        }
-      }
-    }
-
-    return resolved as T
-  }
-
-  findDefinitionBy<T>(token: Token<T>): Binding<T> | undefined {
-    return this._registry.find(token)
-  }
-
-  clear(): void {
-    this._registry.clear()
-  }
-
-  resetInstances(): void {
-    for (const [, binding] of this._registry.entries()) {
-      binding.instance = undefined
-    }
-  }
-
-  bootstrap(): void {
-    for (const [token, binding] of this._registry.entries()) {
-      if (binding.lazy) {
-        continue
-      }
-
-      this.resolveBinding(token, binding, ResolutionContext.INSTANCE)
-    }
-  }
-
-  finalize(): Promise<void> {
-    return Promise.all(
-      this._registry
-        .collect()
-        .filter(
-          ({ binding }) =>
-            binding.onDestroy &&
-            binding.instance &&
-            (binding.lifecycle === Lifecycle.SINGLETON || binding.lifecycle === Lifecycle.CONTAINER)
-        )
-        .map(({ binding }) => binding.instance[binding.onDestroy as string | symbol]())
-    ).then(() => this.clear())
-  }
-
-  //region Internal
-
   getBindings<T>(token: Token<T>): Binding<T>[] {
     if (this.has(token)) {
       return [this._registry.find(token) as Binding<T>]
@@ -320,63 +239,41 @@ export class DI {
     return []
   }
 
-  private newClassInstance<T>(ctor: Ctor<T> | DeferredCtor<T>, context: ResolutionContext): T {
-    if (ctor instanceof DeferredCtor) {
-      return ctor.createProxy(target => this.get(target))
-    }
-
-    const type = DecoratedInjectables.instance().get(ctor)
-
-    if (!type) {
-      throw new TypeNotRegisteredForInjectionError(ctor)
-    }
-
-    const deps = type.dependencies.map(dep => this.resolveParam(ctor, dep, context))
-
-    if (deps.length === 0) {
-      if (ctor.length === 0) {
-        return new ctor()
-      } else {
-        throw new UnresolvableConstructorArguments(ctor)
-      }
-    }
-
-    return new ctor(...deps)
+  clear(): void {
+    this._registry.clear()
   }
 
-  private resolveParam<T>(ctor: Ctor<T>, dep: TokenSpec<T>, context: ResolutionContext): T {
-    if (isNil(dep.token) && isNil(dep.tokenType)) {
-      throw new CircularReferenceError(ctor)
+  resetInstances(): void {
+    for (const [, binding] of this._registry.entries()) {
+      binding.instance = undefined
     }
-
-    let resolution
-
-    if (dep.multiple) {
-      resolution = this.getMany(dep.token, context)
-    } else {
-      resolution = this.get(dep.token, context)
-    }
-
-    if (isNil(resolution)) {
-      const byType = this._registry.find(dep.tokenType)
-
-      if (byType) {
-        resolution = this.resolveBinding(dep.token, byType, context)
-      }
-    }
-
-    if (!isNil(resolution)) {
-      return resolution
-    }
-
-    if (dep.optional) {
-      return null as unknown as T
-    }
-
-    throw new NoResolutionForTokenError(dep)
   }
 
-  private setup() {
+  bootstrap(): void {
+    for (const [token, binding] of this._registry.entries()) {
+      if (binding.lazy) {
+        continue
+      }
+
+      Resolver.resolveBinding(this, token, binding, ResolutionContext.INSTANCE)
+    }
+  }
+
+  finalize(): Promise<void> {
+    return Promise.all(
+      this._registry
+        .collect()
+        .filter(
+          ({ binding }) =>
+            binding.onDestroy &&
+            binding.instance &&
+            (binding.lifecycle === Lifecycle.SINGLETON || binding.lifecycle === Lifecycle.CONTAINER)
+        )
+        .map(({ binding }) => binding.instance[binding.onDestroy as string | symbol]())
+    ).then(() => this.clear())
+  }
+
+  private setup(): void {
     for (const [type, binding] of DecoratedInjectables.instance().entries()) {
       if (binding.namespace !== this.namespace) {
         continue
@@ -386,7 +283,7 @@ export class DI {
         continue
       }
 
-      this.registerBinding(type, binding)
+      this.register(type, binding)
 
       for (const qualifier of binding.qualifiers) {
         const entry = this._qualifiersMap.get(qualifier)
@@ -400,6 +297,4 @@ export class DI {
       }
     }
   }
-
-  //endregion
 }

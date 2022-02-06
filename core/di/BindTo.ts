@@ -19,7 +19,7 @@ export class BindTo<T> {
     notNil(ctor)
 
     this.binding.provider = new ClassProvider(ctor)
-    this.di.registerBinding(this.token, this.binding)
+    this.di.register(this.token, this.binding)
 
     return new BindToOptions<T>(this.di, this.token, this.binding)
   }
@@ -32,7 +32,7 @@ export class BindTo<T> {
     this.binding.provider = new ValueProvider(value)
     this.binding.lifecycle = Lifecycle.SINGLETON
 
-    this.di.registerBinding(this.token, this.binding)
+    this.di.register(this.token, this.binding)
 
     return new BindToOptions<T>(this.di, this.token, this.binding)
   }
@@ -41,7 +41,7 @@ export class BindTo<T> {
     notNil(token)
 
     this.binding.provider = new TokenProvider(token)
-    this.di.registerBinding(this.token, this.binding)
+    this.di.register(this.token, this.binding)
 
     return new BindToOptions<T>(this.di, this.token, this.binding)
   }
@@ -52,7 +52,7 @@ export class BindTo<T> {
 
     this.binding.provider = new FactoryProvider(factory)
     this.binding.lifecycle = Lifecycle.SINGLETON
-    this.di.registerBinding(this.token, this.binding)
+    this.di.register(this.token, this.binding)
 
     return new BindToOptions<T>(this.di, this.token, this.binding)
   }
