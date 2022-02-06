@@ -127,6 +127,7 @@ typings/
 .npmrc
 package-lock.json
 playground.js
+playground.ts
 
 # Dist
 dist/
