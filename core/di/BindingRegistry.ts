@@ -1,4 +1,3 @@
-import { isNil } from '../checks/isNil.js'
 import { notNil } from '../preconditions/notNil.js'
 import { Binding } from './Binding.js'
 import { Token } from './Token.js'
@@ -16,20 +15,6 @@ export class BindingRegistry {
     notNil(binding)
 
     const entry = this.entry(token)
-
-    // binding.primary = isNil(entry.primary) ? binding.primary : entry.primary
-    // binding.late = isNil(entry.late) ? binding.late : entry.late
-    // binding.lifecycle = isNil(entry.lifecycle) ? binding.lifecycle : entry.lifecycle
-    // binding.provider = isNil(entry.provider) ? binding.provider : entry.provider
-    // binding.dependencies = isNil(entry.dependencies) ? binding.dependencies : entry.dependencies
-    // binding.instance = isNil(entry.instance) ? binding.instance : entry.instance
-    // binding.namespace = isNil(entry.namespace) ? binding.namespace : entry.namespace
-    // binding.qualifiers = isNil(entry.qualifiers) ? binding.qualifiers : entry.qualifiers
-    // binding.lazy = isNil(entry.lazy) ? binding.lazy : entry.lazy
-    // binding.onDestroy = isNil(entry.onDestroy) ? binding.onDestroy : entry.onDestroy
-    //
-    // binding.scopedProvider = isNil(entry.scopedProvider) ? binding.scopedProvider : entry.scopedProvider
-    // binding.scope = isNil(entry.scope) ? binding.scope : entry.scope
 
     this._types.set(token, { ...entry, ...binding })
   }

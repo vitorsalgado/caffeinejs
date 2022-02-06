@@ -5,4 +5,5 @@ export interface ConfigurationProviderOptions {
   token: Token
   dependencies: TokenSpec[]
   name: string | symbol
+  primary: boolean
 }

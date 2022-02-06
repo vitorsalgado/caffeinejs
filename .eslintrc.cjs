@@ -16,6 +16,7 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': ['off'],
     '@typescript-eslint/ban-types': ['off'],
     '@typescript-eslint/no-namespace': ['off'],
+    '@typescript-eslint/no-non-null-assertion': ['off'],
 
     'node/no-missing-import': ['off'],
     'node/no-unpublished-import': ['off'],

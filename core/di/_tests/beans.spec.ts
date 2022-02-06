@@ -4,6 +4,7 @@ import { Configuration } from '../decorators/Configuration.js'
 import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
+import { Primary } from '../decorators/Primary.js'
 import { DI } from '../DI'
 
 describe('Bean Configuration', function () {
@@ -121,6 +122,63 @@ describe('Bean Configuration', function () {
 
       expect(txt).toEqual(expected)
       expect(usingTxt.txt).toEqual(expected)
+    })
+  })
+
+  describe('configuration class with primary beans', function () {
+    abstract class Abs {
+      abstract test(): string
+    }
+
+    @Injectable()
+    class Abs1 extends Abs {
+      test(): string {
+        return 'one'
+      }
+    }
+
+    interface Interface {
+      test(): string
+    }
+
+    @Injectable()
+    @Named('interface')
+    class A2 implements Interface {
+      test(): string {
+        return 'a2'
+      }
+    }
+
+    @Configuration()
+    class Conf {
+      @Bean(Abs)
+      @Primary()
+      abs(): Abs {
+        return new (class extends Abs {
+          test(): string {
+            return 'abs-bean'
+          }
+        })()
+      }
+
+      @Bean('interface')
+      @Primary()
+      fromInterface(): Interface {
+        return new (class implements Interface {
+          test(): string {
+            return 'interface-bean'
+          }
+        })()
+      }
+    }
+
+    it('should use primary beans from configurations class', function () {
+      const di = DI.setup()
+      const abs = di.get(Abs)
+      const i = di.get<Interface>('interface')
+
+      expect(abs.test()).toEqual('abs-bean')
+      expect(i.test()).toEqual('interface-bean')
     })
   })
 })
