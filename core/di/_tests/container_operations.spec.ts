@@ -2,7 +2,7 @@ import { v4 } from 'uuid'
 import { DI } from '../DI.js'
 import { Injectable } from '../decorators/Injectable.js'
 
-describe('DI - Basic', function () {
+describe('Basic', function () {
   describe('calling .clear()', function () {
     @Injectable()
     class Dep {}

@@ -7,7 +7,7 @@ import { BarFail } from './fixtures/circular/BarFail.js'
 import { Foo } from './fixtures/circular/Foo.js'
 import { FooFail } from './fixtures/circular/FooFail.js'
 
-describe('DI - Circular References', function () {
+describe('Circular References', function () {
   describe('dependencies with deferred constructor', function () {
     it('should resolve dependencies', function () {
       const di = DI.setup()

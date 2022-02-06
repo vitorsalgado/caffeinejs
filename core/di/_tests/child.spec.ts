@@ -5,7 +5,7 @@ import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
 import { Scopes } from '../Scopes.js'
 
-describe('DI - Child', function () {
+describe('Child', function () {
   describe('when creating a child container', function () {
     @Injectable()
     @ScopedAs(Scopes.CONTAINER)

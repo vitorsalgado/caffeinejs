@@ -1,4 +1,5 @@
 import { v4 } from 'uuid'
+import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { InjectAll } from '../decorators/InjectAll.js'
 import { Named } from '../decorators/Named.js'
@@ -8,7 +9,7 @@ import { DI } from '../DI'
 import { NoUniqueInjectionForTokenError } from '../DiError.js'
 import { NoResolutionForTokenError } from '../DiError.js'
 
-describe('DI - Class', function () {
+describe('Class', function () {
   describe('when using dependencies with default configurations', function () {
     const spy = jest.fn()
 
@@ -56,6 +57,7 @@ describe('DI - Class', function () {
       expect(DI.setup().has(Root)).toBeTruthy()
       expect(root.seeYaService.bye()).toEqual('bye-bye')
       expect(root.okService.ok()).toEqual('ok-bye-bye')
+      expect(spy).toHaveBeenCalledTimes(3)
     })
 
     it('should return singleton instance as default', function () {
@@ -64,9 +66,6 @@ describe('DI - Class', function () {
 
       expect(root1).toEqual(root2)
       expect(root1.id).toEqual(root2.id)
-    })
-
-    it('should construct singleton classes only once', function () {
       expect(spy).toHaveBeenCalledTimes(3)
     })
   })
@@ -252,6 +251,10 @@ describe('DI - Class', function () {
   describe('optional injections', function () {
     class Repo {}
 
+    interface Service {
+      run(): void
+    }
+
     @Injectable()
     class OptSvc {
       constructor(@Optional() readonly repo?: Repo) {}
@@ -262,12 +265,19 @@ describe('DI - Class', function () {
       constructor(readonly repo?: Repo) {}
     }
 
+    @Injectable()
+    class Ctrl {
+      constructor(@Inject('service') @Optional() readonly service?: Service) {}
+    }
+
     it('should inject null values when dependency cannot be resolved and is marked as optional', function () {
       const di = DI.setup()
       const svc = di.get(OptSvc)
+      const ctrl = di.get(Ctrl)
 
       expect(svc.repo).toBeNull()
       expect(() => di.get(NonSvc)).toThrow()
+      expect(ctrl.service).toBeNull()
     })
   })
 

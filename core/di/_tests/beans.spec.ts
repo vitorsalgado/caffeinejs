@@ -7,7 +7,7 @@ import { Named } from '../decorators/Named.js'
 import { Primary } from '../decorators/Primary.js'
 import { DI } from '../DI'
 
-describe('Bean Configuration', function () {
+describe('Configuration', function () {
   describe('class provider', function () {
     const spy = jest.fn()
 

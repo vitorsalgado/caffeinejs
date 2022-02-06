@@ -4,7 +4,7 @@ import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
 
-describe('DI - Named Dependencies', function () {
+describe('Named Dependencies', function () {
   const ack = Symbol.for('ok')
 
   @Injectable()

@@ -5,7 +5,7 @@ import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
 import { Scopes } from '../Scopes.js'
 
-describe('DI - Abstract Classes', function () {
+describe('Abstract Classes', function () {
   describe('using abstract classes as token', function () {
     describe('and referencing the abstract class on constructor without naming', function () {
       const spy = jest.fn()

@@ -19,10 +19,6 @@ import { TokenSpec } from './Token.js'
 export namespace Resolver {
   export function resolve<T>(di: DI, token: Token<T>, binding: Binding<T> | undefined, context: ResolutionContext): T {
     if (binding) {
-      if (!isNil(binding.instance)) {
-        return binding.instance as T
-      }
-
       return binding.scopedProvider.provide({ di, token, binding, resolutionContext: context }) as T
     }
 

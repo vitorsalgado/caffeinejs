@@ -5,7 +5,7 @@ import { LateBind } from '../decorators/LateBind.js'
 import { Named } from '../decorators/Named.js'
 import { DI } from '../DI.js'
 
-describe('DI - Manual Binding', function () {
+describe('Manual Binding', function () {
   abstract class Abs {
     abstract msg(): string
   }

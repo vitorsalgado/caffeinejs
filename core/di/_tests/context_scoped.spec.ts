@@ -5,7 +5,7 @@ import { Scopes } from '../Scopes.js'
 import { ResolutionContext } from '../ResolutionContext.js'
 import { ScopedAs } from '../decorators/ScopedAs.js'
 
-describe('DI - Context Scoped', function () {
+describe('Context Scoped', function () {
   @Injectable()
   @ScopedAs(Scopes.RESOLUTION_CONTEXT)
   class ResScopedDep {

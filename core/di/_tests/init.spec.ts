@@ -4,7 +4,7 @@ import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
 import { Scopes } from '../Scopes.js'
 
-describe('DI - Init Singleton and Container Scoped', function () {
+describe('Init Singleton and Container Scoped', function () {
   const spy1 = jest.fn()
   const spy2 = jest.fn()
   const spy3 = jest.fn()
