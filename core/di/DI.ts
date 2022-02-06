@@ -145,7 +145,7 @@ export class DI {
   bind<T>(token: Token<T>): BindTo<T> {
     notNil(token)
 
-    const type = DecoratedInjectables.instance().get(token as Ctor)
+    const type = DecoratedInjectables.instance().get(token)
     const binding = newBinding(type)
 
     this.configureBinding(token, binding)
@@ -180,7 +180,7 @@ export class DI {
           scope: binding.scope
         } as Binding
 
-        copiedBinding.scopedProvider = binding.scope.wrap(binding.provider as Provider)
+        copiedBinding.scopedProvider = binding.scope.wrap(binding.provider)
         child.bindingRegistry.register(token, copiedBinding)
       })
 
@@ -218,7 +218,7 @@ export class DI {
       }
     }
 
-    binding.provider = provider as Provider<T>
+    binding.provider = provider
     binding.scope = DI.Scopes.get(binding.scopeId) as Scope<T>
     binding.scopedProvider = binding.scope.wrap(binding.provider as Provider)
 

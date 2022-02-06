@@ -3,7 +3,9 @@ import { TokenSpec } from '../Token.js'
 
 export function getParamTypes<TFunction>(target: TFunction, propertyKey?: string | symbol): TokenSpec<unknown>[] {
   const paramsTypes: unknown[] =
-    Reflect.getOwnMetadata('design:paramtypes', target, propertyKey as string | symbol) || []
+    (propertyKey
+      ? Reflect.getOwnMetadata('design:paramtypes', target, propertyKey)
+      : Reflect.getOwnMetadata('design:paramtypes', target)) || []
   const params = [...paramsTypes]
 
   const injectionTokens: Record<string, TokenSpec<unknown>> = Reflect.getOwnMetadata(DiVars.INJECTION_KEY, target) || {}

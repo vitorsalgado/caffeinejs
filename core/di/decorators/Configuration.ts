@@ -27,7 +27,7 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
       Reflect.getOwnMetadata(DiVars.BEAN_METHOD, target) || new Map()
 
     for (const [method, factory] of factories) {
-      DI.configureInjectable(factory.token as Ctor, {
+      DI.configureInjectable(factory.token, {
         names: factory.name ? [factory.name] : [],
         dependencies: factory.dependencies,
         namespace: config.namespace,

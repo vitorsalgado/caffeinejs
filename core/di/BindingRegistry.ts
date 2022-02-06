@@ -18,7 +18,7 @@ export class BindingRegistry {
   }
 
   get<T>(token: Token<T>): Binding<T> | undefined {
-    return this._types.get(token) as Binding<T> | undefined
+    return this._types.get(token)
   }
 
   has(token: Token): boolean {
