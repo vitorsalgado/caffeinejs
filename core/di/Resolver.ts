@@ -17,26 +17,19 @@ import { Token } from './Token.js'
 import { TokenSpec } from './Token.js'
 
 export namespace Resolver {
-  export function resolveBinding<T>(
-    di: DI,
-    token: Token<T>,
-    binding: Binding<T> | undefined,
-    context: ResolutionContext
-  ): T {
+  export function resolve<T>(di: DI, token: Token<T>, binding: Binding<T> | undefined, context: ResolutionContext): T {
     if (binding) {
       if (!isNil(binding.instance)) {
         return binding.instance as T
       }
 
-      const resolved = binding.scopedProvider?.provide({ di, token, binding, resolutionContext: context })
-
-      return resolved as T
+      return binding.scopedProvider.provide({ di, token, binding, resolutionContext: context }) as T
     }
 
     let resolved: T | undefined
 
     if (token instanceof DeferredCtor) {
-      resolved = newClassInstance<T>(di, token, context)
+      resolved = construct<T>(di, token, context)
     }
 
     if (typeof token === 'function') {
@@ -63,7 +56,7 @@ export namespace Resolver {
     return resolved as T
   }
 
-  export function newClassInstance<T>(di: DI, ctor: Ctor<T> | DeferredCtor<T>, context: ResolutionContext): T {
+  export function construct<T>(di: DI, ctor: Ctor<T> | DeferredCtor<T>, context: ResolutionContext): T {
     if (ctor instanceof DeferredCtor) {
       return ctor.createProxy(target => di.get(target, context))
     }
@@ -110,7 +103,7 @@ export namespace Resolver {
       const byType = di.searchBy(dep.tokenType)
 
       if (byType) {
-        resolution = resolveBinding(di, dep.token, byType, context)
+        resolution = resolve(di, dep.token, byType, context)
 
         if (!isNil(resolution)) {
           di.configureBinding(dep.token, byType)

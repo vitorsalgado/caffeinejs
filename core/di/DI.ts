@@ -76,13 +76,13 @@ export class DI {
       const primary = bindings.find(x => x.primary)
 
       if (primary) {
-        return Resolver.resolveBinding<T>(this, token, primary, context)
+        return Resolver.resolve<T>(this, token, primary, context)
       }
 
       throw new NoUniqueInjectionForTokenError(token)
     }
 
-    return Resolver.resolveBinding<T>(this, token, bindings[0], context)
+    return Resolver.resolve<T>(this, token, bindings[0], context)
   }
 
   getRequired<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
@@ -113,10 +113,10 @@ export class DI {
         return []
       }
 
-      return entries.map(entry => Resolver.resolveBinding(this, entry.token, entry.binding, context))
+      return entries.map(entry => Resolver.resolve(this, entry.token, entry.binding, context))
     }
 
-    return bindings.map(binding => Resolver.resolveBinding(this, token, binding, context))
+    return bindings.map(binding => Resolver.resolve(this, token, binding, context))
   }
 
   has<T>(token: Token<T>, checkParent = false): boolean {
@@ -261,7 +261,7 @@ export class DI {
         continue
       }
 
-      Resolver.resolveBinding(this, token, binding, ResolutionContext.INSTANCE)
+      Resolver.resolve(this, token, binding, ResolutionContext.INSTANCE)
     }
   }
 

@@ -1,8 +1,7 @@
-import { Scopes } from './Scopes.js'
 import { Identifier } from './Identifier.js'
 import { Provider } from './internal/Provider.js'
-import { SingletonScope } from './internal/SingletonScope.js'
 import { Scope } from './Scope.js'
+import { Scopes } from './Scopes.js'
 import { TokenSpec } from './Token.js'
 
 export interface Binding<T = any> {
@@ -11,9 +10,9 @@ export interface Binding<T = any> {
   scopeId: Identifier
   names: Identifier[]
   scope: Scope<T>
+  provider: Provider<unknown>
+  scopedProvider: Provider<unknown>
   instance?: T
-  provider?: Provider<unknown>
-  scopedProvider?: Provider<unknown>
   primary?: boolean
   late?: boolean
   lazy?: boolean
@@ -32,11 +31,11 @@ export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
     namespace: initial.namespace || '',
     names: initial.names || [],
     instance: initial.instance,
-    provider: initial.provider,
     primary: initial.primary,
     late: initial.late,
     onDestroy: initial.onDestroy,
-    scopedProvider: initial.scopedProvider,
-    scope: initial.scope || new SingletonScope()
+    scopedProvider: initial.scopedProvider!,
+    provider: initial.provider!,
+    scope: initial.scope!
   }
 }

@@ -10,6 +10,6 @@ export class ClassProvider<T = any> extends Provider<T> {
   }
 
   provide(ctx: ProviderContext): T {
-    return Resolver.newClassInstance(ctx.di, this.clazz, ctx.resolutionContext)
+    return Resolver.construct(ctx.di, this.clazz, ctx.resolutionContext)
   }
 }
