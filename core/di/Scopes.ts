@@ -1,4 +1,4 @@
-export const BuiltInLifecycles = {
+export const Scopes = {
   SINGLETON: 'singleton',
   TRANSIENT: 'transient',
   CONTAINER: 'container',

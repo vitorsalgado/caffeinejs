@@ -2,7 +2,7 @@ import { Injectable } from '../decorators/Injectable.js'
 import { Lazy } from '../decorators/Lazy.js'
 import { Scoped } from '../decorators/Scoped.js'
 import { DI } from '../DI.js'
-import { BuiltInLifecycles } from '../BuiltInLifecycles.js'
+import { Scopes } from '../Scopes.js'
 
 describe('DI - Init Singleton and Container Scoped', function () {
   const spy1 = jest.fn()
@@ -19,7 +19,7 @@ describe('DI - Init Singleton and Container Scoped', function () {
   }
 
   @Injectable()
-  @Scoped(BuiltInLifecycles.CONTAINER)
+  @Scoped(Scopes.CONTAINER)
   class Dep2 {
     constructor() {
       spy2()
@@ -27,7 +27,7 @@ describe('DI - Init Singleton and Container Scoped', function () {
   }
 
   @Injectable()
-  @Scoped(BuiltInLifecycles.TRANSIENT)
+  @Scoped(Scopes.TRANSIENT)
   class Dep3 {
     constructor() {
       spy3()
@@ -43,7 +43,7 @@ describe('DI - Init Singleton and Container Scoped', function () {
   }
 
   @Injectable()
-  @Scoped(BuiltInLifecycles.TRANSIENT)
+  @Scoped(Scopes.TRANSIENT)
   @Lazy(false)
   class Dep5 {
     constructor() {

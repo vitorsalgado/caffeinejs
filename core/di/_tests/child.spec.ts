@@ -3,12 +3,12 @@ import { Injectable } from '../decorators/Injectable.js'
 import { LateInjectable } from '../decorators/LateInjectable.js'
 import { Scoped } from '../decorators/Scoped.js'
 import { DI } from '../DI.js'
-import { BuiltInLifecycles } from '../BuiltInLifecycles.js'
+import { Scopes } from '../Scopes.js'
 
 describe('DI - Child', function () {
   describe('when creating a child container', function () {
     @Injectable()
-    @Scoped(BuiltInLifecycles.CONTAINER)
+    @Scoped(Scopes.CONTAINER)
     class ContainerSvc {
       readonly id: string = v4()
     }

@@ -5,7 +5,6 @@ import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
 import { BindTo } from './BindTo.js'
-import { BuiltInLifecycles } from './BuiltInLifecycles.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'
 import { CircularReferenceError } from './DiError.js'
 import { NoProviderForTokenError } from './DiError.js'
@@ -23,15 +22,16 @@ import { TransientScope } from './internal/TransientScope.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { Resolver } from './Resolver.js'
 import { Scope } from './Scope.js'
+import { Scopes as BuiltInScopes } from './Scopes.js'
 import { tokenStr } from './Token.js'
 import { isNamedToken, Token } from './Token.js'
 
 export class DI {
   private static readonly Scopes = new Map<Identifier, Scope<unknown>>()
-    .set(BuiltInLifecycles.SINGLETON, new SingletonScope())
-    .set(BuiltInLifecycles.CONTAINER, new ContainerScope())
-    .set(BuiltInLifecycles.RESOLUTION_CONTEXT, new ResolutionContextScope())
-    .set(BuiltInLifecycles.TRANSIENT, new TransientScope())
+    .set(BuiltInScopes.SINGLETON, new SingletonScope())
+    .set(BuiltInScopes.CONTAINER, new ContainerScope())
+    .set(BuiltInScopes.RESOLUTION_CONTEXT, new ResolutionContextScope())
+    .set(BuiltInScopes.TRANSIENT, new TransientScope())
 
   private readonly bindingRegistry: BindingRegistry = new BindingRegistry()
   private readonly bindingNames: Map<Identifier, Binding[]> = new Map()
@@ -146,7 +146,7 @@ export class DI {
     const type = DecoratedInjectables.instance().get(token as Ctor)
     const binding = newBinding(type)
 
-    this.register(token, binding)
+    this.configureBinding(token, binding)
 
     return new BindTo<T>(this, token, { ...binding })
   }
@@ -166,7 +166,7 @@ export class DI {
 
     this.bindingRegistry
       .toArray()
-      .filter(x => x.binding.lifecycle === BuiltInLifecycles.CONTAINER)
+      .filter(x => x.binding.lifecycle === BuiltInScopes.CONTAINER)
       .forEach(({ token, binding }) => {
         const copiedBinding = {
           provider: binding.provider,
@@ -185,7 +185,7 @@ export class DI {
     return child
   }
 
-  register<T>(token: Token<T>, binding: Binding<T>): void {
+  configureBinding<T>(token: Token<T>, binding: Binding<T>): void {
     const provider = providerFromToken(token, binding.provider)
 
     if (!provider) {
@@ -271,7 +271,7 @@ export class DI {
           ({ binding }) =>
             binding.onDestroy &&
             binding.instance &&
-            (binding.lifecycle === BuiltInLifecycles.SINGLETON || binding.lifecycle === BuiltInLifecycles.CONTAINER)
+            (binding.lifecycle === BuiltInScopes.SINGLETON || binding.lifecycle === BuiltInScopes.CONTAINER)
         )
         .map(({ binding }) => binding.instance[binding.onDestroy as Identifier]())
     ).then(() => this.clear())
@@ -287,7 +287,7 @@ export class DI {
         continue
       }
 
-      this.register(key, binding)
+      this.configureBinding(key, binding)
 
       for (const name of binding.names) {
         const named = this.bindingNames.get(name)

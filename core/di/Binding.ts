@@ -1,4 +1,4 @@
-import { BuiltInLifecycles } from './BuiltInLifecycles.js'
+import { Scopes } from './Scopes.js'
 import { Identifier } from './Identifier.js'
 import { Provider } from './internal/Provider.js'
 import { SingletonScope } from './internal/SingletonScope.js'
@@ -21,11 +21,9 @@ export interface Binding<T = any> {
 }
 
 export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
-  const lifecycle = initial.lifecycle === undefined ? BuiltInLifecycles.SINGLETON : initial.lifecycle
+  const lifecycle = initial.lifecycle === undefined ? Scopes.SINGLETON : initial.lifecycle
   const lazy =
-    initial.lazy === undefined
-      ? !(lifecycle === BuiltInLifecycles.SINGLETON || lifecycle === BuiltInLifecycles.CONTAINER)
-      : initial.lazy
+    initial.lazy === undefined ? !(lifecycle === Scopes.SINGLETON || lifecycle === Scopes.CONTAINER) : initial.lazy
 
   return {
     lazy,
