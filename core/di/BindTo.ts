@@ -9,7 +9,7 @@ import { FactoryProvider } from './internal/FactoryProvider.js'
 import { ProviderContext } from './internal/Provider.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { ValueProvider } from './internal/ValueProvider.js'
-import { Lifecycle } from './Lifecycle.js'
+import { BuiltInLifecycles } from './BuiltInLifecycles.js'
 import { Token } from './Token.js'
 
 export class BindTo<T> {
@@ -30,7 +30,7 @@ export class BindTo<T> {
 
   toValue(value: T): BindToOptions<T> {
     this.binding.provider = new ValueProvider(value)
-    this.binding.lifecycle = Lifecycle.SINGLETON
+    this.binding.lifecycle = BuiltInLifecycles.SINGLETON
 
     this.di.register(this.token, this.binding)
 
@@ -51,7 +51,7 @@ export class BindTo<T> {
     isFn(factory)
 
     this.binding.provider = new FactoryProvider(factory)
-    this.binding.lifecycle = Lifecycle.SINGLETON
+    this.binding.lifecycle = BuiltInLifecycles.SINGLETON
     this.di.register(this.token, this.binding)
 
     return new BindToOptions<T>(this.di, this.token, this.binding)

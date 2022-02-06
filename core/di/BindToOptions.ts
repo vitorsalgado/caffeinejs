@@ -1,7 +1,7 @@
 import { notNil } from '../preconditions/notNil.js'
 import { Binding } from './Binding.js'
 import { DI } from './DI.js'
-import { Lifecycle } from './Lifecycle.js'
+import { BuiltInLifecycles } from './BuiltInLifecycles.js'
 import { Token } from './Token.js'
 
 export class BindToOptions<T> {
@@ -17,22 +17,22 @@ export class BindToOptions<T> {
   }
 
   singleton(): void {
-    this.binding.lifecycle = Lifecycle.SINGLETON
+    this.binding.lifecycle = BuiltInLifecycles.SINGLETON
     this.di.register(this.token, this.binding)
   }
 
   transient(): void {
-    this.binding.lifecycle = Lifecycle.TRANSIENT
+    this.binding.lifecycle = BuiltInLifecycles.TRANSIENT
     this.di.register(this.token, this.binding)
   }
 
   containerScoped(): void {
-    this.binding.lifecycle = Lifecycle.CONTAINER
+    this.binding.lifecycle = BuiltInLifecycles.CONTAINER
     this.di.register(this.token, this.binding)
   }
 
   resolutionScoped(): void {
-    this.binding.lifecycle = Lifecycle.RESOLUTION_CONTEXT
+    this.binding.lifecycle = BuiltInLifecycles.RESOLUTION_CONTEXT
     this.di.register(this.token, this.binding)
   }
 }

@@ -15,7 +15,7 @@ export function Configuration<T>(): ClazzDecorator<T> {
 
     for (const [method, factory] of factories) {
       DI.configureInjectable(factory.token as Ctor, {
-        qualifiers: factory.name ? [factory.name] : [],
+        names: factory.name ? [factory.name] : [],
         provider: new FactoryProvider(({ di }) => {
           const clazz = di.get<{ [key: symbol | string]: (...args: unknown[]) => T }>(target)
           const deps = factory.dependencies.map(dep => (dep.multiple ? di.getMany(dep.token) : di.get(dep.token)))

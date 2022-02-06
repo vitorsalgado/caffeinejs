@@ -1,15 +1,12 @@
+import { DiVars } from '../DiVars.js'
 import { TokenSpec } from '../Token.js'
-import { INJECTION_TOKEN_METADATA_KEY } from './keys.js'
 
 export function getParamTypes<TFunction>(target: TFunction, propertyKey?: string | symbol): TokenSpec<unknown>[] {
   const paramsTypes: unknown[] =
     Reflect.getOwnMetadata('design:paramtypes', target, propertyKey as string | symbol) || []
   const params = [...paramsTypes]
 
-  const injectionTokens: Record<string, TokenSpec<unknown>> = Reflect.getOwnMetadata(
-    INJECTION_TOKEN_METADATA_KEY,
-    target
-  ) || {}
+  const injectionTokens: Record<string, TokenSpec<unknown>> = Reflect.getOwnMetadata(DiVars.INJECTION_KEY, target) || {}
 
   for (let i = 0; i < params.length; i++) {
     const key = +i

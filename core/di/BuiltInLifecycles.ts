@@ -1,4 +1,4 @@
-export const Lifecycle = {
+export const BuiltInLifecycles = {
   SINGLETON: 'singleton',
   TRANSIENT: 'transient',
   CONTAINER: 'container',

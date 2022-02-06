@@ -5,11 +5,11 @@ import { Binding } from './Binding.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'
 import { DeferredCtor } from './DeferredCtor.js'
 import { DI } from './DI.js'
-import { NoUniqueInjectionForTokenError } from './errors.js'
-import { NoResolutionForTokenError } from './errors.js'
-import { CircularReferenceError } from './errors.js'
-import { UnresolvableConstructorArguments } from './errors.js'
-import { TypeNotRegisteredForInjectionError } from './errors.js'
+import { NoUniqueInjectionForTokenError } from './DiError.js'
+import { TypeNotRegisteredForInjectionError } from './DiError.js'
+import { UnresolvableConstructorArguments } from './DiError.js'
+import { NoResolutionForTokenError } from './DiError.js'
+import { CircularReferenceError } from './DiError.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { Token } from './Token.js'
@@ -88,7 +88,11 @@ export namespace Resolver {
 
   function resolveParam<T>(di: DI, ctor: Ctor<T>, dep: TokenSpec<T>, context: ResolutionContext): T {
     if (isNil(dep.token) && isNil(dep.tokenType)) {
-      throw new CircularReferenceError(ctor)
+      throw new CircularReferenceError(
+        `Attempt to resolve a undefined injection token. This could mean that the class ${ctor.name} has a ` +
+          'circular reference. If this was intentional, make sure to decorate your circular constructor parameters with @Defer to correctly resolve ' +
+          'this class dependencies'
+      )
     }
 
     let resolution

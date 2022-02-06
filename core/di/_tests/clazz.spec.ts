@@ -5,8 +5,8 @@ import { Named } from '../decorators/Named.js'
 import { Optional } from '../decorators/Optional.js'
 import { Primary } from '../decorators/Primary.js'
 import { DI } from '../DI'
-import { NoResolutionForTokenError } from '../errors.js'
-import { NoUniqueInjectionForTokenError } from '../errors.js'
+import { NoUniqueInjectionForTokenError } from '../DiError.js'
+import { NoResolutionForTokenError } from '../DiError.js'
 
 describe('DI - Class', function () {
   describe('when using dependencies with default configurations', function () {

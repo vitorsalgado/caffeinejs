@@ -14,12 +14,10 @@ export class BindingRegistry {
     notNil(token)
     notNil(binding)
 
-    const entry = this.entry(token)
-
-    this._types.set(token, { ...entry, ...binding })
+    this._types.set(token, { ...this.getEntry(token), ...binding })
   }
 
-  find<T>(token: Token<T>): Binding<T> | undefined {
+  get<T>(token: Token<T>): Binding<T> | undefined {
     return this._types.get(token) as Binding<T> | undefined
   }
 
@@ -31,11 +29,11 @@ export class BindingRegistry {
     return this._types.entries()
   }
 
-  collect(): BindingEntry[] {
+  toArray(): BindingEntry[] {
     return Array.from(this._types.entries()).map(([token, registration]) => ({ token, binding: registration }))
   }
 
-  remove(token: Token): boolean {
+  delete(token: Token): boolean {
     return this._types.delete(token)
   }
 
@@ -43,7 +41,7 @@ export class BindingRegistry {
     this._types.clear()
   }
 
-  private entry(token: Token<unknown>): Binding {
+  private getEntry(token: Token<unknown>): Binding {
     const entry = this._types.get(token)
 
     if (entry) {

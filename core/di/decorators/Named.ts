@@ -7,7 +7,7 @@ export function Named<T>(name: string | symbol) {
   return function (target: Ctor<T> | object, method?: string | symbol) {
     if (typeof target === 'function' && !method) {
       DI.configureInjectable<T>(target, {
-        qualifiers: [name],
+        names: [name],
         provider: new ClassProvider(target as Ctor)
       })
       return

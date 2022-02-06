@@ -3,7 +3,7 @@ import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
 import { Scoped } from '../decorators/Scoped.js'
 import { DI } from '../DI.js'
-import { Lifecycle } from '../Lifecycle.js'
+import { BuiltInLifecycles } from '../BuiltInLifecycles.js'
 
 describe('DI - Abstract Classes', function () {
   describe('using abstract classes as token', function () {
@@ -31,7 +31,7 @@ describe('DI - Abstract Classes', function () {
       }
 
       @Injectable()
-      @Scoped(Lifecycle.TRANSIENT)
+      @Scoped(BuiltInLifecycles.TRANSIENT)
       class Service {
         constructor(readonly dep: Base) {}
 

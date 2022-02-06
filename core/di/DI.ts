@@ -5,11 +5,12 @@ import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
 import { BindTo } from './BindTo.js'
+import { BuiltInLifecycles } from './BuiltInLifecycles.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'
-import { NoResolutionForTokenError } from './errors.js'
-import { NoUniqueInjectionForTokenError } from './errors.js'
-import { NoProviderForTokenError } from './errors.js'
-import { DiError } from './errors/DiError.js'
+import { CircularReferenceError } from './DiError.js'
+import { NoProviderForTokenError } from './DiError.js'
+import { NoUniqueInjectionForTokenError } from './DiError.js'
+import { NoResolutionForTokenError } from './DiError.js'
 import { ClassProvider } from './internal/ClassProvider.js'
 import { ContainerScope } from './internal/ContainerScope.js'
 import { Provider } from './internal/Provider.js'
@@ -18,7 +19,6 @@ import { ResolutionContextScope } from './internal/ResolutionContextScope.js'
 import { SingletonScope } from './internal/SingletonScope.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { TransientScope } from './internal/TransientScope.js'
-import { Lifecycle } from './Lifecycle.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { Resolver } from './Resolver.js'
 import { Scope } from './Scope.js'
@@ -27,13 +27,13 @@ import { isNamedToken, Token } from './Token.js'
 
 export class DI {
   private static readonly Scopes = new Map<string | symbol, Scope<unknown>>()
-    .set(Lifecycle.SINGLETON, new SingletonScope())
-    .set(Lifecycle.CONTAINER, new ContainerScope())
-    .set(Lifecycle.RESOLUTION_CONTEXT, new ResolutionContextScope())
-    .set(Lifecycle.TRANSIENT, new TransientScope())
+    .set(BuiltInLifecycles.SINGLETON, new SingletonScope())
+    .set(BuiltInLifecycles.CONTAINER, new ContainerScope())
+    .set(BuiltInLifecycles.RESOLUTION_CONTEXT, new ResolutionContextScope())
+    .set(BuiltInLifecycles.TRANSIENT, new TransientScope())
 
-  private readonly _registry: BindingRegistry = new BindingRegistry()
-  private readonly _qualifiersMap: Map<string | symbol, Binding[]> = new Map()
+  private readonly bindingRegistry: BindingRegistry = new BindingRegistry()
+  private readonly bindingNames: Map<string | symbol, Binding[]> = new Map()
 
   protected constructor(readonly namespace = '', readonly parent?: DI) {
     notNil(namespace)
@@ -46,11 +46,11 @@ export class DI {
     return di
   }
 
-  static configureInjectable<T>(token: Ctor<T> | Function | object, opts?: Partial<Binding>): void {
+  static configureInjectable<T>(token: Token<T>, opts?: Partial<Binding>): void {
     notNil(token)
 
     const tk = typeof token === 'object' ? token.constructor : token
-    const existing = DecoratedInjectables.instance().get(tk as Ctor<T>)
+    const existing = DecoratedInjectables.instance().get(tk)
     const binding = newBinding({ ...existing, ...opts })
 
     if (isNil(binding.provider)) {
@@ -62,13 +62,10 @@ export class DI {
     }
 
     if (!binding.provider) {
-      throw new DiError(
-        `Could not determine a provider for token: ${tokenStr(token as Token)}`,
-        DiError.CODE_NO_PROVIDER
-      )
+      throw new NoProviderForTokenError(`Could not determine a provider for token: ${tokenStr(token)}`)
     }
 
-    DecoratedInjectables.instance().configure(tk as Ctor<T>, binding)
+    DecoratedInjectables.instance().configure(tk, binding)
   }
 
   get<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
@@ -104,7 +101,7 @@ export class DI {
       let entries: BindingEntry[]
 
       if (isNamedToken(token)) {
-        entries = this.search((tk, r) => isNamedToken(tk) && r.qualifiers.includes(token))
+        entries = this.search((tk, b) => isNamedToken(tk) && b.names.includes(token))
       } else {
         entries = this.search(tk => typeof tk === 'function' && tk !== token && token.isPrototypeOf(tk))
       }
@@ -113,20 +110,22 @@ export class DI {
         return []
       }
 
-      return entries.map(r => Resolver.resolveBinding(this, r.token, r.binding, context)) as T[]
+      return entries.map(entry => Resolver.resolveBinding(this, entry.token, entry.binding, context))
     }
 
     return bindings.map(binding => Resolver.resolveBinding(this, token, binding, context))
   }
 
   has<T>(token: Token<T>, checkParent = false): boolean {
-    return this._registry.has(token) || (checkParent && (this.parent || false) && this.parent.has(token, true))
+    return this.bindingRegistry.has(token) || (checkParent && (this.parent || false) && this.parent.has(token, true))
   }
 
   search(predicate: <T>(token: Token<T>, registration: Binding) => boolean): BindingEntry[] {
+    notNil(predicate)
+
     const result: BindingEntry[] = []
 
-    for (const [token, registrations] of this._registry.entries()) {
+    for (const [token, registrations] of this.bindingRegistry.entries()) {
       if (predicate(token, registrations)) {
         result.push({ token, binding: registrations })
       }
@@ -136,7 +135,8 @@ export class DI {
   }
 
   searchBy<T>(token: Token<T>): Binding<T> | undefined {
-    return this._registry.find(token)
+    notNil(token)
+    return this.bindingRegistry.get(token)
   }
 
   bind<T>(token: Token<T>): BindTo<T> {
@@ -151,7 +151,8 @@ export class DI {
   }
 
   unbind<T>(token: Token<T>): void {
-    this._registry.remove(token)
+    notNil(token)
+    this.bindingRegistry.delete(token)
   }
 
   rebind<T>(token: Token<T>): BindTo<T> {
@@ -162,22 +163,22 @@ export class DI {
   newChild(): DI {
     const child = new DI(this.namespace, this)
 
-    this._registry
-      .collect()
-      .filter(x => x.binding.lifecycle === Lifecycle.CONTAINER)
+    this.bindingRegistry
+      .toArray()
+      .filter(x => x.binding.lifecycle === BuiltInLifecycles.CONTAINER)
       .forEach(({ token, binding }) => {
-        const copy = {
+        const copiedBinding = {
           provider: binding.provider,
           dependencies: binding.dependencies,
           primary: binding.primary,
           lifecycle: binding.lifecycle,
-          qualifiers: binding.qualifiers,
+          names: binding.names,
           namespace: binding.namespace,
           scope: binding.scope
         } as Binding
 
-        copy.scopedProvider = binding.scope.wrap(binding.provider as Provider)
-        child._registry.register(token, copy)
+        copiedBinding.scopedProvider = binding.scope.wrap(binding.provider as Provider)
+        child.bindingRegistry.register(token, copiedBinding)
       })
 
     return child
@@ -199,12 +200,12 @@ export class DI {
         const currentToken: Token = tokenProvider.provide(ctx)
 
         if (path.includes(currentToken)) {
-          throw new Error(`Token registration cycle detected! ${[...path, currentToken].join(' -> ')}`)
+          throw new CircularReferenceError(`Token registration cycle detected! ${[...path, currentToken].join(' -> ')}`)
         }
 
         path.push(currentToken)
 
-        const binding: Binding | undefined = this._registry.find(currentToken)
+        const binding: Binding | undefined = this.bindingRegistry.get(currentToken)
 
         if (binding && binding.provider instanceof TokenProvider) {
           tokenProvider = binding.provider
@@ -218,39 +219,41 @@ export class DI {
     binding.scope = DI.Scopes.get(binding.lifecycle) as Scope<T>
     binding.scopedProvider = binding.scope.wrap(binding.provider as Provider)
 
-    this._registry.register(token, binding)
+    this.bindingRegistry.register(token, binding)
   }
 
   getBindings<T>(token: Token<T>): Binding<T>[] {
     if (this.has(token)) {
-      return [this._registry.find(token) as Binding<T>]
+      return [this.bindingRegistry.get(token) as Binding<T>]
     }
 
     if (this.parent) {
       return this.parent.getBindings(token)
     }
 
-    const nm = this._qualifiersMap.get(token as string)
+    if (isNamedToken(token)) {
+      const namedBinding = this.bindingNames.get(token)
 
-    if (nm) {
-      return nm as Binding<T>[]
+      if (namedBinding) {
+        return namedBinding
+      }
     }
 
     return []
   }
 
   clear(): void {
-    this._registry.clear()
+    this.bindingRegistry.clear()
   }
 
   resetInstances(): void {
-    for (const [, binding] of this._registry.entries()) {
+    for (const [, binding] of this.bindingRegistry.entries()) {
       binding.instance = undefined
     }
   }
 
   bootstrap(): void {
-    for (const [token, binding] of this._registry.entries()) {
+    for (const [token, binding] of this.bindingRegistry.entries()) {
       if (binding.lazy) {
         continue
       }
@@ -261,20 +264,20 @@ export class DI {
 
   finalize(): Promise<void> {
     return Promise.all(
-      this._registry
-        .collect()
+      this.bindingRegistry
+        .toArray()
         .filter(
           ({ binding }) =>
             binding.onDestroy &&
             binding.instance &&
-            (binding.lifecycle === Lifecycle.SINGLETON || binding.lifecycle === Lifecycle.CONTAINER)
+            (binding.lifecycle === BuiltInLifecycles.SINGLETON || binding.lifecycle === BuiltInLifecycles.CONTAINER)
         )
         .map(({ binding }) => binding.instance[binding.onDestroy as string | symbol]())
     ).then(() => this.clear())
   }
 
   private setup(): void {
-    for (const [type, binding] of DecoratedInjectables.instance().entries()) {
+    for (const [key, binding] of DecoratedInjectables.instance().entries()) {
       if (binding.namespace !== this.namespace) {
         continue
       }
@@ -283,16 +286,16 @@ export class DI {
         continue
       }
 
-      this.register(type, binding)
+      this.register(key, binding)
 
-      for (const qualifier of binding.qualifiers) {
-        const entry = this._qualifiersMap.get(qualifier)
+      for (const name of binding.names) {
+        const named = this.bindingNames.get(name)
 
-        if (!entry) {
-          this._qualifiersMap.set(qualifier, [binding])
+        if (!named) {
+          this.bindingNames.set(name, [binding])
         } else {
-          entry.push(binding)
-          this._qualifiersMap.set(qualifier, entry)
+          named.push(binding)
+          this.bindingNames.set(name, named)
         }
       }
     }

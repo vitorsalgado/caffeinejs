@@ -1,6 +1,6 @@
 import { newBinding } from '../Binding.js'
 import { DI } from '../DI.js'
-import { CircularReferenceError } from '../errors.js'
+import { CircularReferenceError } from '../DiError.js'
 import { TokenProvider } from '../internal/TokenProvider.js'
 import { Bar } from './fixtures/circular/Bar.js'
 import { BarFail } from './fixtures/circular/BarFail.js'
