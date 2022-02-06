@@ -7,7 +7,6 @@ import { DeferredCtor } from './DeferredCtor.js'
 import { DI } from './DI.js'
 import { NoUniqueInjectionForTokenError } from './DiError.js'
 import { TypeNotRegisteredForInjectionError } from './DiError.js'
-import { UnresolvableConstructorArguments } from './DiError.js'
 import { NoResolutionForTokenError } from './DiError.js'
 import { CircularReferenceError } from './DiError.js'
 import { TokenProvider } from './internal/TokenProvider.js'
@@ -66,11 +65,7 @@ export namespace Resolver {
     const deps = type.dependencies.map(dep => resolveParam(di, ctor, dep, context))
 
     if (deps.length === 0) {
-      if (ctor.length === 0) {
-        return new ctor()
-      } else {
-        throw new UnresolvableConstructorArguments(ctor)
-      }
+      return new ctor()
     }
 
     return new ctor(...deps)

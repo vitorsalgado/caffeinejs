@@ -6,14 +6,14 @@ import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
 import { BindTo } from './BindTo.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'
+import { ScopeAlreadyRegisteredError } from './DiError.js'
+import { ScopeNotRegisteredError } from './DiError.js'
 import { CircularReferenceError } from './DiError.js'
-import { NoProviderForTokenError } from './DiError.js'
 import { NoUniqueInjectionForTokenError } from './DiError.js'
 import { NoResolutionForTokenError } from './DiError.js'
 import { Identifier } from './Identifier.js'
 import { ClassProvider } from './internal/ClassProvider.js'
 import { ContainerScope } from './internal/ContainerScope.js'
-import { Provider } from './internal/Provider.js'
 import { providerFromToken } from './internal/providerFromToken.js'
 import { ResolutionContextScope } from './internal/ResolutionContextScope.js'
 import { SingletonScope } from './internal/SingletonScope.js'
@@ -62,11 +62,24 @@ export class DI {
       }
     }
 
-    if (!binding.provider) {
-      throw new NoProviderForTokenError(`Could not determine a provider for token: ${tokenStr(token)}`)
-    }
+    notNil(binding.provider, `Could not determine a provider for token: ${tokenStr(token)}`)
 
     DecoratedInjectables.instance().configure(tk, binding)
+  }
+
+  static bindScope<T>(scopeId: Identifier, scope: Scope<T>): void {
+    notNil(scopeId)
+    notNil(scope)
+
+    if (this.Scopes.has(scopeId)) {
+      throw new ScopeAlreadyRegisteredError(scopeId)
+    }
+
+    DI.Scopes.set(scopeId, scope)
+  }
+
+  static unbindScope(scopeId: Identifier): void {
+    DI.Scopes.delete(notNil(scopeId))
   }
 
   get<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
@@ -190,9 +203,7 @@ export class DI {
   configureBinding<T>(token: Token<T>, binding: Binding<T>): void {
     const provider = providerFromToken(token, binding.provider)
 
-    if (!provider) {
-      throw new NoProviderForTokenError(token)
-    }
+    notNil(provider, `Could not determine a provider for token: ${tokenStr(token)}`)
 
     if (provider instanceof TokenProvider) {
       const path = [token]
@@ -218,9 +229,15 @@ export class DI {
       }
     }
 
+    const scope = this.getScope<T>(binding.scopeId)
+
+    if (!scope) {
+      throw new ScopeNotRegisteredError(binding.scopeId)
+    }
+
     binding.provider = provider
-    binding.scope = DI.Scopes.get(binding.scopeId) as Scope<T>
-    binding.scopedProvider = binding.scope.wrap(binding.provider as Provider)
+    binding.scope = scope
+    binding.scopedProvider = binding.scope.wrap(binding.provider)
 
     this.bindingRegistry.register(token, binding)
   }
@@ -243,6 +260,10 @@ export class DI {
     }
 
     return []
+  }
+
+  getScope<T>(scopeId: Identifier): Scope<T> | undefined {
+    return DI.Scopes.get(notNil(scopeId)) as Scope<T> | undefined
   }
 
   clear(): void {

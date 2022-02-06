@@ -10,8 +10,8 @@ export interface Binding<T = any> {
   scopeId: Identifier
   names: Identifier[]
   scope: Scope<T>
-  provider: Provider<unknown>
-  scopedProvider: Provider<unknown>
+  provider: Provider<T>
+  scopedProvider: Provider<T>
   instance?: T
   primary?: boolean
   late?: boolean

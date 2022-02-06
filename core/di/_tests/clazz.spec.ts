@@ -6,8 +6,11 @@ import { Named } from '../decorators/Named.js'
 import { Optional } from '../decorators/Optional.js'
 import { Primary } from '../decorators/Primary.js'
 import { DI } from '../DI'
+import { TypeNotRegisteredForInjectionError } from '../DiError.js'
 import { NoUniqueInjectionForTokenError } from '../DiError.js'
 import { NoResolutionForTokenError } from '../DiError.js'
+import { ResolutionContext } from '../ResolutionContext.js'
+import { Resolver } from '../Resolver.js'
 
 describe('Class', function () {
   describe('when using dependencies with default configurations', function () {
@@ -325,5 +328,15 @@ describe('Class', function () {
         expect(repo.dep).toEqual(dep)
       })
     })
+  })
+
+  it('should fail when trying to construct a class not managed by the DI container', function () {
+    class NonManaged {
+      constructor(private readonly value: string) {}
+    }
+
+    expect(() => Resolver.construct(DI.setup(), NonManaged, ResolutionContext.INSTANCE)).toThrow(
+      TypeNotRegisteredForInjectionError
+    )
   })
 })

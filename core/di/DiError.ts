@@ -1,21 +1,14 @@
-import { Ctor } from '../types/Ctor.js'
+import { Identifier } from './Identifier.js'
 import { tokenStr } from './Token.js'
 import { Token } from './Token.js'
 
 export class DiError extends Error {
+  static CODE_DEFAULT = 'DI_ERR'
   readonly code: string
 
   constructor(message: string, code?: string) {
     super(message)
-    this.code = code ? `DI_ERR_${code}` : 'DI_ERR'
-  }
-}
-
-export class NoProviderForTokenError extends DiError {
-  constructor(token: Token) {
-    super(`Could not determine a provider for token: ${tokenStr(token)}`, 'NO_PROVIDER')
-    Error.captureStackTrace(this, NoProviderForTokenError)
-    this.name = 'NoProviderForTokenError'
+    this.code = code ? `${DiError.CODE_DEFAULT}_${code}` : DiError.CODE_DEFAULT
   }
 }
 
@@ -43,14 +36,6 @@ export class TypeNotRegisteredForInjectionError extends DiError {
   }
 }
 
-export class UnresolvableConstructorArguments extends DiError {
-  constructor(ctor: Ctor) {
-    super(`Class ${ctor.name} contains unresolvable constructor arguments.`, 'CTOR_ARGS_UNRESOLVABLE')
-    Error.captureStackTrace(this, UnresolvableConstructorArguments)
-    this.name = 'UnresolvableConstructorArguments'
-  }
-}
-
 export class NoResolutionForTokenError extends DiError {
   constructor(spec: { token: Token; tokenType?: Token }) {
     super(
@@ -69,5 +54,22 @@ export class CircularReferenceError extends DiError {
     super(message, 'CIRCULAR_REFERENCE')
     Error.captureStackTrace(this, CircularReferenceError)
     this.name = 'CircularReferenceError'
+  }
+}
+
+export class ScopeNotRegisteredError extends DiError {
+  constructor(scopeId: Identifier) {
+    super(
+      `Scope ${scopeId.toString()} is not registered! If this is a valid scope, use DI.bindScope() static method to register it.`,
+      'SCOPE_NOT_REGISTERED'
+    )
+    this.name = 'ScopeNotRegisteredError'
+  }
+}
+
+export class ScopeAlreadyRegisteredError extends DiError {
+  constructor(scopeId: Identifier) {
+    super(`Scope ${scopeId.toString()} is already registered!`, 'SCOPE_ALREADY_REGISTERED')
+    this.name = 'ScopeAlreadyRegisteredError'
   }
 }
