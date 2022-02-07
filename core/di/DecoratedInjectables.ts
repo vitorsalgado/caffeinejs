@@ -1,5 +1,4 @@
 import { notNil } from '../preconditions/notNil.js'
-import { Ctor } from '../types/Ctor.js'
 import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { Token } from './Token.js'
@@ -37,5 +36,10 @@ export class DecoratedInjectables {
 
   entries(): IterableIterator<[Token, Binding]> {
     return this._entries.entries()
+  }
+
+  delete(token: Token): boolean {
+    notNil(token)
+    return this._entries.delete(token)
   }
 }

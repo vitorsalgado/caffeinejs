@@ -115,6 +115,11 @@ describe('Conditionals', function () {
         }
       }
 
+      beforeEach(() => {
+        spy1.mockReset()
+        spy2.mockReset()
+      })
+
       it('should merge the conditionals from class and method level', function () {
         const di = DI.setup()
 

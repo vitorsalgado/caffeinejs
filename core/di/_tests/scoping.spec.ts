@@ -1,4 +1,5 @@
 import { v4 } from 'uuid'
+import { DecoratedInjectables } from '../DecoratedInjectables.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
@@ -28,15 +29,20 @@ describe('Scoping', function () {
   }
 
   it('should fail when using an non-registered scope', function () {
-    expect(() => {
-      @Injectable()
-      @ScopedAs('none')
-      class NonexistentScope {}
+    @Injectable()
+    @ScopedAs('none')
+    class NonexistentScope {}
 
+    try {
       DI.setup()
-    }).toThrow(ScopeNotRegisteredError)
+    } catch (e) {
+      expect(e).toBeInstanceOf(ScopeNotRegisteredError)
+      DI.unbindScope('none')
+      DecoratedInjectables.instance().delete(NonexistentScope)
+      return
+    }
 
-    DI.unbindScope('none')
+    fail('should not reach here!')
   })
 
   it('should use scope specified with decorator when it is registered', function () {
