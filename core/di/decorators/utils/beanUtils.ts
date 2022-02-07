@@ -8,8 +8,10 @@ export function configureBean(
 ): void {
   const factories: Map<string | symbol, ConfigurationProviderOptions> =
     Reflect.getOwnMetadata(DiVars.CONFIGURATION_PROVIDER, target) || new Map()
-  const actual = factories.get(method) || ({} as ConfigurationProviderOptions)
-  const definition = { ...actual, method, ...configurations }
+  const actual = factories.get(method) || def()
+  const conditionals = [...actual.conditionals, ...(configurations.conditionals || [])]
+  const names = [...actual.names, ...(configurations.names || [])]
+  const definition = { ...actual, method, ...configurations, names, conditionals } as ConfigurationProviderOptions
 
   factories.set(method, definition)
 
@@ -19,5 +21,13 @@ export function configureBean(
 export function getBeanConfiguration(target: Function, method: string | symbol): ConfigurationProviderOptions {
   const factories: Map<string | symbol, ConfigurationProviderOptions> =
     Reflect.getOwnMetadata(DiVars.CONFIGURATION_PROVIDER, target) || new Map()
-  return factories.get(method) || ({} as ConfigurationProviderOptions)
+  return factories.get(method) || def()
+}
+
+function def(): ConfigurationProviderOptions {
+  return {
+    dependencies: [],
+    names: [],
+    conditionals: []
+  } as unknown as ConfigurationProviderOptions
 }

@@ -13,6 +13,6 @@ export function Named<T>(name: string | symbol) {
       return
     }
 
-    configureBean(target.constructor, propertyKey as string | symbol, { name })
+    configureBean(target.constructor, propertyKey as string | symbol, { names: [name] })
   }
 }

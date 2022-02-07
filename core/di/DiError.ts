@@ -1,3 +1,4 @@
+import { Ctor } from '../types/Ctor.js'
 import { Identifier } from './Identifier.js'
 import { tokenStr } from './Token.js'
 import { Token } from './Token.js'
@@ -73,5 +74,15 @@ export class ScopeAlreadyRegisteredError extends DiError {
   constructor(scopeId: Identifier) {
     super(`Scope ${scopeId.toString()} is already registered!`, 'SCOPE_ALREADY_REGISTERED')
     this.name = 'ScopeAlreadyRegisteredError'
+  }
+}
+
+export class RepeatedBeanNamesConfigurationError extends DiError {
+  constructor(clazz: Ctor, identifier: string) {
+    super(
+      `Found multiple configurations with name ${identifier} on configuration class ${clazz}`,
+      'MULTIPLE_CONFIG_SAME_NAME'
+    )
+    this.name = 'RepeatedBeanNamesConfigurationError'
   }
 }

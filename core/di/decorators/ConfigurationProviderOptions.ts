@@ -9,7 +9,7 @@ export interface ConfigurationProviderOptions {
   token: Token
   dependencies: TokenSpec[]
   conditionals: Conditional[]
-  name: Identifier
+  names: Identifier[]
   primary: boolean
   late: boolean
 }

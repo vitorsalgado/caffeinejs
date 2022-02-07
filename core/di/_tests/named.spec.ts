@@ -1,8 +1,12 @@
 import { v4 } from 'uuid'
-import { DI } from '../DI.js'
+import { Bean } from '../decorators/Bean.js'
+import { Configuration } from '../decorators/Configuration.js'
 import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
+import { Primary } from '../decorators/Primary.js'
+import { DI } from '../DI.js'
+import { RepeatedBeanNamesConfigurationError } from '../DiError.js'
 
 describe('Named Dependencies', function () {
   const ack = Symbol.for('ok')
@@ -29,6 +33,10 @@ describe('Named Dependencies', function () {
     }
   }
 
+  class Msg {
+    constructor(readonly type: string) {}
+  }
+
   @Injectable()
   class Root {
     readonly id: string = v4()
@@ -49,5 +57,80 @@ describe('Named Dependencies', function () {
     const byeNamed = di.get('bye')
 
     expect(bye).toEqual(byeNamed)
+  })
+
+  describe('resolving many', function () {
+    @Configuration()
+    class Conf {
+      @Bean(Msg)
+      @Named('two')
+      msg2() {
+        return new Msg('two_2')
+      }
+
+      @Bean(Msg)
+      @Named('am')
+      msg3() {
+        return new Msg('am')
+      }
+
+      @Bean(Msg)
+      @Named('eu')
+      @Primary()
+      msg3_1() {
+        return new Msg('eu')
+      }
+    }
+
+    it('should fail when trying to set multiple raw beans with same name', function () {
+      expect(() => {
+        @Configuration()
+        class ManyRawConf {
+          @Bean('test')
+          test1() {
+            return 'one'
+          }
+
+          @Bean('test')
+          test2() {
+            return 'two'
+          }
+        }
+      }).toThrow(RepeatedBeanNamesConfigurationError)
+    })
+
+    it('should fail when trying to repeat a name for the same type', function () {
+      expect(() => {
+        @Configuration()
+        class Rep {
+          @Bean(Msg)
+          @Named('one')
+          msg1() {
+            return new Msg('one_1')
+          }
+
+          @Bean(Msg)
+          @Named('one')
+          msg1_1() {
+            return new Msg('one_1_1')
+          }
+        }
+      }).toThrow()
+    })
+
+    it('should ', function () {
+      const di = DI.setup()
+      const twos = di.getMany('two')
+      const two = di.get<Msg>('two')
+      const msgs = di.getMany(Msg)
+      const am = di.get<Msg>('am')
+      const eu = di.get<Msg>('eu')
+
+      expect(twos).toHaveLength(1)
+      expect(two.type).toEqual('two_2')
+      expect(msgs).toHaveLength(3)
+      expect(am.type).toEqual('am')
+      expect(eu.type).toEqual('eu')
+    })
   })
 })

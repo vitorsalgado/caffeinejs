@@ -6,6 +6,7 @@ import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
 import { BindTo } from './BindTo.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'
+import { RepeatedBeanNamesConfigurationError } from './DiError.js'
 import { ScopeAlreadyRegisteredError } from './DiError.js'
 import { ScopeNotRegisteredError } from './DiError.js'
 import { CircularReferenceError } from './DiError.js'
@@ -53,6 +54,21 @@ export class DI {
 
     const tk = typeof token === 'object' ? token.constructor : token
     const existing = DecoratedInjectables.instance().get(tk)
+
+    if (existing) {
+      const names = existing.names
+
+      if (opts?.names) {
+        if (names.some(value => opts.names!.includes(value))) {
+          throw new Error()
+        }
+
+        names.push(...opts.names)
+
+        opts.names = names
+      }
+    }
+
     const binding = newBinding({ ...existing, ...opts })
 
     if (isNil(binding.provider)) {
