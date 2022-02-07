@@ -5,7 +5,8 @@ export function configureInjectionMetadata(
   tokenSpec: Partial<TokenSpec<unknown>>
 ): <TFunction>(target: TFunction, propertyKey: string | symbol, parameterIndex: number) => void {
   return function (target: any, propertyKey: string | symbol, parameterIndex: number): void {
-    const descriptors: Record<string, TokenSpec<unknown>> = Reflect.getOwnMetadata(DiVars.INJECTION_KEY, target) || {}
+    const descriptors: Record<string, TokenSpec<unknown>> = Reflect.getOwnMetadata(DiVars.INJECTION_TOKENS, target) ||
+    {}
 
     if (descriptors[parameterIndex]) {
       descriptors[parameterIndex] = { ...descriptors[parameterIndex], ...tokenSpec }
@@ -13,6 +14,6 @@ export function configureInjectionMetadata(
       descriptors[parameterIndex] = tokenSpec as TokenSpec<unknown>
     }
 
-    Reflect.defineMetadata(DiVars.INJECTION_KEY, descriptors, target)
+    Reflect.defineMetadata(DiVars.INJECTION_TOKENS, descriptors, target)
   }
 }

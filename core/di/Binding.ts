@@ -1,3 +1,4 @@
+import { Conditional } from './Conditional.js'
 import { Identifier } from './Identifier.js'
 import { Provider } from './internal/Provider.js'
 import { Scope } from './Scope.js'
@@ -12,6 +13,8 @@ export interface Binding<T = any> {
   scope: Scope<T>
   provider: Provider<T>
   scopedProvider: Provider<T>
+  conditionals: Conditional[]
+  configuration?: boolean
   instance?: T
   primary?: boolean
   late?: boolean
@@ -30,10 +33,12 @@ export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
     dependencies: initial.dependencies || [],
     namespace: initial.namespace || '',
     names: initial.names || [],
+    conditionals: initial.conditionals || [],
     instance: initial.instance,
     primary: initial.primary,
     late: initial.late,
     onDestroy: initial.onDestroy,
+    configuration: initial.configuration,
     scopedProvider: initial.scopedProvider!,
     provider: initial.provider!,
     scope: initial.scope!

@@ -11,6 +11,7 @@ import { ScopeNotRegisteredError } from './DiError.js'
 import { CircularReferenceError } from './DiError.js'
 import { NoUniqueInjectionForTokenError } from './DiError.js'
 import { NoResolutionForTokenError } from './DiError.js'
+import { DiVars } from './DiVars.js'
 import { Identifier } from './Identifier.js'
 import { ClassProvider } from './internal/ClassProvider.js'
 import { ContainerScope } from './internal/ContainerScope.js'
@@ -301,6 +302,8 @@ export class DI {
   }
 
   private setup(): void {
+    const cond = new Map<Token, Binding>()
+
     for (const [key, binding] of DecoratedInjectables.instance().entries()) {
       if (binding.namespace !== this.namespace) {
         continue
@@ -312,6 +315,10 @@ export class DI {
 
       this.configureBinding(key, binding)
 
+      if (binding.conditionals) {
+        cond.set(key, binding)
+      }
+
       for (const name of binding.names) {
         const named = this.bindingNames.get(name)
 
@@ -320,6 +327,24 @@ export class DI {
         } else {
           named.push(binding)
           this.bindingNames.set(name, named)
+        }
+      }
+    }
+
+    for (const [token, binding] of cond) {
+      if (binding.conditionals.length > 0) {
+        const pass = binding.conditionals.every(conditional => conditional({ di: this }))
+
+        if (!pass) {
+          this.bindingRegistry.delete(token)
+
+          if (binding.configuration) {
+            const tokens = Reflect.getOwnMetadata(DiVars.CONFIGURATION_TOKENS_PROVIDED, token)
+
+            for (const tk of tokens) {
+              this.bindingRegistry.delete(tk)
+            }
+          }
         }
       }
     }

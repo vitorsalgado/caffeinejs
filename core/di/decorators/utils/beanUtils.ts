@@ -7,11 +7,17 @@ export function configureBean(
   configurations: Partial<ConfigurationProviderOptions>
 ): void {
   const factories: Map<string | symbol, ConfigurationProviderOptions> =
-    Reflect.getOwnMetadata(DiVars.BEAN_METHOD, target) || new Map()
+    Reflect.getOwnMetadata(DiVars.CONFIGURATION_PROVIDER, target) || new Map()
   const actual = factories.get(method) || ({} as ConfigurationProviderOptions)
   const definition = { ...actual, method, ...configurations }
 
   factories.set(method, definition)
 
-  Reflect.defineMetadata(DiVars.BEAN_METHOD, factories, target)
+  Reflect.defineMetadata(DiVars.CONFIGURATION_PROVIDER, factories, target)
+}
+
+export function getBeanConfiguration(target: Function, method: string | symbol): ConfigurationProviderOptions {
+  const factories: Map<string | symbol, ConfigurationProviderOptions> =
+    Reflect.getOwnMetadata(DiVars.CONFIGURATION_PROVIDER, target) || new Map()
+  return factories.get(method) || ({} as ConfigurationProviderOptions)
 }

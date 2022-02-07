@@ -1,6 +1,5 @@
 import { isNil } from '../../checks/isNil.js'
 import { ClazzDecorator } from '../../types/ClazzDecorator.js'
-import { Ctor } from '../../types/Ctor.js'
 import { DI } from '../DI.js'
 import { DiVars } from '../DiVars.js'
 import { Identifier } from '../Identifier.js'
@@ -21,10 +20,17 @@ export interface ConfigurationOptions {
 
 export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): ClazzDecorator<T> {
   return function (target) {
-    DI.configureInjectable<T>(target, { dependencies: getParamTypes(target), namespace: config.namespace })
+    DI.configureInjectable<T>(target, {
+      dependencies: getParamTypes(target),
+      namespace: config.namespace,
+      configuration: true
+    })
 
     const factories: Map<string | symbol, ConfigurationProviderOptions> =
-      Reflect.getOwnMetadata(DiVars.BEAN_METHOD, target) || new Map()
+      Reflect.getOwnMetadata(DiVars.CONFIGURATION_PROVIDER, target) || new Map()
+    const tokens = Array.from(factories.entries()).map(([_, options]) => options.token)
+
+    Reflect.defineMetadata(DiVars.CONFIGURATION_TOKENS_PROVIDED, tokens, target)
 
     for (const [method, factory] of factories) {
       DI.configureInjectable(factory.token, {
@@ -35,6 +41,7 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
         primary: isNil(config.primary) ? factory.primary : config.primary,
         scopeId: isNil(config.scopeId) ? factory.scopeId : config.scopeId,
         late: isNil(config.late) ? factory.late : config.late,
+        conditionals: factory.conditionals,
         provider: new FactoryProvider(({ di }) => {
           const clazz = di.get<{ [key: symbol | string]: (...args: unknown[]) => T }>(target, config.resolutionContext)
           const deps = factory.dependencies.map(dep =>
