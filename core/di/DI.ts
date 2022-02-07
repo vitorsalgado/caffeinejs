@@ -167,14 +167,28 @@ export class DI {
     return new BindTo<T>(this, token, { ...binding })
   }
 
-  unbind<T>(token: Token<T>): void {
+  unbind<T>(token: Token<T>, destroy = true): Promise<void> {
     notNil(token)
-    this.bindingRegistry.delete(token)
+
+    if (this.has(token)) {
+      const binding = this.bindingRegistry.get(token)
+
+      if (binding?.instance && binding?.preDestroy && destroy) {
+        return DI.destroyBinding(binding).finally(() => this.bindingRegistry.delete(token))
+      }
+
+      this.bindingRegistry.delete(token)
+    }
+
+    if (this.parent) {
+      return this.parent.unbind(token)
+    }
+
+    return Promise.resolve()
   }
 
-  rebind<T>(token: Token<T>): BindTo<T> {
-    this.unbind(token)
-    return this.bind(token)
+  rebind<T>(token: Token<T>, destroy = true): Promise<BindTo<T>> | BindTo<T> {
+    return this.unbind(token, destroy).then(() => this.bind(token))
   }
 
   newChild(): DI {
@@ -291,14 +305,19 @@ export class DI {
     return Promise.all(
       this.bindingRegistry
         .toArray()
-        .filter(
-          ({ binding }) =>
-            binding.onDestroy &&
-            binding.instance &&
-            (binding.scopeId === BuiltInScopes.SINGLETON || binding.scopeId === BuiltInScopes.CONTAINER)
-        )
-        .map(({ binding }) => binding.instance[binding.onDestroy as Identifier]())
-    ).then(() => this.clear())
+        .filter(({ binding }) => binding.preDestroy && binding.instance)
+        .map(({ binding }) => DI.destroyBinding(binding))
+    ).then(() => this.resetInstances())
+  }
+
+  private static destroyBinding(binding: Binding): Promise<void> {
+    const d = binding.instance[binding.preDestroy as Identifier]()
+
+    if (d && 'then' in d && typeof d.then === 'function') {
+      return d
+    }
+
+    return Promise.resolve()
   }
 
   private setup(): void {

@@ -19,7 +19,7 @@ export interface Binding<T = any> {
   primary?: boolean
   late?: boolean
   lazy?: boolean
-  onDestroy?: Identifier
+  preDestroy?: Identifier
 }
 
 export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
@@ -37,7 +37,7 @@ export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
     instance: initial.instance,
     primary: initial.primary,
     late: initial.late,
-    onDestroy: initial.onDestroy,
+    preDestroy: initial.preDestroy,
     configuration: initial.configuration,
     scopedProvider: initial.scopedProvider!,
     provider: initial.provider!,

@@ -37,11 +37,13 @@ export class TypeNotRegisteredForInjectionError extends DiError {
 }
 
 export class NoResolutionForTokenError extends DiError {
-  constructor(spec: { token: Token; tokenType?: Token }) {
+  constructor(spec: { token: Token; tokenType?: Token }, message?: string) {
     super(
-      `Unable to resolve required injection for token "${tokenStr(spec.token)}"${
-        spec.token !== spec.tokenType && spec.tokenType ? ' of type ' + tokenStr(spec.tokenType) : ''
-      }`,
+      message
+        ? message
+        : `Unable to resolve required injection for token "${tokenStr(spec.token)}"${
+            spec.token !== spec.tokenType && spec.tokenType ? ' of type ' + tokenStr(spec.tokenType) : ''
+          }`,
       'NO_RESOLUTION_FOR_TOKEN'
     )
     Error.captureStackTrace(this, NoResolutionForTokenError)

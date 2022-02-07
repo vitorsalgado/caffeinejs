@@ -3,9 +3,12 @@ import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { LateBind } from '../decorators/LateBind.js'
 import { Named } from '../decorators/Named.js'
+import { PreDestroy } from '../decorators/PreDestroy.js'
 import { DI } from '../DI.js'
 
 describe('Manual Binding', function () {
+  const destroySpy = jest.fn()
+
   abstract class Abs {
     abstract msg(): string
   }
@@ -31,6 +34,15 @@ describe('Manual Binding', function () {
 
   @LateBind()
   @Injectable()
+  class LateDestroyable {
+    @PreDestroy()
+    destroy() {
+      destroySpy()
+    }
+  }
+
+  @LateBind()
+  @Injectable()
   class StrValue {
     constructor(@Inject('val') readonly val: string) {}
   }
@@ -42,6 +54,10 @@ describe('Manual Binding', function () {
   class FromFactory {
     constructor(@Inject(sy) readonly val: string) {}
   }
+
+  beforeEach(() => {
+    destroySpy.mockReset()
+  })
 
   it('should bind to class', function () {
     const di = DI.setup()
@@ -119,28 +135,68 @@ describe('Manual Binding', function () {
   })
 
   describe('unbinding', function () {
-    it('should unbinding registered component when calling .unbind', function () {
+    it('should unbinding registered component when calling .unbind', async function () {
       const di = DI.setup()
 
       di.bind(Late).toSelf()
 
       expect(di.has(Late)).toBeTruthy()
 
-      di.unbind(Late)
+      await di.unbind(Late)
 
       expect(di.has(Late)).toBeFalsy()
+    })
+
+    it('should unbind from parent when one is set', async function () {
+      const di = DI.setup()
+      const child = di.newChild()
+
+      di.bind(Late).toSelf()
+
+      const has = child.has(Late, true)
+
+      await child.unbind(Late)
+
+      expect(has).toBeTruthy()
+      expect(child.has(Late, true)).toBeFalsy()
+      expect(di.has(Late)).toBeFalsy()
+    })
+
+    it('should call pre destroy method when one is set', async function () {
+      const di = DI.setup()
+
+      di.bind(LateDestroyable).toSelf()
+      di.get(LateDestroyable)
+
+      await di.unbind(LateDestroyable)
+
+      expect(di.has(LateDestroyable)).toBeFalsy()
+      expect(destroySpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should call pre destroy only if requested', async function () {
+      const di = DI.setup()
+
+      di.bind(LateDestroyable).toSelf()
+      di.get(LateDestroyable)
+
+      await di.unbind(LateDestroyable, false)
+
+      expect(di.has(LateDestroyable)).toBeFalsy()
+      expect(destroySpy).toHaveBeenCalledTimes(0)
     })
   })
 
   describe('rebinding', function () {
-    it('should rebinding component with a different configuration', function () {
+    it('should rebinding component with a different configuration', async function () {
       const di = DI.setup()
 
       di.bind(Late).toSelf()
 
       const dep1 = di.get(Late)
 
-      di.rebind(Late).toFactory(ctx => new Late())
+      const bindTo = await di.rebind(Late)
+      bindTo.toFactory(() => new Late())
 
       const dep2 = di.get(Late)
 

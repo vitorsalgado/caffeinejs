@@ -44,8 +44,8 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
         conditionals: factory.conditionals,
         provider: new FactoryProvider(({ di }) => {
           const clazz = di.get<{ [key: symbol | string]: (...args: unknown[]) => T }>(target, config.resolutionContext)
-          const deps = factory.dependencies.map(dep =>
-            Resolver.resolveParam(di, factory.token, dep, config.resolutionContext || ResolutionContext.INSTANCE)
+          const deps = factory.dependencies.map((dep, index) =>
+            Resolver.resolveParam(di, factory.token, dep, index, config.resolutionContext || ResolutionContext.INSTANCE)
           )
 
           return clazz[method](...deps)

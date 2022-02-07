@@ -14,6 +14,8 @@ import { ResolutionContext } from './ResolutionContext.js'
 import { tokenStr } from './Token.js'
 import { Token } from './Token.js'
 import { TokenSpec } from './Token.js'
+import { fmtTokenError } from './utils/errorFmt.js'
+import { fmtParamError } from './utils/errorFmt.js'
 
 export namespace Resolver {
   export function resolve<T>(di: DI, token: Token<T>, binding: Binding<T> | undefined, context: ResolutionContext): T {
@@ -62,7 +64,7 @@ export namespace Resolver {
       throw new TypeNotRegisteredForInjectionError(ctor)
     }
 
-    const deps = type.dependencies.map(dep => resolveParam(di, ctor, dep, context))
+    const deps = type.dependencies.map((dep, index) => resolveParam(di, ctor, dep, index, context))
 
     if (deps.length === 0) {
       return new ctor()
@@ -71,13 +73,20 @@ export namespace Resolver {
     return new ctor(...deps)
   }
 
-  export function resolveParam<T>(di: DI, target: Token<T>, dep: TokenSpec<T>, context: ResolutionContext): T {
+  export function resolveParam<T>(
+    di: DI,
+    target: Token<T>,
+    dep: TokenSpec<T>,
+    index: number,
+    context: ResolutionContext
+  ): T {
     if (isNil(dep.token) && isNil(dep.tokenType)) {
       throw new CircularReferenceError(
-        `Attempt to resolve a undefined injection token. This could mean that the component ${tokenStr(
+        `Cannot resolve ${fmtParamError(target, index)} from type ${tokenStr(
           target
-        )} has a ` +
-          'circular reference. If this was intentional, make sure to decorate your circular constructor/provider parameters with @Defer to correctly resolve ' +
+        )} because the injection token is undefined.\n` +
+          `This could mean that the component ${tokenStr(target)} has a circular reference.\n` +
+          'If this was intentional, make sure to decorate your circular constructor/provider parameters with @Defer to correctly resolve ' +
           'its dependencies'
       )
     }
@@ -111,6 +120,10 @@ export namespace Resolver {
       return null as unknown as T
     }
 
-    throw new NoResolutionForTokenError(dep)
+    throw new NoResolutionForTokenError(
+      dep,
+      `Cannot resolve ${fmtParamError(target, index)} with token ${fmtTokenError(dep)}.\n` +
+        `Check if the type ${tokenStr(target)} has all its dependencies correctly registered.`
+    )
   }
 }
