@@ -1,4 +1,4 @@
-const config = {
+export default {
   verbose: true,
   testTimeout: 15000,
   collectCoverage: false,
@@ -29,5 +29,3 @@ const config = {
   coveragePathIgnorePatterns: ['/dist/', '<rootDit>/dist', '/node_modules/', '<rootDir>/examples'],
   testPathIgnorePatterns: ['/dist/', '<rootDit>/dist', '/node_modules/', '<rootDir>/examples']
 }
-
-export default config

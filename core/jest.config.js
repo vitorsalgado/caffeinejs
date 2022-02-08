@@ -1,9 +1,7 @@
 import Base from '../jest-base.config.js'
 
-const config = {
+export default {
   ...Base,
   displayName: 'core',
   setupFilesAfterEnv: ['../test/jest.setup.ts']
 }
-
-export default config

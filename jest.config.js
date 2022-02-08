@@ -1,6 +1,6 @@
 import Base from './jest-base.config.js'
 
-const config = {
+export default {
   ...Base,
 
   projects: ['<rootDir>'],
@@ -14,5 +14,3 @@ const config = {
   modulePathIgnorePatterns: ['dist', 'coverage', 'examples/*', 'benchmarks/*', 'scripts/*'],
   testPathIgnorePatterns: ['/node_modules/', '/benchmarks/', '/examples/', '/dist/', '/out/', '/coverage/', 'scripts/*']
 }
-
-export default config
