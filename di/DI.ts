@@ -355,6 +355,26 @@ export class DI {
     ).then(() => this.resetInstances())
   }
 
+  size(): number {
+    return this.bindingRegistry.size()
+  }
+
+  get [Symbol.toStringTag](): string {
+    return DI.name
+  }
+
+  toString() {
+    return (
+      `${DI.name}(namespace=${this.namespace}, count=${this.size()}){` +
+      '\n' +
+      this.bindingRegistry
+        .toArray()
+        .map(x => `${tokenStr(x.token)}: names=${x.binding.names.join('|')}, scope=${x.binding.scopeId.toString()}`)
+        .join('\n, ') +
+      '\n}'
+    )
+  }
+
   private static destroyBinding(binding: Binding): Promise<void> {
     const d = binding.instance[binding.preDestroy as Identifier]()
 

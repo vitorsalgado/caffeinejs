@@ -41,6 +41,10 @@ export class BindingRegistry {
     this._types.clear()
   }
 
+  size(): number {
+    return this._types.size
+  }
+
   private getEntry(token: Token<unknown>): Binding {
     const entry = this._types.get(token)
 
