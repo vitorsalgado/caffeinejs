@@ -6,13 +6,13 @@ import { configureBean } from './utils/beanUtils.js'
 export function Named<T>(name: string | symbol) {
   return function (target: Ctor<T> | object, propertyKey?: string | symbol) {
     if (typeof target === 'function' && !propertyKey) {
-      DI.configureInjectable<T>(target, {
+      DI.configureDecoratedType<T>(target, {
         names: [name],
         provider: new ClassProvider(target as Ctor)
       })
       return
     }
 
-    configureBean(target.constructor, propertyKey as string | symbol, { names: [name] })
+    configureBean(target.constructor, propertyKey as string | symbol, { name })
   }
 }

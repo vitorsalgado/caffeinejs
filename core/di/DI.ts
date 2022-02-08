@@ -6,7 +6,6 @@ import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
 import { BindTo } from './BindTo.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'
-import { RepeatedBeanNamesConfigurationError } from './DiError.js'
 import { ScopeAlreadyRegisteredError } from './DiError.js'
 import { ScopeNotRegisteredError } from './DiError.js'
 import { CircularReferenceError } from './DiError.js'
@@ -37,6 +36,7 @@ export class DI {
 
   private readonly bindingRegistry: BindingRegistry = new BindingRegistry()
   private readonly bindingNames: Map<Identifier, Binding[]> = new Map()
+  private readonly multipleBeansMap: Map<Token, Binding[]> = new Map()
 
   protected constructor(readonly namespace = '', readonly parent?: DI) {
     notNil(namespace)
@@ -49,7 +49,7 @@ export class DI {
     return di
   }
 
-  static configureInjectable<T>(token: Token<T>, opts?: Partial<Binding>): void {
+  static configureDecoratedType<T>(token: Token<T>, opts?: Partial<Binding>): void {
     notNil(token)
 
     const tk = typeof token === 'object' ? token.constructor : token
@@ -82,6 +82,10 @@ export class DI {
     notNil(binding.provider, `Could not determine a provider for token: ${tokenStr(token)}`)
 
     DecoratedInjectables.instance().configure(tk, binding)
+  }
+
+  static addBean<T>(token: Token<T>, binding: Binding<T>): void {
+    DecoratedInjectables.instance().addBean(token, binding)
   }
 
   static bindScope<T>(scopeId: Identifier, scope: Scope<T>): void {
@@ -129,18 +133,32 @@ export class DI {
     const bindings = this.getBindings(token)
 
     if (bindings.length === 0) {
+      if (this.multipleBeansMap.has(token)) {
+        const bindings = this.multipleBeansMap.get(token) as Binding[]
+
+        return bindings.map(binding => Resolver.resolve(this, token, binding, context))
+      }
+
       let entries: BindingEntry[]
 
       if (isNamedToken(token)) {
         //TODO: change this to nameMap
         entries = this.search((tk, b) => isNamedToken(tk) && b.names.includes(token))
       } else {
-        //TODO: create ref cache
-        entries = this.search(tk => typeof tk === 'function' && tk !== token && token.isPrototypeOf(tk))
+        entries = this.search(tk => tk !== token && token.isPrototypeOf(tk))
+
+        if (entries.length === 0) {
+          entries = this.search((tk, binding) => binding.type === token)
+        }
       }
 
       if (entries.length === 0) {
         return []
+      } else {
+        this.multipleBeansMap.set(
+          token,
+          entries.map(entry => entry.binding)
+        )
       }
 
       return entries.map(entry => Resolver.resolve(this, entry.token, entry.binding, context))
@@ -221,7 +239,13 @@ export class DI {
           scopeId: binding.scopeId,
           names: binding.names,
           namespace: binding.namespace,
-          scope: binding.scope
+          scope: binding.scope,
+          type: binding.type,
+          conditionals: binding.conditionals,
+          configuration: binding.configuration,
+          late: binding.late,
+          lazy: binding.lazy,
+          preDestroy: binding.preDestroy
         } as Binding
 
         copiedBinding.scopedProvider = binding.scope.wrap(binding.provider)
@@ -232,6 +256,11 @@ export class DI {
   }
 
   configureBinding<T>(token: Token<T>, binding: Binding<T>): void {
+    notNil(token)
+    notNil(binding)
+
+    binding.scopeId = binding.scopeId ? binding.scopeId : BuiltInScopes.SINGLETON
+
     const provider = providerFromToken(token, binding.provider)
 
     notNil(provider, `Could not determine a provider for token: ${tokenStr(token)}`)
@@ -337,36 +366,22 @@ export class DI {
   }
 
   private setup(): void {
-    const cond = new Map<Token, Binding>()
+    const conditionals = new Map<Token, Binding>()
 
     for (const [key, binding] of DecoratedInjectables.instance().entries()) {
-      if (binding.namespace !== this.namespace) {
-        continue
-      }
-
-      if (binding.late) {
+      if (!this.isRegistrable(binding)) {
         continue
       }
 
       this.configureBinding(key, binding)
+      this.mapNamed(binding)
 
       if (binding.conditionals) {
-        cond.set(key, binding)
-      }
-
-      for (const name of binding.names) {
-        const named = this.bindingNames.get(name)
-
-        if (!named) {
-          this.bindingNames.set(name, [binding])
-        } else {
-          named.push(binding)
-          this.bindingNames.set(name, named)
-        }
+        conditionals.set(key, binding)
       }
     }
 
-    for (const [token, binding] of cond) {
+    for (const [token, binding] of conditionals) {
       if (binding.conditionals.length > 0) {
         const pass = binding.conditionals.every(conditional => conditional({ di: this }))
 
@@ -377,10 +392,45 @@ export class DI {
             const tokens = Reflect.getOwnMetadata(DiVars.CONFIGURATION_TOKENS_PROVIDED, token)
 
             for (const tk of tokens) {
-              this.bindingRegistry.delete(tk)
+              DecoratedInjectables.instance().deleteBean(tk)
             }
           }
         }
+      }
+    }
+
+    for (const [token, binding] of DecoratedInjectables.instance().beans()) {
+      if (!this.isRegistrable(binding)) {
+        continue
+      }
+
+      if (binding.conditionals) {
+        const pass = binding.conditionals.every(conditional => conditional({ di: this }))
+
+        if (pass) {
+          this.configureBinding(token, binding)
+          this.mapNamed(binding)
+        }
+      } else {
+        this.configureBinding(token, binding)
+        this.mapNamed(binding)
+      }
+    }
+  }
+
+  private isRegistrable(binding: Binding): boolean {
+    return binding.namespace === this.namespace && (binding.late == undefined || !binding.late)
+  }
+
+  private mapNamed(binding: Binding): void {
+    for (const name of binding.names) {
+      const named = this.bindingNames.get(name)
+
+      if (!named) {
+        this.bindingNames.set(name, [binding])
+      } else {
+        named.push(binding)
+        this.bindingNames.set(name, named)
       }
     }
   }

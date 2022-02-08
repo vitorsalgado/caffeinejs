@@ -5,7 +5,7 @@ import { configureBean } from './utils/beanUtils.js'
 export function Lazy<T>(lazy = true) {
   return function <TFunction extends Function>(target: TFunction | object, propertyKey?: string | symbol) {
     if (typeof target === 'function') {
-      DI.configureInjectable<T>(target, { dependencies: getParamTypes(target), lazy })
+      DI.configureDecoratedType<T>(target, { dependencies: getParamTypes(target), lazy })
       return
     }
 

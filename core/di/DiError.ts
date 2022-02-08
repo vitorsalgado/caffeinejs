@@ -80,7 +80,7 @@ export class ScopeAlreadyRegisteredError extends DiError {
 export class RepeatedBeanNamesConfigurationError extends DiError {
   constructor(clazz: Ctor, identifier: string) {
     super(
-      `Found multiple configurations with name ${identifier} on configuration class ${clazz}`,
+      `Found multiple configurations with name ${identifier} on configuration class ${clazz.name}`,
       'MULTIPLE_CONFIG_SAME_NAME'
     )
     this.name = 'RepeatedBeanNamesConfigurationError'

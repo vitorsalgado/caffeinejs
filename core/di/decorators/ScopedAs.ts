@@ -7,7 +7,7 @@ import { configureBean } from './utils/beanUtils.js'
 export function ScopedAs(scopeId: Identifier) {
   return function (target: Function | object, propertyKey?: string | symbol) {
     if (typeof target === 'function') {
-      DI.configureInjectable(target as Token, { scopeId })
+      DI.configureDecoratedType(target as Token, { scopeId })
       return
     }
 

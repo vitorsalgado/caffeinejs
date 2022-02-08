@@ -59,29 +59,7 @@ describe('Named Dependencies', function () {
     expect(bye).toEqual(byeNamed)
   })
 
-  describe('resolving many', function () {
-    @Configuration()
-    class Conf {
-      @Bean(Msg)
-      @Named('two')
-      msg2() {
-        return new Msg('two_2')
-      }
-
-      @Bean(Msg)
-      @Named('am')
-      msg3() {
-        return new Msg('am')
-      }
-
-      @Bean(Msg)
-      @Named('eu')
-      @Primary()
-      msg3_1() {
-        return new Msg('eu')
-      }
-    }
-
+  describe('failure scenarios resolving many', function () {
     it('should fail when trying to set multiple raw beans with same name', function () {
       expect(() => {
         @Configuration()
@@ -117,20 +95,46 @@ describe('Named Dependencies', function () {
         }
       }).toThrow()
     })
+  })
+
+  describe('when providing many components of same type with different names', function () {
+    @Configuration()
+    class Conf {
+      @Bean(Msg)
+      @Named('two')
+      msg2() {
+        return new Msg('two_2')
+      }
+
+      @Bean(Msg)
+      @Named('am')
+      msg3() {
+        return new Msg('am')
+      }
+
+      @Bean(Msg)
+      @Named('eu')
+      @Primary()
+      msg3_1() {
+        return new Msg('eu')
+      }
+    }
 
     it('should ', function () {
       const di = DI.setup()
       const twos = di.getMany('two')
       const two = di.get<Msg>('two')
-      const msgs = di.getMany(Msg)
       const am = di.get<Msg>('am')
       const eu = di.get<Msg>('eu')
+      const msg = di.get(Msg)
+      const multiMsg = di.getMany(Msg)
 
       expect(twos).toHaveLength(1)
       expect(two.type).toEqual('two_2')
-      expect(msgs).toHaveLength(3)
       expect(am.type).toEqual('am')
       expect(eu.type).toEqual('eu')
+      expect(msg).toBeUndefined()
+      expect(multiMsg).toHaveLength(3)
     })
   })
 })

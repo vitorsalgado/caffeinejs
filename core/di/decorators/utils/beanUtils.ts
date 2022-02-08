@@ -9,9 +9,7 @@ export function configureBean(
   const factories: Map<string | symbol, ConfigurationProviderOptions> =
     Reflect.getOwnMetadata(DiVars.CONFIGURATION_PROVIDER, target) || new Map()
   const actual = factories.get(method) || def()
-  const conditionals = [...actual.conditionals, ...(configurations.conditionals || [])]
-  const names = [...actual.names, ...(configurations.names || [])]
-  const definition = { ...actual, method, ...configurations, names, conditionals } as ConfigurationProviderOptions
+  const definition = { ...actual, method, ...configurations } as ConfigurationProviderOptions
 
   factories.set(method, definition)
 
@@ -27,7 +25,6 @@ export function getBeanConfiguration(target: Function, method: string | symbol):
 function def(): ConfigurationProviderOptions {
   return {
     dependencies: [],
-    names: [],
     conditionals: []
   } as unknown as ConfigurationProviderOptions
 }

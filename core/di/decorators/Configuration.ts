@@ -1,5 +1,6 @@
 import { isNil } from '../../checks/isNil.js'
 import { ClazzDecorator } from '../../types/ClazzDecorator.js'
+import { newBinding } from '../Binding.js'
 import { DI } from '../DI.js'
 import { RepeatedBeanNamesConfigurationError } from '../DiError.js'
 import { DiVars } from '../DiVars.js'
@@ -24,7 +25,7 @@ export interface ConfigurationOptions {
 
 export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): ClazzDecorator<T> {
   return function (target) {
-    DI.configureInjectable<T>(target, {
+    DI.configureDecoratedType<T>(target, {
       dependencies: getParamTypes(target),
       namespace: config.namespace,
       configuration: true
@@ -34,29 +35,38 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
       Reflect.getOwnMetadata(DiVars.CONFIGURATION_PROVIDER, target) || new Map()
     const configurations = Array.from(factories.entries()).map(([_, options]) => options)
     const tokens = configurations.map(x => x.token)
-    const dup = new Set<Token>()
+    const dupTokens = new Set<Token>()
+    const dupNames = new Set<Identifier>()
 
-    for (const token of tokens) {
-      if (dup.has(token)) {
-        if (isNamedToken(token)) {
-          throw new RepeatedBeanNamesConfigurationError(target, tokenStr(token))
+    for (const [, configuration] of factories) {
+      if (dupTokens.has(configuration.token)) {
+        if (isNamedToken(configuration.token)) {
+          throw new RepeatedBeanNamesConfigurationError(target, tokenStr(configuration.token))
         }
       }
 
-      dup.add(token)
+      if (configuration.name) {
+        if (dupNames.has(configuration.name)) {
+          throw new RepeatedBeanNamesConfigurationError(target, tokenStr(configuration.token))
+        }
+
+        dupNames.add(configuration.name)
+      }
+
+      dupTokens.add(configuration.token)
     }
 
     Reflect.defineMetadata(DiVars.CONFIGURATION_TOKENS_PROVIDED, tokens, target)
 
     for (const [method, factory] of factories) {
-      DI.configureInjectable(factory.token, {
-        dependencies: factory.dependencies,
+      const options = newBinding({
+        dependencies: [...factory.dependencies],
         namespace: config.namespace,
         lazy: isNil(config.lazy) ? factory.lazy : config.lazy,
         primary: isNil(config.primary) ? factory.primary : config.primary,
         scopeId: isNil(config.scopeId) ? factory.scopeId : config.scopeId,
         late: isNil(config.late) ? factory.late : config.late,
-        conditionals: factory.conditionals,
+        conditionals: [...factory.conditionals],
         provider: new FactoryProvider(({ di }) => {
           const clazz = di.get<{ [key: symbol | string]: (...args: unknown[]) => T }>(target, config.resolutionContext)
           const deps = factory.dependencies.map((dep, index) =>
@@ -67,33 +77,16 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
         })
       })
 
-      for (const name of factory.names) {
-        DI.configureInjectable(name, {
-          dependencies: factory.dependencies,
-          namespace: config.namespace,
-          lazy: isNil(config.lazy) ? factory.lazy : config.lazy,
-          primary: isNil(config.primary) ? factory.primary : config.primary,
-          scopeId: isNil(config.scopeId) ? factory.scopeId : config.scopeId,
-          late: isNil(config.late) ? factory.late : config.late,
-          conditionals: factory.conditionals,
-          provider: new FactoryProvider(({ di }) => {
-            const clazz = di.get<{ [key: symbol | string]: (...args: unknown[]) => T }>(
-              target,
-              config.resolutionContext
-            )
-            const deps = factory.dependencies.map((dep, index) =>
-              Resolver.resolveParam(
-                di,
-                factory.token,
-                dep,
-                index,
-                config.resolutionContext || ResolutionContext.INSTANCE
-              )
-            )
+      if (factory.name) {
+        options.names = [factory.name]
 
-            return clazz[method](...deps)
-          })
-        })
+        if (typeof factory.token === 'function') {
+          options.type = factory.token
+        }
+
+        DI.addBean(factory.name, { ...options })
+      } else {
+        DI.addBean(factory.token, { ...options })
       }
     }
   }

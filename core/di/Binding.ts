@@ -14,6 +14,7 @@ export interface Binding<T = any> {
   provider: Provider<T>
   scopedProvider: Provider<T>
   conditionals: Conditional[]
+  type?: Function
   configuration?: boolean
   instance?: T
   primary?: boolean
@@ -39,6 +40,7 @@ export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
     late: initial.late,
     preDestroy: initial.preDestroy,
     configuration: initial.configuration,
+    type: initial.type,
     scopedProvider: initial.scopedProvider!,
     provider: initial.provider!,
     scope: initial.scope!

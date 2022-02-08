@@ -126,13 +126,35 @@ describe('Conditionals', function () {
         expect(di.has(NoConf)).toBeFalsy()
         expect(di.has('txt')).toBeFalsy()
         expect(di.has('val')).toBeFalsy()
-        expect(spy1).toHaveBeenCalledTimes(2)
+        expect(spy1).toHaveBeenCalledTimes(1)
 
         expect(di.has(Conf)).toBeTruthy()
         expect(di.has('json')).toBeTruthy()
         expect(di.has('xml')).toBeFalsy()
         expect(spy2).toHaveBeenCalledTimes(4)
       })
+    })
+  })
+
+  describe('when more than one match', function () {
+    abstract class Base {}
+
+    @Injectable()
+    class Svc1 extends Base {}
+
+    @Injectable()
+    @ConditionalOn(() => false)
+    class Svc2 extends Base {}
+
+    @Injectable()
+    @ConditionalOn(() => false)
+    class Svc3 extends Base {}
+
+    it('should ignore the beans that doesnt pass the conditionals and use the one that is left', function () {
+      const di = DI.setup()
+      const svc = di.get(Base)
+
+      expect(svc).toBeInstanceOf(Svc1)
     })
   })
 })

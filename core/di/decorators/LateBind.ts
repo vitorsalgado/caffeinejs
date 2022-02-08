@@ -3,6 +3,6 @@ import { DI } from '../DI.js'
 
 export function LateBind<T>() {
   return function (target: Ctor<T>) {
-    DI.configureInjectable<T>(target, { late: true })
+    DI.configureDecoratedType<T>(target, { late: true })
   }
 }

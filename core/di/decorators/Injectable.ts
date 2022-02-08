@@ -3,6 +3,6 @@ import { getParamTypes } from '../utils/getParamTypes.js'
 
 export function Injectable<T>(): ClassDecorator {
   return function (target) {
-    DI.configureInjectable<T>(target, { dependencies: getParamTypes(target) })
+    DI.configureDecoratedType<T>(target, { dependencies: getParamTypes(target) })
   }
 }

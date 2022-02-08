@@ -16,7 +16,7 @@ export function ConditionalOn<T>(...conditionals: Conditional[]) {
         cond.push(...injectable.conditionals)
       }
 
-      DI.configureInjectable<T>(target, { dependencies: getParamTypes(target), conditionals: cond })
+      DI.configureDecoratedType<T>(target, { dependencies: getParamTypes(target), conditionals: cond })
       return
     }
 
