@@ -1,4 +1,4 @@
-import { notNil } from '../preconditions/notNil.js'
+import { notNil } from './utils/notNil.js'
 import { Binding } from './Binding.js'
 import { DI } from './DI.js'
 import { Scopes } from './Scopes.js'

@@ -1,4 +1,4 @@
-import { Ctor } from '../../types/Ctor.js'
+import { Ctor } from '../internal/types/Ctor.js'
 import { DI } from '../DI.js'
 import { ClassProvider } from '../internal/ClassProvider.js'
 import { configureBean } from './utils/beanUtils.js'

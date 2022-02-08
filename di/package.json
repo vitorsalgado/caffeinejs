@@ -1,7 +1,7 @@
 {
-  "name": "@caffeinejs/core",
+  "name": "@caffeinejs/di",
   "version": "0.0.0",
-  "description": "CaffeineJs Core",
+  "description": "CaffeineJs DI Framework",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

@@ -1,4 +1,4 @@
-import { Ctor } from '../types/Ctor.js'
+import { Ctor } from './internal/types/Ctor.js'
 import { Identifier } from './Identifier.js'
 import { tokenStr } from './Token.js'
 import { Token } from './Token.js'

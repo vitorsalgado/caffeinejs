@@ -1,5 +1,5 @@
-import { isNil } from '../checks/isNil.js'
-import { Ctor } from '../types/Ctor.js'
+import { isNil } from './utils/isNil.js'
+import { Ctor } from './internal/types/Ctor.js'
 import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'

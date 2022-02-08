@@ -1,5 +1,5 @@
-import { Ctor } from '../../types/Ctor.js'
 import { Token } from '../Token.js'
+import { Ctor } from './types/Ctor.js'
 import { ClassProvider } from './ClassProvider.js'
 import { Provider } from './Provider.js'
 import { TokenProvider } from './TokenProvider.js'

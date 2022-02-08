@@ -4,6 +4,7 @@
   "useWorkspaces": true,
   "packages": [
     "core",
+    "di",
     "examples/*"
   ],
   "ignoreChanges": [

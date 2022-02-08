@@ -1,6 +1,6 @@
-import { Ctor } from '../../types/Ctor.js'
 import { DeferredCtor } from '../DeferredCtor.js'
 import { Resolver } from '../Resolver.js'
+import { Ctor } from './types/Ctor.js'
 import { ProviderContext } from './Provider.js'
 import { Provider } from './Provider.js'
 

@@ -1,7 +1,7 @@
 {
-  "name": "@winter-framework/monorepo",
+  "name": "@caffeinejs/monorepo",
   "version": "0.0.0",
-  "description": "Winter Framework is Coming",
+  "description": "CaffeineJs Monorepo Root",
   "main": "index.js",
   "type": "module",
   "scripts": {

@@ -1,5 +1,5 @@
-import { isNil } from '../../checks/isNil.js'
-import { ClazzDecorator } from '../../types/ClazzDecorator.js'
+import { isNil } from '../utils/isNil.js'
+import { ClazzDecorator } from '../internal/types/ClazzDecorator.js'
 import { newBinding } from '../Binding.js'
 import { DI } from '../DI.js'
 import { RepeatedBeanNamesConfigurationError } from '../DiError.js'

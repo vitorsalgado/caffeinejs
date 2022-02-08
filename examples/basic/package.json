@@ -1,5 +1,5 @@
 {
-  "name": "@winter-framework/examples-basic",
+  "name": "@caffeinejs/examples-basic",
   "version": "0.0.0",
   "description": "Basic Example",
   "type": "module",
@@ -15,7 +15,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@winter-framework/core": "0.0.0",
+    "@caffeinejs/core": "0.0.0",
     "reflect-metadata": "^0.1.13"
   }
 }
