@@ -28,15 +28,15 @@ import { tokenStr } from './Token.js'
 import { isNamedToken, Token } from './Token.js'
 
 export class DI {
-  private static readonly Scopes = new Map<Identifier, Scope<unknown>>()
+  protected static readonly Scopes = new Map<Identifier, Scope<unknown>>()
     .set(BuiltInScopes.SINGLETON, new SingletonScope())
     .set(BuiltInScopes.CONTAINER, new ContainerScope())
     .set(BuiltInScopes.RESOLUTION_CONTEXT, new ResolutionContextScope())
     .set(BuiltInScopes.TRANSIENT, new TransientScope())
 
-  private readonly bindingRegistry: BindingRegistry = new BindingRegistry()
-  private readonly bindingNames: Map<Identifier, Binding[]> = new Map()
-  private readonly multipleBeansMap: Map<Token, Binding[]> = new Map()
+  protected readonly bindingRegistry: BindingRegistry = new BindingRegistry()
+  protected readonly bindingNames: Map<Identifier, Binding[]> = new Map()
+  protected readonly multipleBeansMap: Map<Token, Binding[]> = new Map()
 
   protected constructor(readonly namespace = '', readonly parent?: DI) {
     notNil(namespace)
