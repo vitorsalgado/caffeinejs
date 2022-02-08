@@ -1,3 +1,4 @@
+import { createDeflateRaw } from 'zlib'
 import { isNil } from './utils/isNil.js'
 import { notNil } from './utils/notNil.js'
 import { Ctor } from './internal/types/Ctor.js'
@@ -101,6 +102,11 @@ export class DI {
 
   static unbindScope(scopeId: Identifier): void {
     DI.Scopes.delete(notNil(scopeId))
+  }
+
+  static scan(paths: string[]): Promise<unknown[]> {
+    notNil(paths)
+    return Promise.all(paths.map(path => import(path)))
   }
 
   get<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
