@@ -1,9 +1,10 @@
 import { Injectable } from '../../../decorators/Injectable.js'
+import { TypeOf } from '../../../internal/types/TypeOf.js'
 import { BarFail } from './BarFail.js'
 
 @Injectable()
 export class FooFail {
-  constructor(readonly bar: BarFail) {}
+  constructor(readonly bar: TypeOf<BarFail>) {}
 
   id = () => 'foo'
 

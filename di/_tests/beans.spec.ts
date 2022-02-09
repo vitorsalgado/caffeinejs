@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { v4 } from 'uuid'
 import { Bean } from '../decorators/Bean.js'
 import { Configuration } from '../decorators/Configuration.js'

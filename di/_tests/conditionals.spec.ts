@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { ConditionalOn } from '../ConditionalOn.js'
 import { Bean } from '../decorators/Bean.js'
 import { Configuration } from '../decorators/Configuration.js'

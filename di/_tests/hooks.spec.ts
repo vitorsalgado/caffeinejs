@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { Injectable } from '../decorators/Injectable.js'
 import { PreDestroy } from '../decorators/PreDestroy.js'
 import { ScopedAs } from '../decorators/ScopedAs.js'

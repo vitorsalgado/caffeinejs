@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { v4 } from 'uuid'
 import { DecoratedInjectables } from '../DecoratedInjectables.js'
 import { Injectable } from '../decorators/Injectable.js'
