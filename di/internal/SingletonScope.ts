@@ -19,7 +19,7 @@ export class SingletonScopeProvider<T> extends Provider<T> {
   }
 }
 
-export class SingletonScope<T> extends Scope<T> {
+export class SingletonScope<T> implements Scope<T> {
   wrap(unscoped: Provider): Provider {
     return new SingletonScopeProvider(unscoped)
   }

@@ -20,7 +20,7 @@ class ResolutionContextScopeProvider<T> extends Provider<T> {
   }
 }
 
-export class ResolutionContextScope<T> extends Scope<T> {
+export class ResolutionContextScope<T> implements Scope<T> {
   wrap(unscoped: Provider): Provider {
     return new ResolutionContextScopeProvider(unscoped)
   }

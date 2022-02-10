@@ -1,16 +1,21 @@
+import 'reflect-metadata'
 import * as Path from 'path'
 import { dirname } from 'path'
 import { fileURLToPath } from 'url'
+import tap from 'tap'
 import { DI } from '../DI.js'
 
-describe.skip('Auto Scan', function () {
-  it.skip('should ', async function () {
+const describe = tap.test
+const it = describe
+
+describe('Auto Scan', async function (t) {
+  it('should scan', async function (t) {
     const modulesDir = dirname(fileURLToPath(import.meta.url))
     const paths: string[] = [
-      './fixtures/scan/Bar',
-      './fixtures/scan/Foo',
-      './fixtures/scan/Conf',
-      './fixtures/scan/NonExp'
+      './fixtures/scan/Bar.js',
+      './fixtures/scan/Foo.js',
+      './fixtures/scan/Conf.js',
+      './fixtures/scan/NonExp.js'
     ]
 
     await DI.scan(paths.map(x => Path.join(modulesDir, x)))
@@ -18,6 +23,7 @@ describe.skip('Auto Scan', function () {
     const di = DI.setup()
     const size = di.size()
 
-    expect(size).toEqual(6)
+    t.equal(size, 6)
+    t.end()
   })
 })

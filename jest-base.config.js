@@ -6,7 +6,7 @@ export default {
   restoreMocks: true,
   testEnvironment: 'node',
   preset: 'ts-jest/presets/default-esm',
-  setupFilesAfterEnv: ['<rootDir>/test/jest.setup.js'],
+  setupFilesAfterEnv: ['../test/jest.setup.js'],
   testMatch: ['**/?(*.)+(spec|test).[jt]s?(x)'],
   extensionsToTreatAsEsm: ['.ts'],
   moduleNameMapper: {

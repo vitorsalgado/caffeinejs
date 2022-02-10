@@ -10,6 +10,7 @@ export default {
       useESM: true
     }
   },
+  setupFilesAfterEnv: ['<rootDir>/test/jest.setup.js'],
   coveragePathIgnorePatterns: ['/node_modules/', '/dist/', '/coverage/'],
   modulePathIgnorePatterns: ['dist', 'coverage', 'examples/*', 'benchmarks/*', 'scripts/*'],
   testPathIgnorePatterns: ['/node_modules/', '/benchmarks/', '/examples/', '/dist/', '/out/', '/coverage/', 'scripts/*']

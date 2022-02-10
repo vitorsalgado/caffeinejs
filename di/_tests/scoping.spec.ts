@@ -14,7 +14,7 @@ describe('Scoping', function () {
   const id = Symbol.for('custom')
   const spy = jest.fn()
 
-  class CustomScope<T> extends Scope<T> {
+  class CustomScope<T> implements Scope<T> {
     readonly id: string = v4()
 
     wrap(unscoped: Provider<T>): Provider<T> {
@@ -66,7 +66,7 @@ describe('Scoping', function () {
     expect(() =>
       DI.bindScope(
         Scopes.SINGLETON,
-        new (class extends Scope {
+        new (class implements Scope {
           wrap(unscoped: Provider): Provider {
             return unscoped
           }
