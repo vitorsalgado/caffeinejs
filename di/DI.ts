@@ -1,3 +1,5 @@
+import { DefaultServiceLocator } from './ServiceLocator.js'
+import { ServiceLocator } from './ServiceLocator.js'
 import { loadModule } from './utils/loadModule.js'
 import { isNil } from './utils/isNil.js'
 import { notNil } from './utils/notNil.js'
@@ -258,6 +260,8 @@ export class DI {
         child.bindingRegistry.register(token, copiedBinding)
       })
 
+    DI.registerInternalComponents(child)
+
     return child
   }
 
@@ -391,6 +395,12 @@ export class DI {
     return Promise.resolve()
   }
 
+  private static registerInternalComponents(di: DI) {
+    if (!di.has(ServiceLocator)) {
+      di.bind(ServiceLocator).toValue(new DefaultServiceLocator(di)).as(BuiltInScopes.SINGLETON)
+    }
+  }
+
   private setup(): void {
     const conditionals = new Map<Token, Binding>()
 
@@ -442,6 +452,8 @@ export class DI {
         this.mapNamed(binding)
       }
     }
+
+    DI.registerInternalComponents(this)
   }
 
   private isRegistrable(binding: Binding): boolean {
