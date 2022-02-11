@@ -385,7 +385,7 @@ export class DI {
     )
   }
 
-  private static destroyBinding(binding: Binding): Promise<void> {
+  protected static destroyBinding(binding: Binding): Promise<void> {
     const d = binding.instance[binding.preDestroy as Identifier]()
 
     if (d && 'then' in d && typeof d.then === 'function') {
@@ -395,13 +395,13 @@ export class DI {
     return Promise.resolve()
   }
 
-  private static registerInternalComponents(di: DI) {
+  protected static registerInternalComponents(di: DI) {
     if (!di.has(ServiceLocator)) {
       di.bind(ServiceLocator).toValue(new DefaultServiceLocator(di)).as(BuiltInScopes.SINGLETON)
     }
   }
 
-  private setup(): void {
+  protected setup(): void {
     const conditionals = new Map<Token, Binding>()
 
     for (const [key, binding] of DecoratedInjectables.instance().entries()) {
@@ -456,11 +456,11 @@ export class DI {
     DI.registerInternalComponents(this)
   }
 
-  private isRegistrable(binding: Binding): boolean {
+  protected isRegistrable(binding: Binding): boolean {
     return binding.namespace === this.namespace && (binding.late == undefined || !binding.late)
   }
 
-  private mapNamed(binding: Binding): void {
+  protected mapNamed(binding: Binding): void {
     for (const name of binding.names) {
       const named = this.bindingNames.get(name)
 
