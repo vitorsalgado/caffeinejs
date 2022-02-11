@@ -33,6 +33,6 @@ describe('DI', function () {
   it('should return the number of registered components when calling size()', function () {
     const di = DI.setup()
 
-    expect(di.size()).toEqual(2)
+    expect(di.size()).toEqual(3)
   })
 })
