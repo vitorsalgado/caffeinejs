@@ -1,23 +1,8 @@
-import * as Path from 'path'
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
+import { expect } from '@jest/globals'
 import { DI } from '../DI.js'
 
-describe.skip('Auto Scan', function () {
-  it.skip('should ', async function () {
-    const modulesDir = dirname(fileURLToPath(import.meta.url))
-    const paths: string[] = [
-      './fixtures/scan/Bar',
-      './fixtures/scan/Foo',
-      './fixtures/scan/Conf',
-      './fixtures/scan/NonExp'
-    ]
-
-    await DI.scan(paths.map(x => Path.join(modulesDir, x)))
-
-    const di = DI.setup()
-    const size = di.size()
-
-    expect(size).toEqual(6)
+describe('Auto Scan', function () {
+  it('ensure scan doesnt fail', async function () {
+    expect(() => DI.scan([])).not.toThrow()
   })
 })

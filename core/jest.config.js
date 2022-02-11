@@ -1,7 +1,8 @@
-import Base from '../jest-base.config.js'
+'use strict'
 
-export default {
+const Base = require('../jest-base.config.js')
+
+module.exports = {
   ...Base,
-  displayName: 'core',
-  setupFilesAfterEnv: ['../test/jest.setup.js']
+  displayName: 'core'
 }

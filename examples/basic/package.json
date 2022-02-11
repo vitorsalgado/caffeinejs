@@ -2,7 +2,6 @@
   "name": "@caffeinejs/examples-basic",
   "version": "0.0.0",
   "description": "Basic Example",
-  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {

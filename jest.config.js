@@ -1,13 +1,14 @@
-import Base from './jest-base.config.js'
+'use strict'
 
-export default {
+const Base = require('./jest-base.config.js')
+
+module.exports = {
   ...Base,
 
   projects: ['<rootDir>'],
   globals: {
     'ts-jest': {
-      tsconfig: './tsconfig.test.json',
-      useESM: true
+      tsconfig: './tsconfig.test.json'
     }
   },
   setupFilesAfterEnv: ['<rootDir>/test/jest.setup.js'],

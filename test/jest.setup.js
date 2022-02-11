@@ -1,1 +1,1 @@
-import 'reflect-metadata'
+require('reflect-metadata')

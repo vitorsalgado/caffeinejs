@@ -3,9 +3,7 @@
   "version": "0.0.0",
   "description": "CaffeineJs Monorepo Root",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "t": "node --loader ts-node/esm di/_tests/scan.spec.ts",
     "build": "yarn workspaces foreach run build",
     "build:clean": "yarn workspaces foreach exec rm -rf dist",
     "test": "jest --detectOpenHandles",
@@ -18,8 +16,7 @@
     "prepare": "husky install",
     "postinstall": "husky install",
     "prepublishOnly": "pinst --disable",
-    "postpublish": "pinst --enable",
-    "playground": "node --loader ts-node/esm playground.ts"
+    "postpublish": "pinst --enable"
   },
   "workspaces": [
     "core",
@@ -49,7 +46,6 @@
     "@jest/globals": "^27.5.1",
     "@types/jest": "^27.4.0",
     "@types/node": "^17.0.17",
-    "@types/tap": "^15.0.5",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.11.0",
     "@typescript-eslint/parser": "^5.11.0",
@@ -66,7 +62,6 @@
     "pinst": "^2.1.6",
     "prettier": "^2.5.1",
     "reflect-metadata": "^0.1.13",
-    "tap": "^15.1.6",
     "ts-jest": "27.1.3",
     "ts-node": "^10.5.0",
     "typescript": "^4.5.5",

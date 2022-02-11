@@ -12,4 +12,6 @@ export async function loadModule(file: string): Promise<void> {
 
     throw ex
   }
+
+  return Promise.resolve()
 }

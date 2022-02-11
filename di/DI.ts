@@ -104,9 +104,9 @@ export class DI {
     DI.Scopes.delete(notNil(scopeId))
   }
 
-  static scan(paths: string[]): Promise<unknown[]> {
+  static async scan(paths: string[]): Promise<void> {
     notNil(paths)
-    return Promise.all(paths.map(path => loadModule(path)))
+    await Promise.all(paths.map(path => loadModule(path)))
   }
 
   get<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
