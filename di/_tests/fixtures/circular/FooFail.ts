@@ -1,5 +1,5 @@
 import { Injectable } from '../../../decorators/Injectable.js'
-import { TypeOf } from '../../../internal/types/TypeOf.js'
+import { TypeOf } from '../../../TypeOf.js'
 import { BarFail } from './BarFail.js'
 
 @Injectable()

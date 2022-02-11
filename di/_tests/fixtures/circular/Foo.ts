@@ -1,6 +1,6 @@
 import { Defer } from '../../../decorators/Defer.js'
 import { Injectable } from '../../../decorators/Injectable.js'
-import { TypeOf } from '../../../internal/types/TypeOf.js'
+import { TypeOf } from '../../../TypeOf.js'
 import { Bar } from './Bar.js'
 
 @Injectable()
