@@ -8,8 +8,10 @@ export function getParamTypes<TFunction>(target: TFunction, propertyKey?: string
       : Reflect.getOwnMetadata('design:paramtypes', target)) || []
   const params = [...paramsTypes]
 
-  const injectionTokens: Record<string, TokenSpec<unknown>> = Reflect.getOwnMetadata(DiVars.INJECTION_TOKENS, target) ||
-  {}
+  const injectionTokens: Record<string, TokenSpec<unknown>> = Reflect.getOwnMetadata(
+    DiVars.CTOR_INJECTION_TOKENS,
+    target
+  ) || {}
 
   for (let i = 0; i < params.length; i++) {
     const key = +i

@@ -65,12 +65,21 @@ export namespace Resolver {
     }
 
     const deps = type.dependencies.map((dep, index) => resolveParam(di, ctor, dep, index, context))
+    let instance: any
 
     if (deps.length === 0) {
-      return new ctor()
+      instance = new ctor()
+    } else {
+      instance = new ctor(...deps)
     }
 
-    return new ctor(...deps)
+    if (type.propertyDependencies.length > 0) {
+      for (const [prop, token] of type.propertyDependencies) {
+        instance[prop] = resolveParam(di, ctor, token, 0, context)
+      }
+    }
+
+    return instance as T
   }
 
   export function resolveParam<T>(
