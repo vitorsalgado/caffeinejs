@@ -37,7 +37,7 @@ export class DI {
 
   protected readonly bindingRegistry: BindingRegistry = new BindingRegistry()
   protected readonly bindingNames: Map<Identifier, Binding[]> = new Map()
-  protected readonly multipleBeansMap: Map<Token, Binding[]> = new Map()
+  protected readonly multipleBeansRefCache: Map<Token, Binding[]> = new Map()
 
   protected constructor(readonly namespace = '', readonly parent?: DI) {
     notNil(namespace)
@@ -139,8 +139,8 @@ export class DI {
     const bindings = this.getBindings(token)
 
     if (bindings.length === 0) {
-      if (this.multipleBeansMap.has(token)) {
-        const bindings = this.multipleBeansMap.get(token) as Binding[]
+      if (this.multipleBeansRefCache.has(token)) {
+        const bindings = this.multipleBeansRefCache.get(token) as Binding[]
 
         return bindings.map(binding => Resolver.resolve(this, token, binding, context))
       }
@@ -161,7 +161,7 @@ export class DI {
       if (entries.length === 0) {
         return []
       } else {
-        this.multipleBeansMap.set(
+        this.multipleBeansRefCache.set(
           token,
           entries.map(entry => entry.binding)
         )
