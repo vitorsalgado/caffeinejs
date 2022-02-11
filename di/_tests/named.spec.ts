@@ -1,3 +1,4 @@
+import { expect } from '@jest/globals'
 import { v4 } from 'uuid'
 import { Bean } from '../decorators/Bean.js'
 import { Configuration } from '../decorators/Configuration.js'
@@ -9,10 +10,11 @@ import { DI } from '../DI.js'
 import { RepeatedBeanNamesConfigurationError } from '../DiError.js'
 
 describe('Named Dependencies', function () {
-  const ack = Symbol.for('ok')
+  const kAck = Symbol('ok')
+  const kBye = 'test-named-dependencies-bye'
 
   @Injectable()
-  @Named('bye')
+  @Named(kBye)
   class ByeService {
     readonly id: string = v4()
 
@@ -22,7 +24,7 @@ describe('Named Dependencies', function () {
   }
 
   @Injectable()
-  @Named(ack)
+  @Named(kAck)
   class AckService {
     readonly id: string = v4()
 
@@ -41,7 +43,7 @@ describe('Named Dependencies', function () {
   class Root {
     readonly id: string = v4()
 
-    constructor(@Inject('bye') readonly byeService: ByeService, @Inject(ack) readonly ackService: AckService) {}
+    constructor(@Inject(kBye) readonly byeService: ByeService, @Inject(kAck) readonly ackService: AckService) {}
   }
 
   it('should resolve based on dependency qualifier', function () {
@@ -54,22 +56,24 @@ describe('Named Dependencies', function () {
   it('should resolve same instance when using named and type', function () {
     const di = DI.setup()
     const bye = di.get(ByeService)
-    const byeNamed = di.get('bye')
+    const byeNamed = di.get(kBye)
 
     expect(bye).toEqual(byeNamed)
   })
 
   describe('failure scenarios resolving many', function () {
     it('should fail when trying to set multiple raw beans with same name', function () {
+      const kTest = Symbol('test')
+
       expect(() => {
         @Configuration()
         class ManyRawConf {
-          @Bean('test')
+          @Bean(kTest)
           test1() {
             return 'one'
           }
 
-          @Bean('test')
+          @Bean(kTest)
           test2() {
             return 'two'
           }
@@ -78,17 +82,19 @@ describe('Named Dependencies', function () {
     })
 
     it('should fail when trying to repeat a name for the same type', function () {
+      const kOne = Symbol('one')
+
       expect(() => {
         @Configuration()
         class Rep {
           @Bean(Msg)
-          @Named('one')
+          @Named(kOne)
           msg1() {
             return new Msg('one_1')
           }
 
           @Bean(Msg)
-          @Named('one')
+          @Named(kOne)
           msg1_1() {
             return new Msg('one_1_1')
           }
@@ -97,44 +103,64 @@ describe('Named Dependencies', function () {
     })
   })
 
-  describe('when providing many components of same type with different names', function () {
+  describe('when configuration provides many components of same type with different names', function () {
+    const kTwo = Symbol('two')
+    const kAm = Symbol('am')
+    const kEu = Symbol('eu')
+
     @Configuration()
     class Conf {
       @Bean(Msg)
-      @Named('two')
+      @Named(kTwo)
       msg2() {
         return new Msg('two_2')
       }
 
       @Bean(Msg)
-      @Named('am')
+      @Named(kAm)
       msg3() {
         return new Msg('am')
       }
 
       @Bean(Msg)
-      @Named('eu')
+      @Named(kEu)
       @Primary()
       msg3_1() {
         return new Msg('eu')
       }
     }
 
-    it('should ', function () {
-      const di = DI.setup()
-      const twos = di.getMany('two')
-      const two = di.get<Msg>('two')
-      const am = di.get<Msg>('am')
-      const eu = di.get<Msg>('eu')
-      const msg = di.get(Msg)
-      const multiMsg = di.getMany(Msg)
+    const di = DI.setup()
 
-      expect(twos).toHaveLength(1)
+    describe('and requesting many instances of a type', function () {
+      it('should return all registered components ignoring the name when using the class type as the key', function () {
+        const multiMsg = di.getMany(Msg)
+
+        expect(multiMsg).toHaveLength(3)
+        expect(multiMsg.every(x => x instanceof Msg)).toBeTruthy()
+      })
+
+      it('should return an array with a single entry when passing a named key with one entry', function () {
+        const twos = di.getMany<Msg>(kTwo)
+
+        expect(twos).toHaveLength(1)
+        expect(twos[0]).toBeInstanceOf(Msg)
+        expect(twos[0].type).toEqual('two_2')
+      })
+    })
+
+    it('should return undefined when requesting a instance with the unregistered class type', function () {
+      expect(di.get(Msg)).toBeUndefined()
+    })
+
+    it('should return an specific instance for each named provided bean', function () {
+      const two = di.get<Msg>(kTwo)
+      const am = di.get<Msg>(kAm)
+      const eu = di.get<Msg>(kEu)
+
       expect(two.type).toEqual('two_2')
       expect(am.type).toEqual('am')
       expect(eu.type).toEqual('eu')
-      expect(msg).toBeUndefined()
-      expect(multiMsg).toHaveLength(3)
     })
   })
 })

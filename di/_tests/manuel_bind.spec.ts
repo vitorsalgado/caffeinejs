@@ -9,6 +9,7 @@ import { DI } from '../DI.js'
 
 describe('Manual Binding', function () {
   const destroySpy = jest.fn()
+  const kTest = 'nmTest'
 
   abstract class Abs {
     abstract msg(): string
@@ -24,7 +25,7 @@ describe('Manual Binding', function () {
 
   @LateBind()
   @Injectable()
-  @Named('test')
+  @Named(kTest)
   class Late {
     readonly id: string = v4()
 
@@ -48,7 +49,7 @@ describe('Manual Binding', function () {
     constructor(@Inject('val') readonly val: string) {}
   }
 
-  const sy = Symbol.for('test')
+  const sy = Symbol('test')
 
   @LateBind()
   @Injectable()

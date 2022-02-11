@@ -40,7 +40,7 @@ export class DecoratedInjectables {
   }
 
   deleteBean(token: Token): void {
-    const idx = this._beans.findIndex(([k, v]) => k === token)
+    const idx = this._beans.findIndex(([k]) => k === token)
 
     if (idx > -1) {
       this._beans.splice(idx, 1)

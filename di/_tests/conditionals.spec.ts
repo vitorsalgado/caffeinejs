@@ -62,13 +62,18 @@ describe('Conditionals', function () {
       const spy1 = jest.fn()
       const spy2 = jest.fn()
 
+      const kTxt = Symbol('txt')
+      const kVal = Symbol('val')
+      const kJson = Symbol('json')
+      const kXml = Symbol('xml')
+
       @Configuration()
       @ConditionalOn(() => {
         spy1()
         return false
       })
       class NoConf {
-        @Bean('txt')
+        @Bean(kTxt)
         @ConditionalOn(() => {
           spy1()
           return true
@@ -77,7 +82,7 @@ describe('Conditionals', function () {
           return 'txt'
         }
 
-        @Bean('val')
+        @Bean(kVal)
         val() {
           return 'val'
         }
@@ -89,7 +94,7 @@ describe('Conditionals', function () {
         return true
       })
       class Conf {
-        @Bean('json')
+        @Bean(kJson)
         @ConditionalOn(() => {
           spy2()
           return true
@@ -102,7 +107,7 @@ describe('Conditionals', function () {
           return 'json'
         }
 
-        @Bean('xml')
+        @Bean(kXml)
         @ConditionalOn(() => {
           spy2()
           return false
@@ -125,13 +130,13 @@ describe('Conditionals', function () {
         const di = DI.setup()
 
         expect(di.has(NoConf)).toBeFalsy()
-        expect(di.has('txt')).toBeFalsy()
-        expect(di.has('val')).toBeFalsy()
+        expect(di.has(kTxt)).toBeFalsy()
+        expect(di.has(kVal)).toBeFalsy()
         expect(spy1).toHaveBeenCalledTimes(1)
 
         expect(di.has(Conf)).toBeTruthy()
-        expect(di.has('json')).toBeTruthy()
-        expect(di.has('xml')).toBeFalsy()
+        expect(di.has(kJson)).toBeTruthy()
+        expect(di.has(kXml)).toBeFalsy()
         expect(spy2).toHaveBeenCalledTimes(4)
       })
     })

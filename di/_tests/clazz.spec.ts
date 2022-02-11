@@ -92,14 +92,14 @@ describe('Class', function () {
   })
 
   describe('injecting many', function () {
-    const identifier = Symbol.for('testId')
+    const kIdentifier = Symbol('testId')
 
     abstract class Base {
       abstract hello(): string
     }
 
     @Injectable()
-    @Named(identifier)
+    @Named(kIdentifier)
     class En extends Base {
       hello(): string {
         return 'hi'
@@ -107,7 +107,7 @@ describe('Class', function () {
     }
 
     @Injectable()
-    @Named(identifier)
+    @Named(kIdentifier)
     class Pt extends Base {
       hello(): string {
         return 'oi'
@@ -116,7 +116,7 @@ describe('Class', function () {
 
     @Injectable()
     class Lang {
-      constructor(@InjectAll(identifier) readonly all: Base[]) {}
+      constructor(@InjectAll(kIdentifier) readonly all: Base[]) {}
     }
 
     @Injectable()
@@ -198,10 +198,10 @@ describe('Class', function () {
     })
 
     describe('when multiple resolutions exists for a named token', function () {
-      const name = 'svc'
+      const kName = Symbol('svc')
 
       @Injectable()
-      @Named(name)
+      @Named(kName)
       class Svc1 {
         name() {
           return 'svc1'
@@ -209,7 +209,7 @@ describe('Class', function () {
       }
 
       @Injectable()
-      @Named(name)
+      @Named(kName)
       @Primary()
       class Svc2 {
         name() {
@@ -219,7 +219,7 @@ describe('Class', function () {
 
       it('should resolve the primary one', function () {
         const di = DI.setup()
-        const dep = di.get<Svc2>(name)
+        const dep = di.get<Svc2>(kName)
 
         expect(dep.name()).toEqual('svc2')
       })

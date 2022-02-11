@@ -31,14 +31,17 @@ describe('Namespace', function () {
 
   class NsBean {}
 
+  const kDep = Symbol('dep')
+  const kDiffRef = Symbol('diffRef')
+
   @Configuration({ namespace: 'ns2' })
   class Conf {
-    @Bean('dep')
+    @Bean(kDep)
     dep() {
       return 'dep'
     }
 
-    @Bean('diffRef')
+    @Bean(kDiffRef)
     diffRef(ns1: Ns1) {
       return ns1
     }
@@ -81,14 +84,14 @@ describe('Namespace', function () {
       const di = DI.setup('ns2')
 
       it('should return components according to its namespace', function () {
-        expect(di.get('dep')).toEqual('dep')
+        expect(di.get(kDep)).toEqual('dep')
         expect(di.get('ns1')).toBeUndefined()
         expect(di.get(Ns1)).toBeUndefined()
         expect(di.get(NsBean)).toBeInstanceOf(NsBean)
       })
 
       it('should fail when a component from one namespace has a reference for component from another', function () {
-        expect(() => di.get('diffRef')).toThrow(NoResolutionForTokenError)
+        expect(() => di.get(kDiffRef)).toThrow(NoResolutionForTokenError)
       })
     })
   })

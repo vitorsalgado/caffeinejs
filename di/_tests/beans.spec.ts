@@ -64,6 +64,7 @@ describe('Configuration', function () {
 
   describe('named class provider', function () {
     const spy = jest.fn()
+    const kTest = Symbol('test')
 
     class Service {
       readonly id: string = v4()
@@ -78,7 +79,7 @@ describe('Configuration', function () {
     @Configuration()
     class Conf {
       @Bean(Service)
-      @Named('test')
+      @Named(kTest)
       service(@Inject('msg') msg: string) {
         spy()
         return new Service(msg)
@@ -91,8 +92,8 @@ describe('Configuration', function () {
 
       di.bind('msg').toValue(msg)
 
-      const service = di.get<Service>('test')
-      const service2 = di.get<Service>('test')
+      const service = di.get<Service>(kTest)
+      const service2 = di.get<Service>(kTest)
 
       expect(service).toBeInstanceOf(Service)
       expect(service.txt()).toEqual(msg)
@@ -127,6 +128,8 @@ describe('Configuration', function () {
   })
 
   describe('configuration class with primary beans', function () {
+    const kInterface = Symbol('interface')
+
     abstract class Abs {
       abstract test(): string
     }
@@ -143,7 +146,7 @@ describe('Configuration', function () {
     }
 
     @Injectable()
-    @Named('interface')
+    @Named(kInterface)
     class A2 implements Interface {
       test(): string {
         return 'a2'
@@ -162,7 +165,7 @@ describe('Configuration', function () {
         })()
       }
 
-      @Bean('interface')
+      @Bean(kInterface)
       @Primary()
       fromInterface(): Interface {
         return new (class implements Interface {
@@ -176,7 +179,7 @@ describe('Configuration', function () {
     it('should use primary beans from configurations class', function () {
       const di = DI.setup()
       const abs = di.get(Abs)
-      const i = di.get<Interface>('interface')
+      const i = di.get<Interface>(kInterface)
 
       expect(abs.test()).toEqual('abs-bean')
       expect(i.test()).toEqual('interface-bean')

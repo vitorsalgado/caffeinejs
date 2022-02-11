@@ -61,14 +61,15 @@ describe('Abstract Classes', function () {
     })
 
     describe('and referencing dependencies by name', function () {
-      const mongo = Symbol('mongodb')
+      const kMongo = Symbol.for('mongodb')
+      const kSql = Symbol.for('sql')
 
       abstract class Repo {
         abstract list(): string
       }
 
       @Injectable()
-      @Named('sql')
+      @Named(kSql)
       class MySqlRepo extends Repo {
         list(): string {
           return 'mysql'
@@ -76,7 +77,7 @@ describe('Abstract Classes', function () {
       }
 
       @Injectable()
-      @Named(mongo)
+      @Named(kMongo)
       class MongoRepo extends Repo {
         list(): string {
           return 'mongodb'
@@ -85,7 +86,7 @@ describe('Abstract Classes', function () {
 
       @Injectable()
       class DbService {
-        constructor(@Inject(mongo) readonly repo: Repo) {}
+        constructor(@Inject(kMongo) readonly repo: Repo) {}
 
         list() {
           return this.repo.list()

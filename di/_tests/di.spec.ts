@@ -3,11 +3,13 @@ import { Named } from '../decorators/Named.js'
 import { DI } from '../DI.js'
 
 describe('DI', function () {
+  const kTestName = 'test-name'
+
   @Injectable()
   class Test {}
 
   @Injectable()
-  @Named('test-name')
+  @Named(kTestName)
   class NamedTest {}
 
   it('should print the type name when calling toString()', function () {
@@ -22,7 +24,7 @@ describe('DI', function () {
 
     expect(str).toContain('Test')
     expect(str).toContain('NamedTest')
-    expect(str).toContain('test-name')
+    expect(str).toContain(kTestName)
     expect(str).toContain('tk100')
     expect(str).toContain('tk200')
     expect(protoStr).toEqual('[object DI]')

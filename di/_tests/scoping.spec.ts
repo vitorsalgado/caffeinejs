@@ -1,3 +1,4 @@
+import { afterAll } from '@jest/globals'
 import { jest } from '@jest/globals'
 import { v4 } from 'uuid'
 import { DecoratedInjectables } from '../DecoratedInjectables.js'
@@ -11,7 +12,7 @@ import { Scope } from '../Scope.js'
 import { Scopes } from '../Scopes.js'
 
 describe('Scoping', function () {
-  const id = Symbol.for('custom')
+  const kCustomScopeId = Symbol('custom')
   const spy = jest.fn()
 
   class CustomScope<T> implements Scope<T> {
@@ -24,10 +25,15 @@ describe('Scoping', function () {
   }
 
   @Injectable()
-  @ScopedAs(id)
+  @ScopedAs(kCustomScopeId)
   class Dep {
     readonly id: string = v4()
   }
+
+  afterAll(() => {
+    DI.unbindScope(kCustomScopeId)
+    DecoratedInjectables.instance().delete(Dep)
+  })
 
   it('should fail when using an non-registered scope', function () {
     @Injectable()
@@ -38,9 +44,10 @@ describe('Scoping', function () {
       DI.setup()
     } catch (e) {
       expect(e).toBeInstanceOf(ScopeNotRegisteredError)
+      return
+    } finally {
       DI.unbindScope('none')
       DecoratedInjectables.instance().delete(NonexistentScope)
-      return
     }
 
     fail('should not reach here!')
@@ -49,7 +56,7 @@ describe('Scoping', function () {
   it('should use scope specified with decorator when it is registered', function () {
     const scope = new CustomScope()
 
-    DI.bindScope(id, scope)
+    DI.bindScope(kCustomScopeId, scope)
 
     const di = DI.setup()
     const scoped1 = di.get(Dep)
@@ -58,7 +65,7 @@ describe('Scoping', function () {
     expect(scoped1).toBeInstanceOf(Dep)
     expect(scoped2).toBeInstanceOf(Dep)
     expect(scoped1).not.toEqual(scoped2)
-    expect(scope).toEqual(di.getScope(id))
+    expect(scope).toEqual(di.getScope(kCustomScopeId))
     expect(spy).toHaveBeenCalledTimes(1)
   })
 
