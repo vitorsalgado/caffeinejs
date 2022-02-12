@@ -2,20 +2,25 @@ import { tokenStr } from '../Token.js'
 import { TokenSpec } from '../Token.js'
 import { Token } from '../Token.js'
 
-export function fmtParamError(ctor: Token, index: number): string {
+export function fmtParamError(ctor: Token, indexOrProp: number | (string | symbol)): string {
+  const isNum = typeof indexOrProp === 'number'
+  const msg = isNum ? `parameter at position ${indexOrProp}` : `property ${String(indexOrProp)}`
+
   if (typeof ctor !== 'function') {
-    return `parameter at position ${index}`
+    return msg
   }
 
   const [, params = null] = ctor.toString().match(/constructor\(([\w, ]+)\)/) || []
 
   if (params === null) {
-    return `parameter at position ${index}`
+    return msg
   }
 
-  const param = params.split(',')[index].trim()
+  if (isNum) {
+    return `parameter ${params.split(',')[indexOrProp].trim()} at position ${indexOrProp}`
+  }
 
-  return `parameter ${param} at position ${index}`
+  return msg
 }
 
 export function fmtTokenError(spec: TokenSpec): string {

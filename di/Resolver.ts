@@ -75,7 +75,7 @@ export namespace Resolver {
 
     if (type.propertyDependencies.length > 0) {
       for (const [prop, token] of type.propertyDependencies) {
-        instance[prop] = resolveParam(di, ctor, token, 0, context)
+        instance[prop] = resolveParam(di, ctor, token, prop, context)
       }
     }
 
@@ -86,12 +86,12 @@ export namespace Resolver {
     di: DI,
     target: Token<T>,
     dep: TokenSpec<T>,
-    index: number,
+    indexOrProp: number | string | symbol,
     context: ResolutionContext
   ): T {
     if (isNil(dep.token) && isNil(dep.tokenType)) {
       throw new CircularReferenceError(
-        `Cannot resolve ${fmtParamError(target, index)} from type ${tokenStr(
+        `Cannot resolve ${fmtParamError(target, indexOrProp)} from type ${tokenStr(
           target
         )} because the injection token is undefined.\n` +
           `This could mean that the component ${tokenStr(target)} has a circular reference.\n` +
@@ -131,7 +131,7 @@ export namespace Resolver {
 
     throw new NoResolutionForTokenError(
       dep,
-      `Cannot resolve ${fmtParamError(target, index)} with token ${fmtTokenError(dep)}.\n` +
+      `Cannot resolve ${fmtParamError(target, indexOrProp)} with token ${fmtTokenError(dep)}.\n` +
         `Check if the type ${tokenStr(target)} has all its dependencies correctly registered.`
     )
   }

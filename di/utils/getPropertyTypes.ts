@@ -3,7 +3,7 @@ import { TokenSpec } from '../Token.js'
 
 export function getPropertyTypes<TFunction>(target: TFunction): [string, TokenSpec<unknown>][] {
   const injectionTokens: Record<string, TokenSpec<unknown>> = Reflect.getOwnMetadata(
-    DiVars.PROPERTY_INJECTION_TOKENS,
+    DiVars.CLASS_PROPERTIES_INJECTION_TOKENS,
     target
   ) || {}
 

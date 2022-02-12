@@ -1,3 +1,5 @@
+import { MethodInjectionPostResolution } from './internal/MethodInjectionPostResolution.js'
+import { Provider } from './internal/Provider.js'
 import { DefaultServiceLocator } from './ServiceLocator.js'
 import { ServiceLocator } from './ServiceLocator.js'
 import { loadModule } from './utils/loadModule.js'
@@ -269,8 +271,7 @@ export class DI {
     notNil(token)
     notNil(binding)
 
-    binding.scopeId = binding.scopeId ? binding.scopeId : BuiltInScopes.SINGLETON
-
+    const scopeId = binding.scopeId ? binding.scopeId : BuiltInScopes.SINGLETON
     const provider = providerFromToken(token, binding.provider)
 
     notNil(provider, `Could not determine a provider for token: ${tokenStr(token)}`)
@@ -299,15 +300,26 @@ export class DI {
       }
     }
 
-    const scope = this.getScope<T>(binding.scopeId)
+    const scope = this.getScope<T>(scopeId)
 
     if (!scope) {
-      throw new ScopeNotRegisteredError(binding.scopeId)
+      throw new ScopeNotRegisteredError(scopeId)
     }
 
+    binding.scopeId = scopeId
     binding.provider = provider
     binding.scope = scope
-    binding.scopedProvider = binding.scope.wrap(binding.provider)
+
+    const scopedProvider = binding.scope.wrap(binding.provider)
+    let finalProvider: Provider
+
+    if (binding.methodInjections.length > 0) {
+      finalProvider = new MethodInjectionPostResolution(scopedProvider)
+    } else {
+      finalProvider = scopedProvider
+    }
+
+    binding.scopedProvider = finalProvider
 
     this.bindingRegistry.register(token, binding)
   }

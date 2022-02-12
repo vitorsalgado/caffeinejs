@@ -7,7 +7,8 @@ import { TokenSpec } from './Token.js'
 
 export interface Binding<T = any> {
   dependencies: TokenSpec<unknown>[]
-  propertyDependencies: [string, TokenSpec<unknown>][]
+  propertyDependencies: [Identifier, TokenSpec<unknown>][]
+  methodInjections: [Identifier, TokenSpec<unknown>[]][]
   namespace: Identifier
   scopeId: Identifier
   names: Identifier[]
@@ -34,6 +35,7 @@ export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
     scopeId: lifecycle,
     dependencies: initial.dependencies || [],
     propertyDependencies: initial.propertyDependencies || [],
+    methodInjections: initial.methodInjections || [],
     namespace: initial.namespace || '',
     names: initial.names || [],
     conditionals: initial.conditionals || [],
