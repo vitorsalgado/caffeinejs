@@ -8,6 +8,8 @@ export interface LocatorOptions {
 
 export abstract class ServiceLocator {
   abstract get<T>(key: Token<T>, options?: Partial<LocatorOptions>): T
+
+  abstract getMany<T>(key: Token<T>, options?: Partial<LocatorOptions>): T[]
 }
 
 export class DefaultServiceLocator extends ServiceLocator {
@@ -17,5 +19,9 @@ export class DefaultServiceLocator extends ServiceLocator {
 
   get<T>(key: Token<T>, options?: Partial<LocatorOptions>): T {
     return this.di.get(key, options?.resolutionContext)
+  }
+
+  getMany<T>(key: Token<T>, options?: Partial<LocatorOptions>): T[] {
+    return this.di.getMany(key, options?.resolutionContext)
   }
 }

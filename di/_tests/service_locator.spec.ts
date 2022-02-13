@@ -51,4 +51,13 @@ describe('Service Locator', function () {
     expect(svc11.test()).toEqual('hello world')
     expect(svc21.test()).toEqual('hello world')
   })
+
+  it('should expose getMany() from container', function () {
+    const di = DI.setup()
+    const serviceLocator = di.get(ServiceLocator)
+    const many = serviceLocator.getMany(Svc)
+
+    expect(many).toHaveLength(1)
+    expect(many[0]).toBeInstanceOf(Svc)
+  })
 })
