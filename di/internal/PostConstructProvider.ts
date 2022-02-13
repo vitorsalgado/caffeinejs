@@ -1,7 +1,7 @@
 import { ProviderContext } from './Provider.js'
 import { Provider } from './Provider.js'
 
-export class AfterResolutionPostProvider<T> extends Provider<T> {
+export class PostConstructProvider<T> extends Provider<T> {
   constructor(private readonly provider: Provider<T>) {
     super()
   }
@@ -9,11 +9,11 @@ export class AfterResolutionPostProvider<T> extends Provider<T> {
   provide(ctx: ProviderContext): T {
     const instance: any = this.provider.provide(ctx)
 
-    if (instance === null || instance === undefined || ctx.binding.afterResolution === undefined) {
+    if (instance === null || instance === undefined || ctx.binding.postConstruct === undefined) {
       return instance
     }
 
-    instance[ctx.binding.afterResolution]()
+    instance[ctx.binding.postConstruct]()
 
     return instance
   }

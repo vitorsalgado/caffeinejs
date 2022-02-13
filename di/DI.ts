@@ -10,7 +10,7 @@ import { NoUniqueInjectionForTokenError } from './DiError.js'
 import { NoResolutionForTokenError } from './DiError.js'
 import { DiVars } from './DiVars.js'
 import { Identifier } from './Identifier.js'
-import { AfterResolutionPostProvider } from './internal/AfterResolutionPostProvider.js'
+import { PostConstructProvider } from './internal/PostConstructProvider.js'
 import { ClassProvider } from './internal/ClassProvider.js'
 import { ContainerScope } from './internal/ContainerScope.js'
 import { InternalMetadataReader } from './internal/InternalMetadataReader.js'
@@ -366,8 +366,8 @@ export class DI {
       finalProvider = postProviderFactory.provide(finalProvider)
     }
 
-    if (binding.afterResolution) {
-      finalProvider = new AfterResolutionPostProvider(finalProvider)
+    if (binding.postConstruct) {
+      finalProvider = new PostConstructProvider(finalProvider)
     }
 
     binding.scopedProvider = finalProvider

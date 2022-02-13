@@ -1,12 +1,12 @@
 import { jest } from '@jest/globals'
 import { expect } from '@jest/globals'
 import { v4 } from 'uuid'
-import { AfterResolution } from '../decorators/AfterResolution.js'
+import { PostConstruct } from '../decorators/PostConstruct.js'
 import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { DI } from '../DI.js'
 
-describe('After Resolution', function () {
+describe('Post Construct', function () {
   const stack: string[] = []
   const spy = jest.fn()
 
@@ -34,7 +34,7 @@ describe('After Resolution', function () {
       expect(this.svc).toBeUndefined()
     }
 
-    @AfterResolution()
+    @PostConstruct()
     init() {
       spy()
       stack.push('init')

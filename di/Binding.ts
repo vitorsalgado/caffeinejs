@@ -24,7 +24,7 @@ export interface Binding<T = any> {
   late?: boolean
   lazy?: boolean
   preDestroy?: Identifier
-  afterResolution?: Identifier
+  postConstruct?: Identifier
 }
 
 export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
@@ -41,7 +41,7 @@ export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
     lazy: initial.lazy,
     late: initial.late,
     preDestroy: initial.preDestroy,
-    afterResolution: initial.afterResolution,
+    postConstruct: initial.postConstruct,
     configuration: initial.configuration,
     type: initial.type,
     scopeId: initial.scopeId!,
