@@ -86,3 +86,9 @@ export class RepeatedBeanNamesConfigurationError extends DiError {
     this.name = 'RepeatedBeanNamesConfigurationError'
   }
 }
+
+export class InvalidBindingError extends DiError {
+  constructor(message: string) {
+    super(message, 'INVALID_BINDING')
+  }
+}

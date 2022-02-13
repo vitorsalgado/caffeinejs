@@ -1,3 +1,8 @@
+import { InvalidBindingError } from './DiError.js'
+import { Identifier } from './Identifier.js'
+import { Provider } from './internal/Provider.js'
+import { tokenStr } from './Token.js'
+import { isNamedToken } from './Token.js'
 import { isFn } from './utils/isFn.js'
 import { notNil } from './utils/notNil.js'
 import { Ctor } from './internal/types/Ctor.js'
@@ -9,7 +14,6 @@ import { FactoryProvider } from './internal/FactoryProvider.js'
 import { ProviderContext } from './internal/Provider.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { ValueProvider } from './internal/ValueProvider.js'
-import { Scopes } from './Scopes.js'
 import { Token } from './Token.js'
 
 //TODO: create interface Binder
@@ -18,6 +22,7 @@ export class BindTo<T> {
 
   to(ctor: Ctor<T>): BindToOptions<T> {
     notNil(ctor)
+    isFn(ctor)
 
     this.binding.rawProvider = new ClassProvider(ctor)
     this.di.configureBinding(this.token, this.binding)
@@ -26,19 +31,23 @@ export class BindTo<T> {
   }
 
   toSelf(): BindToOptions<T> {
+    if (isNamedToken(this.token)) {
+      throw new InvalidBindingError(
+        '.toSelf() cannot be used when binding key is not a class type. ' + `Current token is: ${tokenStr(this.token)}`
+      )
+    }
+
     return this.to(this.token as Ctor)
   }
 
   toValue(value: T): BindToOptions<T> {
     this.binding.rawProvider = new ValueProvider(value)
-    this.binding.scopeId = Scopes.SINGLETON
-
     this.di.configureBinding(this.token, this.binding)
 
     return new BindToOptions<T>(this.di, this.token, this.binding)
   }
 
-  toToken(token: string | symbol): BindToOptions<T> {
+  toToken(token: Identifier): BindToOptions<T> {
     notNil(token)
 
     this.binding.rawProvider = new TokenProvider(token)
@@ -52,7 +61,15 @@ export class BindTo<T> {
     isFn(factory)
 
     this.binding.rawProvider = new FactoryProvider(factory)
-    this.binding.scopeId = Scopes.SINGLETON
+    this.di.configureBinding(this.token, this.binding)
+
+    return new BindToOptions<T>(this.di, this.token, this.binding)
+  }
+
+  toProvider(provider: Provider<T>): BindToOptions<T> {
+    notNil(provider)
+
+    this.binding.rawProvider = provider
     this.di.configureBinding(this.token, this.binding)
 
     return new BindToOptions<T>(this.di, this.token, this.binding)

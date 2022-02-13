@@ -128,6 +128,14 @@ export class DI {
     DI.Scopes.delete(notNil(scopeId))
   }
 
+  static hasScope(scopeId: Identifier): boolean {
+    return DI.Scopes.has(scopeId)
+  }
+
+  static getScope<T = unknown>(scopeId: Identifier): Scope<T> | undefined {
+    return DI.Scopes.get(scopeId) as Scope<T> | undefined
+  }
+
   static async scan(paths: string[]): Promise<void> {
     notNil(paths)
     await Promise.all(paths.map(path => loadModule(path)))
@@ -372,6 +380,7 @@ export class DI {
 
     binding.scopedProvider = finalProvider
 
+    this.mapNamed(binding)
     this.bindingRegistry.register(token, binding)
   }
 
@@ -511,7 +520,6 @@ export class DI {
       }
 
       this.configureBinding(key, binding)
-      this.mapNamed(binding)
 
       if (binding.conditionals) {
         conditionals.set(key, binding)
@@ -546,11 +554,9 @@ export class DI {
 
         if (pass) {
           this.configureBinding(token, binding)
-          this.mapNamed(binding)
         }
       } else {
         this.configureBinding(token, binding)
-        this.mapNamed(binding)
       }
     }
 
