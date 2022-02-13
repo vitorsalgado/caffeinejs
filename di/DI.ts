@@ -443,11 +443,19 @@ export class DI {
 
   toString() {
     return (
-      `${DI.name}(namespace=${String(this.namespace)}, count=${this.size()}){` +
+      `${DI.name}(namespace=${String(this.namespace)}, count=${this.size()}) {` +
       '\n' +
       this.bindingRegistry
         .toArray()
-        .map(x => `${tokenStr(x.token)}: names=${x.binding.names.join('|')}, scope=${x.binding.scopeId.toString()}`)
+        .map(
+          x =>
+            `${tokenStr(x.token)}: ` +
+            `names=[${x.binding.names?.join(', ')}], ` +
+            `scope=${x.binding.scopeId.toString()}, ` +
+            `dependencies=[${x.binding.dependencies?.join(', ')}], ` +
+            `lazy=${x.binding.lazy}, ` +
+            `providedBy=${x.binding.rawProvider?.constructor?.name}`
+        )
         .join('\n, ') +
       '\n}'
     )
