@@ -1,7 +1,11 @@
 import { expect } from '@jest/globals'
+import { Binding } from '../Binding.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
 import { DI } from '../DI.js'
+import { InternalMetadataReader } from '../internal/InternalMetadataReader.js'
+import { MetadataReader } from '../internal/MetadataReader.js'
+import { Token } from '../Token.js'
 
 describe('DI', function () {
   const kTestName = 'test-name'
@@ -78,5 +82,29 @@ describe('DI', function () {
     expect(entries.get(NamedTest)?.names).toContain(kTestName)
     expect(entries.has(Test)).toBeTruthy()
     expect(entries.size).toEqual(di.size())
+  })
+
+  describe('when using a custom metadata reader', function () {
+    it('should not allow invalid metadata reader instances', function () {
+      expect(() => DI.changeMetadataReader('wrong' as any)).toThrow()
+    })
+
+    it('should allow set an alternative metadata reader', function () {
+      const original = DI.MetadataReader
+
+      class Custom implements MetadataReader {
+        read(token: Token): Partial<Binding> {
+          return original.read(token)
+        }
+      }
+
+      try {
+        DI.changeMetadataReader(new Custom())
+      } finally {
+        expect(DI.MetadataReader).toBeInstanceOf(Custom)
+        DI.MetadataReader = original
+        expect(DI.MetadataReader).toBeInstanceOf(InternalMetadataReader)
+      }
+    })
   })
 })

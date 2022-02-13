@@ -14,6 +14,7 @@ import { AfterResolutionPostProvider } from './internal/AfterResolutionPostProvi
 import { ClassProvider } from './internal/ClassProvider.js'
 import { ContainerScope } from './internal/ContainerScope.js'
 import { InternalMetadataReader } from './internal/InternalMetadataReader.js'
+import { MetadataReader } from './internal/MetadataReader.js'
 import { MethodInjectionPostProvider } from './internal/MethodInjectionPostProvider.js'
 import { PropertyInjectionPostProvider } from './internal/PropertyInjectionPostProvider.js'
 import { providerFromToken } from './internal/providerFromToken.js'
@@ -33,12 +34,13 @@ import { DefaultServiceLocator } from './ServiceLocator.js'
 import { ServiceLocator } from './ServiceLocator.js'
 import { tokenStr } from './Token.js'
 import { isNamedToken, Token } from './Token.js'
+import { check } from './utils/check.js'
 import { isNil } from './utils/isNil.js'
 import { loadModule } from './utils/loadModule.js'
 import { notNil } from './utils/notNil.js'
 
 export class DI {
-  protected static readonly MetadataReader = new InternalMetadataReader()
+  static MetadataReader = new InternalMetadataReader()
   protected static readonly Scopes = new Map(DI.builtInScopes().entries())
 
   protected readonly bindingRegistry = new BindingRegistry()
@@ -129,6 +131,13 @@ export class DI {
   static async scan(paths: string[]): Promise<void> {
     notNil(paths)
     await Promise.all(paths.map(path => loadModule(path)))
+  }
+
+  static changeMetadataReader(other: MetadataReader) {
+    notNil(other)
+    check('read' in other && other.read.length === 1, 'Provided instance must be an MetadataReader implementation.')
+
+    DI.MetadataReader = other
   }
 
   get<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
