@@ -18,7 +18,7 @@ export class BindTo<T> {
   to(ctor: Ctor<T>): BindToOptions<T> {
     notNil(ctor)
 
-    this.binding.provider = new ClassProvider(ctor)
+    this.binding.rawProvider = new ClassProvider(ctor)
     this.di.configureBinding(this.token, this.binding)
 
     return new BindToOptions<T>(this.di, this.token, this.binding)
@@ -29,7 +29,7 @@ export class BindTo<T> {
   }
 
   toValue(value: T): BindToOptions<T> {
-    this.binding.provider = new ValueProvider(value)
+    this.binding.rawProvider = new ValueProvider(value)
     this.binding.scopeId = Scopes.SINGLETON
 
     this.di.configureBinding(this.token, this.binding)
@@ -40,7 +40,7 @@ export class BindTo<T> {
   toToken(token: string | symbol): BindToOptions<T> {
     notNil(token)
 
-    this.binding.provider = new TokenProvider(token)
+    this.binding.rawProvider = new TokenProvider(token)
     this.di.configureBinding(this.token, this.binding)
 
     return new BindToOptions<T>(this.di, this.token, this.binding)
@@ -50,7 +50,7 @@ export class BindTo<T> {
     notNil(factory)
     isFn(factory)
 
-    this.binding.provider = new FactoryProvider(factory)
+    this.binding.rawProvider = new FactoryProvider(factory)
     this.binding.scopeId = Scopes.SINGLETON
     this.di.configureBinding(this.token, this.binding)
 

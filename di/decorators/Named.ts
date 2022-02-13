@@ -8,7 +8,7 @@ export function Named<T>(name: string | symbol) {
     if (typeof target === 'function' && !propertyKey) {
       DI.configureDecoratedType<T>(target, {
         names: [name],
-        provider: new ClassProvider(target as Ctor)
+        rawProvider: new ClassProvider(target as Ctor)
       })
       return
     }

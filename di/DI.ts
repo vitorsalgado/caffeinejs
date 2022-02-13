@@ -1,11 +1,3 @@
-import { MethodInjectionPostResolution } from './internal/MethodInjectionPostResolution.js'
-import { Provider } from './internal/Provider.js'
-import { DefaultServiceLocator } from './ServiceLocator.js'
-import { ServiceLocator } from './ServiceLocator.js'
-import { loadModule } from './utils/loadModule.js'
-import { isNil } from './utils/isNil.js'
-import { notNil } from './utils/notNil.js'
-import { Ctor } from './internal/types/Ctor.js'
 import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
@@ -18,19 +10,27 @@ import { NoUniqueInjectionForTokenError } from './DiError.js'
 import { NoResolutionForTokenError } from './DiError.js'
 import { DiVars } from './DiVars.js'
 import { Identifier } from './Identifier.js'
+import { AfterResolutionPostProvider } from './internal/AfterResolutionPostProvider.js'
 import { ClassProvider } from './internal/ClassProvider.js'
 import { ContainerScope } from './internal/ContainerScope.js'
+import { MethodInjectionPostProvider } from './internal/MethodInjectionPostProvider.js'
 import { providerFromToken } from './internal/providerFromToken.js'
 import { ResolutionContextScope } from './internal/ResolutionContextScope.js'
 import { SingletonScope } from './internal/SingletonScope.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { TransientScope } from './internal/TransientScope.js'
+import { Ctor } from './internal/types/Ctor.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { Resolver } from './Resolver.js'
 import { Scope } from './Scope.js'
 import { Scopes as BuiltInScopes } from './Scopes.js'
+import { DefaultServiceLocator } from './ServiceLocator.js'
+import { ServiceLocator } from './ServiceLocator.js'
 import { tokenStr } from './Token.js'
 import { isNamedToken, Token } from './Token.js'
+import { isNil } from './utils/isNil.js'
+import { loadModule } from './utils/loadModule.js'
+import { notNil } from './utils/notNil.js'
 
 export class DI {
   protected static readonly Scopes = new Map<Identifier, Scope<unknown>>()
@@ -76,15 +76,15 @@ export class DI {
 
     const binding = newBinding({ ...existing, ...opts })
 
-    if (isNil(binding.provider)) {
+    if (isNil(binding.rawProvider)) {
       if (typeof tk === 'function') {
-        binding.provider = new ClassProvider(tk as Ctor)
+        binding.rawProvider = new ClassProvider(tk as Ctor)
       } else if (isNamedToken(tk)) {
-        binding.provider = new TokenProvider(tk)
+        binding.rawProvider = new TokenProvider(tk)
       }
     }
 
-    notNil(binding.provider, `Could not determine a provider for token: ${tokenStr(token)}`)
+    notNil(binding.rawProvider, `Could not determine a provider for token: ${tokenStr(token)}`)
 
     DecoratedInjectables.instance().configure(tk, binding)
   }
@@ -243,7 +243,7 @@ export class DI {
       .filter(x => x.binding.scopeId === BuiltInScopes.CONTAINER)
       .forEach(({ token, binding }) => {
         const copiedBinding = {
-          provider: binding.provider,
+          rawProvider: binding.rawProvider,
           dependencies: binding.dependencies,
           primary: binding.primary,
           scopeId: binding.scopeId,
@@ -258,7 +258,7 @@ export class DI {
           preDestroy: binding.preDestroy
         } as Binding
 
-        copiedBinding.scopedProvider = binding.scope.wrap(binding.provider)
+        copiedBinding.scopedProvider = binding.scope.wrap(binding.rawProvider)
         child.bindingRegistry.register(token, copiedBinding)
       })
 
@@ -272,7 +272,7 @@ export class DI {
     notNil(binding)
 
     const scopeId = binding.scopeId ? binding.scopeId : BuiltInScopes.SINGLETON
-    const provider = providerFromToken(token, binding.provider)
+    const provider = providerFromToken(token, binding.rawProvider)
 
     notNil(provider, `Could not determine a provider for token: ${tokenStr(token)}`)
 
@@ -292,8 +292,8 @@ export class DI {
 
         const binding: Binding | undefined = this.bindingRegistry.get(currentToken)
 
-        if (binding && binding.provider instanceof TokenProvider) {
-          tokenProvider = binding.provider
+        if (binding && binding.rawProvider instanceof TokenProvider) {
+          tokenProvider = binding.rawProvider
         } else {
           tokenProvider = null
         }
@@ -307,16 +307,21 @@ export class DI {
     }
 
     binding.scopeId = scopeId
-    binding.provider = provider
+    binding.rawProvider = provider
     binding.scope = scope
 
-    const scopedProvider = binding.scope.wrap(binding.provider)
-    let finalProvider: Provider
+    let finalProvider = binding.scope.wrap(binding.rawProvider)
 
     if (binding.methodInjections.length > 0) {
-      finalProvider = new MethodInjectionPostResolution(scopedProvider)
-    } else {
-      finalProvider = scopedProvider
+      finalProvider = new MethodInjectionPostProvider(finalProvider)
+    }
+
+    for (const postProviderFactory of binding.postProviderFactories) {
+      finalProvider = postProviderFactory.provide(finalProvider)
+    }
+
+    if (binding.afterResolution) {
+      finalProvider = new AfterResolutionPostProvider(finalProvider)
     }
 
     binding.scopedProvider = finalProvider

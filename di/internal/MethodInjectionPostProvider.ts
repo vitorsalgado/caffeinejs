@@ -1,9 +1,9 @@
 import { Resolver } from '../Resolver.js'
-import { PostResolution } from './PostResolution.js'
 import { Provider } from './Provider.js'
 import { ProviderContext } from './Provider.js'
+import { ProviderFactory } from './ProviderFactory.js'
 
-export class MethodInjectionPostResolution<T> extends PostResolution<T> {
+export class MethodInjectionPostProvider<T> extends Provider<T> {
   constructor(private readonly provider: Provider<T>) {
     super()
   }
@@ -22,5 +22,11 @@ export class MethodInjectionPostResolution<T> extends PostResolution<T> {
     }
 
     return instance as T
+  }
+}
+
+export class Factory implements ProviderFactory {
+  provide(previous: Provider): Provider {
+    return new MethodInjectionPostProvider(previous)
   }
 }

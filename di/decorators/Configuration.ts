@@ -67,7 +67,7 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
         scopeId: isNil(config.scopeId) ? factory.scopeId : config.scopeId,
         late: isNil(config.late) ? factory.late : config.late,
         conditionals: [...factory.conditionals],
-        provider: new FactoryProvider(({ di }) => {
+        rawProvider: new FactoryProvider(({ di }) => {
           const clazz = di.get<{ [key: symbol | string]: (...args: unknown[]) => T }>(target, config.resolutionContext)
           const deps = factory.dependencies.map((dep, index) =>
             Resolver.resolveParam(di, factory.token, dep, index, config.resolutionContext || ResolutionContext.INSTANCE)

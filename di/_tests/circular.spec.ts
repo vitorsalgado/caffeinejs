@@ -39,9 +39,9 @@ describe('Circular References', function () {
     it('should throw error', function () {
       const di = DI.setup()
 
-      di.configureBinding('foo', newBinding({ provider: new TokenProvider('foo') }))
+      di.configureBinding('foo', newBinding({ rawProvider: new TokenProvider('foo') }))
 
-      expect(() => di.configureBinding('foo', newBinding({ provider: new TokenProvider('foo') }))).toThrow()
+      expect(() => di.configureBinding('foo', newBinding({ rawProvider: new TokenProvider('foo') }))).toThrow()
     })
   })
 })

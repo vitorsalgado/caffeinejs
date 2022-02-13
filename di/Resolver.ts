@@ -36,14 +36,14 @@ export namespace Resolver {
         const tk = entries[0].token
         resolved = di.get<T>(tk, context)
 
-        di.configureBinding(token, newBinding({ provider: new TokenProvider(tk) }))
+        di.configureBinding(token, newBinding({ rawProvider: new TokenProvider(tk) }))
       } else if (entries.length > 1) {
         const primary = entries.find(x => x.binding.primary)
 
         if (primary) {
           resolved = di.get<T>(primary.token, context)
 
-          di.configureBinding(token, newBinding({ ...primary, provider: new TokenProvider(primary.token) }))
+          di.configureBinding(token, newBinding({ ...primary, rawProvider: new TokenProvider(primary.token) }))
         } else {
           throw new NoUniqueInjectionForTokenError(token)
         }
