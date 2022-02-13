@@ -1,3 +1,4 @@
+import { expect } from '@jest/globals'
 import { newBinding } from '../Binding.js'
 import { DI } from '../DI.js'
 import { CircularReferenceError } from '../DiError.js'
@@ -25,6 +26,9 @@ describe('Circular References', function () {
 
       expect(foo2.test()).toEqual('foo-bar')
       expect(bar2.test()).toEqual('bar-foo')
+
+      expect(foo.uuid).toEqual(foo2.uuid)
+      expect(bar.uuid).not.toEqual(bar2.uuid)
     })
   })
 

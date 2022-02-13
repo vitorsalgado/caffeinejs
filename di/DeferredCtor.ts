@@ -25,7 +25,7 @@ export class DeferredCtor<T> {
 
     const deferredObject = () => {
       if (!init) {
-        value = creator(this.callback())
+        value = creator(this.unwrap())
         init = true
       }
 
@@ -33,6 +33,10 @@ export class DeferredCtor<T> {
     }
 
     return new Proxy<any>({}, DeferredCtor.createHandler(deferredObject))
+  }
+
+  unwrap(): Token<T> {
+    return this.callback()
   }
 
   private static createHandler<T>(deferredObject: () => T): ProxyHandler<object> {

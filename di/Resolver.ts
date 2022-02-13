@@ -2,11 +2,9 @@ import { isNil } from './utils/isNil.js'
 import { Ctor } from './internal/types/Ctor.js'
 import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
-import { DecoratedInjectables } from './DecoratedInjectables.js'
 import { DeferredCtor } from './DeferredCtor.js'
 import { DI } from './DI.js'
 import { NoUniqueInjectionForTokenError } from './DiError.js'
-import { TypeNotRegisteredForInjectionError } from './DiError.js'
 import { NoResolutionForTokenError } from './DiError.js'
 import { CircularReferenceError } from './DiError.js'
 import { TokenProvider } from './internal/TokenProvider.js'
@@ -26,7 +24,7 @@ export namespace Resolver {
     let resolved: T | undefined
 
     if (token instanceof DeferredCtor) {
-      resolved = construct<T>(di, token, context)
+      resolved = token.createProxy(target => di.get(target, context))
     }
 
     if (typeof token === 'function') {
@@ -53,27 +51,8 @@ export namespace Resolver {
     return resolved as T
   }
 
-  export function construct<T>(di: DI, ctor: Ctor<T> | DeferredCtor<T>, context: ResolutionContext): T {
-    if (ctor instanceof DeferredCtor) {
-      return ctor.createProxy(target => di.get(target, context))
-    }
-
-    const type = DecoratedInjectables.instance().get(ctor)
-
-    if (!type) {
-      throw new TypeNotRegisteredForInjectionError(ctor)
-    }
-
-    const deps = type.dependencies.map((dep, index) => resolveParam(di, ctor, dep, index, context))
-    let instance: any
-
-    if (deps.length === 0) {
-      instance = new ctor()
-    } else {
-      instance = new ctor(...deps)
-    }
-
-    return instance as T
+  export function construct<T>(di: DI, ctor: Ctor<T>, binding: Binding, context: ResolutionContext): T {
+    return new ctor(...binding.dependencies.map((dep, index) => resolveParam(di, ctor, dep, index, context)))
   }
 
   export function resolveParam<T>(

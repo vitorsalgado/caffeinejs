@@ -1,3 +1,4 @@
+import { v4 } from 'uuid'
 import { Defer } from '../../../decorators/Defer.js'
 import { Injectable } from '../../../decorators/Injectable.js'
 import { ScopedAs } from '../../../decorators/ScopedAs.js'
@@ -8,6 +9,8 @@ import { Foo } from './Foo.js'
 @Injectable()
 @ScopedAs(Scopes.TRANSIENT)
 export class Bar {
+  uuid: string = v4()
+
   constructor(@Defer(() => Foo) readonly foo: TypeOf<Foo>) {}
 
   id = () => 'bar'
