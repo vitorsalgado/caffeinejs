@@ -1,3 +1,4 @@
+import { Binder } from './Binder.js'
 import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
@@ -235,7 +236,7 @@ export class DI {
     return this.bindingRegistry.get(token)
   }
 
-  bind<T>(token: Token<T>): BindTo<T> {
+  bind<T>(token: Token<T>): Binder<T> {
     notNil(token)
 
     const type = DecoratedInjectables.instance().get(token)
@@ -266,7 +267,7 @@ export class DI {
     return Promise.resolve()
   }
 
-  rebind<T>(token: Token<T>, destroy = true): Promise<BindTo<T>> | BindTo<T> {
+  rebind<T>(token: Token<T>, destroy = true): Promise<Binder<T>> {
     return this.unbind(token, destroy).then(() => this.bind(token))
   }
 

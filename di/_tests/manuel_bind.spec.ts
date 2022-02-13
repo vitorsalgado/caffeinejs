@@ -343,5 +343,10 @@ describe('Manual Binding', function () {
       const di = DI.setup()
       expect(() => di.bind('test').toSelf()).toThrow(InvalidBindingError)
     })
+
+    it('should only accept previously registered scopes', function () {
+      const di = DI.setup()
+      expect(() => di.bind('test').toValue('value').as('nonexistent-scope')).toThrow(InvalidBindingError)
+    })
   })
 })

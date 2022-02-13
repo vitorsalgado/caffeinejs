@@ -1,23 +1,25 @@
-import { InvalidBindingError } from './DiError.js'
-import { Identifier } from './Identifier.js'
-import { Provider } from './internal/Provider.js'
-import { tokenStr } from './Token.js'
-import { isNamedToken } from './Token.js'
-import { isFn } from './utils/isFn.js'
-import { notNil } from './utils/notNil.js'
-import { Ctor } from './internal/types/Ctor.js'
+import { Binder } from './Binder.js'
+import { BinderOptions } from './BinderOptions.js'
 import { Binding } from './Binding.js'
 import { BindToOptions } from './BindToOptions.js'
 import { DI } from './DI.js'
+import { InvalidBindingError } from './DiError.js'
+import { Identifier } from './Identifier.js'
 import { ClassProvider } from './internal/ClassProvider.js'
 import { FactoryProvider } from './internal/FactoryProvider.js'
+import { Provider } from './internal/Provider.js'
 import { ProviderContext } from './internal/Provider.js'
 import { TokenProvider } from './internal/TokenProvider.js'
+import { Ctor } from './internal/types/Ctor.js'
 import { ValueProvider } from './internal/ValueProvider.js'
+import { tokenStr } from './Token.js'
+import { isNamedToken } from './Token.js'
 import { Token } from './Token.js'
+import { isFn } from './utils/isFn.js'
+import { notNil } from './utils/notNil.js'
 
 //TODO: create interface Binder
-export class BindTo<T> {
+export class BindTo<T> implements Binder<T> {
   constructor(private readonly di: DI, private readonly token: Token<T>, private readonly binding: Binding<T>) {}
 
   to(ctor: Ctor<T>): BindToOptions<T> {
@@ -40,14 +42,14 @@ export class BindTo<T> {
     return this.to(this.token as Ctor)
   }
 
-  toValue(value: T): BindToOptions<T> {
+  toValue(value: T): BinderOptions<T> {
     this.binding.rawProvider = new ValueProvider(value)
     this.di.configureBinding(this.token, this.binding)
 
     return new BindToOptions<T>(this.di, this.token, this.binding)
   }
 
-  toToken(token: Identifier): BindToOptions<T> {
+  toToken(token: Identifier): BinderOptions<T> {
     notNil(token)
 
     this.binding.rawProvider = new TokenProvider(token)
@@ -56,7 +58,7 @@ export class BindTo<T> {
     return new BindToOptions<T>(this.di, this.token, this.binding)
   }
 
-  toFactory(factory: (ctx: ProviderContext) => T): BindToOptions<T> {
+  toFactory(factory: (ctx: ProviderContext) => T): BinderOptions<T> {
     notNil(factory)
     isFn(factory)
 
@@ -66,7 +68,7 @@ export class BindTo<T> {
     return new BindToOptions<T>(this.di, this.token, this.binding)
   }
 
-  toProvider(provider: Provider<T>): BindToOptions<T> {
+  toProvider(provider: Provider<T>): BinderOptions<T> {
     notNil(provider)
 
     this.binding.rawProvider = provider

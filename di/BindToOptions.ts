@@ -1,15 +1,16 @@
-import { InvalidBindingError } from './DiError.js'
-import { Identifier } from './Identifier.js'
-import { notNil } from './utils/notNil.js'
+import { BinderOptions } from './BinderOptions.js'
 import { Binding } from './Binding.js'
 import { DI } from './DI.js'
+import { InvalidBindingError } from './DiError.js'
+import { Identifier } from './Identifier.js'
 import { Scopes } from './Scopes.js'
 import { Token } from './Token.js'
+import { notNil } from './utils/notNil.js'
 
-export class BindToOptions<T> {
+export class BindToOptions<T> implements BinderOptions<T> {
   constructor(private readonly di: DI, private readonly token: Token<T>, private readonly binding: Binding<T>) {}
 
-  as(scopeId: string | symbol): BindToOptions<T> {
+  as(scopeId: Identifier): BinderOptions<T> {
     notNil(scopeId)
 
     if (!DI.hasScope(scopeId)) {
@@ -22,7 +23,7 @@ export class BindToOptions<T> {
     return this
   }
 
-  qualifiers(...names: Identifier[]): BindToOptions<T> {
+  qualifiers(...names: Identifier[]): BinderOptions<T> {
     notNil(names)
 
     this.binding.names = names
