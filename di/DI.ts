@@ -13,6 +13,7 @@ import { Identifier } from './Identifier.js'
 import { AfterResolutionPostProvider } from './internal/AfterResolutionPostProvider.js'
 import { ClassProvider } from './internal/ClassProvider.js'
 import { ContainerScope } from './internal/ContainerScope.js'
+import { InternalMetadataReader } from './internal/InternalMetadataReader.js'
 import { MethodInjectionPostProvider } from './internal/MethodInjectionPostProvider.js'
 import { PropertyInjectionPostProvider } from './internal/PropertyInjectionPostProvider.js'
 import { providerFromToken } from './internal/providerFromToken.js'
@@ -21,9 +22,12 @@ import { SingletonScope } from './internal/SingletonScope.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { TransientScope } from './internal/TransientScope.js'
 import { Ctor } from './internal/types/Ctor.js'
+import { InitialOptions } from './Options.js'
+import { Options } from './Options.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { Resolver } from './Resolver.js'
 import { Scope } from './Scope.js'
+import { Scopes } from './Scopes.js'
 import { Scopes as BuiltInScopes } from './Scopes.js'
 import { DefaultServiceLocator } from './ServiceLocator.js'
 import { ServiceLocator } from './ServiceLocator.js'
@@ -34,30 +38,43 @@ import { loadModule } from './utils/loadModule.js'
 import { notNil } from './utils/notNil.js'
 
 export class DI {
-  protected static readonly Scopes = new Map<Identifier, Scope<unknown>>()
-    .set(BuiltInScopes.SINGLETON, new SingletonScope())
-    .set(BuiltInScopes.CONTAINER, new ContainerScope())
-    .set(BuiltInScopes.RESOLUTION_CONTEXT, new ResolutionContextScope())
-    .set(BuiltInScopes.TRANSIENT, new TransientScope())
+  protected static readonly MetadataReader = new InternalMetadataReader()
+  protected static readonly Scopes = new Map(DI.builtInScopes().entries())
 
-  protected readonly bindingRegistry: BindingRegistry = new BindingRegistry()
-  protected readonly bindingNames: Map<Identifier, Binding[]> = new Map()
-  protected readonly multipleBeansRefCache: Map<Token, Binding[]> = new Map()
+  protected readonly bindingRegistry = new BindingRegistry()
+  protected readonly bindingNames = new Map<Identifier, Binding[]>()
+  protected readonly multipleBeansRefCache = new Map<Token, Binding[]>()
+  protected readonly scopeId: Identifier
+  protected readonly lazy?: boolean
+  protected readonly lateBind?: boolean
 
-  protected constructor(readonly namespace = '', readonly parent?: DI) {
-    notNil(namespace)
+  readonly namespace: Identifier
+  readonly parent?: DI
+
+  protected constructor(options: Partial<Options> | Identifier = '', parent?: DI) {
+    const opts =
+      typeof options === 'string' || typeof options === 'symbol'
+        ? { ...InitialOptions, namespace: options }
+        : { ...InitialOptions, options }
+
+    this.parent = parent
+    this.namespace = opts.namespace || ''
+    this.lazy = opts.lazy
+    this.lateBind = opts.lateBind
+    this.scopeId = opts.scopeId || BuiltInScopes.SINGLETON
   }
 
-  static setup(namespace = '', parent?: DI): DI {
-    const di = new DI(namespace, parent)
+  static setup(options: Partial<Options> | Identifier = '', parent?: DI): DI {
+    const di = new DI(options, parent)
     di.setup()
 
     return di
   }
 
-  static configureDecoratedType<T>(token: Token<T>, opts?: Partial<Binding>): void {
+  static configureDecoratedType<T>(token: Token<T>, additional?: Partial<Binding>): void {
     notNil(token)
 
+    const opts = { ...DI.MetadataReader.read(token), ...additional }
     const tk = typeof token === 'object' ? token.constructor : token
     const existing = DecoratedInjectables.instance().get(tk)
 
@@ -237,7 +254,15 @@ export class DI {
   }
 
   newChild(): DI {
-    const child = new DI(this.namespace, this)
+    const child = new DI(
+      {
+        lazy: this.lazy,
+        scopeId: this.scopeId,
+        lateBind: this.lateBind,
+        namespace: this.namespace
+      },
+      this
+    )
 
     this.bindingRegistry
       .toArray()
@@ -272,7 +297,7 @@ export class DI {
     notNil(token)
     notNil(binding)
 
-    const scopeId = binding.scopeId ? binding.scopeId : BuiltInScopes.SINGLETON
+    const scopeId = binding.scopeId ? binding.scopeId : this.scopeId
     const provider = providerFromToken(token, binding.rawProvider)
 
     notNil(provider, `Could not determine a provider for token: ${tokenStr(token)}`)
@@ -310,6 +335,13 @@ export class DI {
     binding.scopeId = scopeId
     binding.rawProvider = provider
     binding.scope = scope
+    binding.late = binding.late === undefined ? this.lateBind : binding.late
+    binding.lazy = binding.lazy =
+      binding.lazy === undefined && this.lazy === undefined
+        ? !(binding.scopeId === Scopes.SINGLETON || binding.scopeId === Scopes.CONTAINER)
+        : binding.lazy === undefined
+        ? this.lazy
+        : binding.lazy
 
     let finalProvider = binding.scope.wrap(binding.rawProvider)
 
@@ -407,7 +439,7 @@ export class DI {
 
   toString() {
     return (
-      `${DI.name}(namespace=${this.namespace}, count=${this.size()}){` +
+      `${DI.name}(namespace=${String(this.namespace)}, count=${this.size()}){` +
       '\n' +
       this.bindingRegistry
         .toArray()
@@ -431,6 +463,14 @@ export class DI {
     if (!di.has(ServiceLocator)) {
       di.bind(ServiceLocator).toValue(new DefaultServiceLocator(di)).as(BuiltInScopes.SINGLETON)
     }
+  }
+
+  protected static builtInScopes() {
+    return new Map<Identifier, Scope<unknown>>()
+      .set(BuiltInScopes.SINGLETON, new SingletonScope())
+      .set(BuiltInScopes.CONTAINER, new ContainerScope())
+      .set(BuiltInScopes.RESOLUTION_CONTEXT, new ResolutionContextScope())
+      .set(BuiltInScopes.TRANSIENT, new TransientScope())
   }
 
   protected setup(): void {

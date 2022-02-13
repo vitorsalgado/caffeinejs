@@ -3,7 +3,6 @@ import { Identifier } from './Identifier.js'
 import { Provider } from './internal/Provider.js'
 import { ProviderFactory } from './internal/ProviderFactory.js'
 import { Scope } from './Scope.js'
-import { Scopes } from './Scopes.js'
 import { TokenSpec } from './Token.js'
 
 export interface Binding<T = any> {
@@ -29,14 +28,7 @@ export interface Binding<T = any> {
 }
 
 export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
-  //TODO: refactor this to undefined and set default on DI configuration
-  const lifecycle = initial.scopeId === undefined ? Scopes.SINGLETON : initial.scopeId
-  const lazy =
-    initial.lazy === undefined ? !(lifecycle === Scopes.SINGLETON || lifecycle === Scopes.CONTAINER) : initial.lazy
-
   return {
-    lazy,
-    scopeId: lifecycle,
     dependencies: initial.dependencies || [],
     propertyDependencies: initial.propertyDependencies || [],
     methodInjections: initial.methodInjections || [],
@@ -46,11 +38,13 @@ export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
     conditionals: initial.conditionals || [],
     instance: initial.instance,
     primary: initial.primary,
+    lazy: initial.lazy,
     late: initial.late,
     preDestroy: initial.preDestroy,
     afterResolution: initial.afterResolution,
     configuration: initial.configuration,
     type: initial.type,
+    scopeId: initial.scopeId!,
     scopedProvider: initial.scopedProvider!,
     rawProvider: initial.rawProvider!,
     scope: initial.scope!
