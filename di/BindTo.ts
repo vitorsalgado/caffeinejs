@@ -12,6 +12,7 @@ import { ValueProvider } from './internal/ValueProvider.js'
 import { Scopes } from './Scopes.js'
 import { Token } from './Token.js'
 
+//TODO: create interface Binder
 export class BindTo<T> {
   constructor(private readonly di: DI, private readonly token: Token<T>, private readonly binding: Binding<T>) {}
 
