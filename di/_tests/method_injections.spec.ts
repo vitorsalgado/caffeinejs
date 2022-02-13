@@ -172,4 +172,34 @@ describe('Method Injections', function () {
       expect(r1.base).toBeInstanceOf(B2)
     })
   })
+
+  describe('given the injection order, constructor, properties and setter methods', function () {
+    const kValue = Symbol('value')
+    const kMethodValue = Symbol('method_value')
+
+    @Injectable()
+    class Dep {
+      @Inject(kValue)
+      value!: string
+      methodValue!: string
+
+      @Inject()
+      setMethodValue(@Inject(kMethodValue) methodValue: string) {
+        expect(this.value).toEqual('test')
+        this.methodValue = methodValue
+      }
+    }
+
+    it('should inject dependencies on setter methods after property injections', function () {
+      const di = DI.setup()
+
+      di.bind(kValue).toValue('test')
+      di.bind(kMethodValue).toValue('method_test')
+
+      const res = di.get(Dep)
+
+      expect(res.value).toEqual('test')
+      expect(res.methodValue).toEqual('method_test')
+    })
+  })
 })

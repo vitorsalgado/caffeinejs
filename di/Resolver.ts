@@ -73,12 +73,6 @@ export namespace Resolver {
       instance = new ctor(...deps)
     }
 
-    if (type.propertyDependencies.length > 0) {
-      for (const [prop, token] of type.propertyDependencies) {
-        instance[prop] = resolveParam(di, ctor, token, prop, context)
-      }
-    }
-
     return instance as T
   }
 

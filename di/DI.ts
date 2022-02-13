@@ -14,6 +14,7 @@ import { AfterResolutionPostProvider } from './internal/AfterResolutionPostProvi
 import { ClassProvider } from './internal/ClassProvider.js'
 import { ContainerScope } from './internal/ContainerScope.js'
 import { MethodInjectionPostProvider } from './internal/MethodInjectionPostProvider.js'
+import { PropertyInjectionPostProvider } from './internal/PropertyInjectionPostProvider.js'
 import { providerFromToken } from './internal/providerFromToken.js'
 import { ResolutionContextScope } from './internal/ResolutionContextScope.js'
 import { SingletonScope } from './internal/SingletonScope.js'
@@ -311,6 +312,10 @@ export class DI {
     binding.scope = scope
 
     let finalProvider = binding.scope.wrap(binding.rawProvider)
+
+    if (binding.propertyDependencies.length > 0) {
+      finalProvider = new PropertyInjectionPostProvider(finalProvider)
+    }
 
     if (binding.methodInjections.length > 0) {
       finalProvider = new MethodInjectionPostProvider(finalProvider)
