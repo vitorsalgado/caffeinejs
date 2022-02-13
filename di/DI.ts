@@ -368,6 +368,16 @@ export class DI {
     }
   }
 
+  resetInstance(token: Token): void {
+    notNil(token)
+
+    const bindings = this.getBindings(token)
+
+    for (const binding of bindings) {
+      binding.instance = undefined
+    }
+  }
+
   bootstrap(): void {
     for (const [token, binding] of this.bindingRegistry.entries()) {
       if (binding.lazy) {
