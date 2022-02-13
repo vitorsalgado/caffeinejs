@@ -1,3 +1,4 @@
+import { expect } from '@jest/globals'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
 import { DI } from '../DI.js'
@@ -32,5 +33,50 @@ describe('DI', function () {
     const di = DI.setup()
 
     expect(di.size()).toEqual(3)
+  })
+
+  it('should allow to iterate all binding entries', function () {
+    const di = DI.setup()
+    const entries = new Map(di.entries())
+
+    for (const [token, binding] of di.entries()) {
+      expect(token).toBeDefined()
+      expect(binding).toBeDefined()
+    }
+
+    expect(entries.has(NamedTest)).toBeTruthy()
+    expect(entries.get(NamedTest)?.names).toContain(kTestName)
+    expect(entries.has(Test)).toBeTruthy()
+    expect(entries.size).toEqual(di.size())
+  })
+
+  it('should allow iterate all binding aliases', function () {
+    const di = DI.setup()
+    const aliases = new Map(di.aliases())
+    const entries = new Map(di.entries())
+    const named = entries.get(NamedTest)
+
+    for (const [token, bindings] of di.aliases()) {
+      expect(token).toBeDefined()
+      expect(bindings).toBeInstanceOf(Array)
+    }
+
+    expect(aliases.has(kTestName)).toBeTruthy()
+    expect(aliases.get(kTestName)?.[0]).toEqual(named)
+  })
+
+  it('should allow iteration direct on DI instance', function () {
+    const di = DI.setup()
+    const entries = new Map(di)
+
+    for (const [token, binding] of di) {
+      expect(token).toBeDefined()
+      expect(binding).toBeDefined()
+    }
+
+    expect(entries.has(NamedTest)).toBeTruthy()
+    expect(entries.get(NamedTest)?.names).toContain(kTestName)
+    expect(entries.has(Test)).toBeTruthy()
+    expect(entries.size).toEqual(di.size())
   })
 })

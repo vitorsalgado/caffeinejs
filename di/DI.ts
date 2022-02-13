@@ -433,8 +433,12 @@ export class DI {
     return this.bindingRegistry.size()
   }
 
-  get [Symbol.toStringTag](): string {
-    return DI.name
+  entries(): Iterable<[Token, Binding]> {
+    return this.bindingRegistry.entries()
+  }
+
+  aliases(): Iterable<[Identifier, Binding[]]> {
+    return this.bindingNames.entries()
   }
 
   toString() {
@@ -447,6 +451,14 @@ export class DI {
         .join('\n, ') +
       '\n}'
     )
+  }
+
+  [Symbol.iterator](): IterableIterator<[Token, Binding]> {
+    return this.bindingRegistry.entries()
+  }
+
+  get [Symbol.toStringTag]() {
+    return DI.name
   }
 
   protected static destroyBinding(binding: Binding): Promise<void> {
