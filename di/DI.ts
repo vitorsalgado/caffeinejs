@@ -40,7 +40,7 @@ import { notNil } from './utils/notNil.js'
 
 export class DI {
   static MetadataReader = new InternalMetadataReader()
-  protected static readonly Scopes = new Map(DI.Lifecycle().entries())
+  protected static readonly Scopes = new Map(DI.builtInScopes().entries())
 
   protected readonly bindingRegistry = new BindingRegistry()
   protected readonly bindingNames = new Map<Identifier, Binding[]>()
@@ -478,7 +478,7 @@ export class DI {
     }
   }
 
-  protected static Lifecycle() {
+  protected static builtInScopes() {
     return new Map<Identifier, Scope<unknown>>()
       .set(Lifecycle.SINGLETON, new SingletonScope())
       .set(Lifecycle.CONTAINER, new ContainerScope())
