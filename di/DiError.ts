@@ -1,4 +1,3 @@
-import { Ctor } from './internal/types/Ctor.js'
 import { Identifier } from './Identifier.js'
 import { tokenStr } from './Token.js'
 import { Token } from './Token.js'
@@ -20,7 +19,6 @@ export class NoUniqueInjectionForTokenError extends DiError {
         'Use @Named(), @Primary() or conditionals to ensure a single match or make sure your component can receive multiple injections.',
       'NO_UNIQUE_INJECTION'
     )
-    Error.captureStackTrace(this, NoUniqueInjectionForTokenError)
     this.name = 'NoUniqueInjectionForTokenError'
   }
 }
@@ -35,7 +33,6 @@ export class NoResolutionForTokenError extends DiError {
           }`,
       'NO_RESOLUTION_FOR_TOKEN'
     )
-    Error.captureStackTrace(this, NoResolutionForTokenError)
     this.name = 'NoResolutionForTokenError'
   }
 }
@@ -43,7 +40,6 @@ export class NoResolutionForTokenError extends DiError {
 export class CircularReferenceError extends DiError {
   constructor(message: string) {
     super(message, 'CIRCULAR_REFERENCE')
-    Error.captureStackTrace(this, CircularReferenceError)
     this.name = 'CircularReferenceError'
   }
 }
@@ -75,11 +71,13 @@ export class RepeatedNamesError extends DiError {
 export class InvalidBindingError extends DiError {
   constructor(message: string) {
     super(message, 'INVALID_BINDING')
+    this.name = 'InvalidBindingError'
   }
 }
 
 export class MultiplePrimaryError extends DiError {
   constructor(message: string) {
     super(message, 'MULTIPLE_PRIMARY_SAME_COMPONENT')
+    this.name = 'MultiplePrimaryError'
   }
 }
