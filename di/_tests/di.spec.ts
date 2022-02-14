@@ -46,7 +46,7 @@ describe('DI', function () {
   it('should return the number of registered components when calling size()', function () {
     const di = DI.setup()
 
-    expect(di.size()).toEqual(3)
+    expect(di.size()).toEqual(3 + 1) // <User Registered> + <Internal Components>
   })
 
   it('should allow to iterate all binding entries', function () {

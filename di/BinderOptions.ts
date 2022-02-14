@@ -1,4 +1,3 @@
-import { BindToOptions } from './BindToOptions.js'
 import { Identifier } from './Identifier.js'
 
 export interface BinderOptions<T> {
@@ -6,13 +5,15 @@ export interface BinderOptions<T> {
 
   qualifiers(...names: Identifier[]): BinderOptions<T>
 
-  lazy(lazy?: boolean): BindToOptions<T>
+  lazy(lazy?: boolean): BinderOptions<T>
 
-  singletonScoped(): void
+  primary(primary?: boolean): BinderOptions<T>
 
-  transientScoped(): void
+  singletonScoped(): BinderOptions<T>
 
-  containerScoped(): void
+  transientScoped(): BinderOptions<T>
 
-  resolutionContextScoped(): void
+  containerScoped(): BinderOptions<T>
+
+  resolutionContextScoped(): BinderOptions<T>
 }

@@ -14,7 +14,11 @@ export class BindToOptions<T> implements BinderOptions<T> {
     notNil(scopeId)
 
     if (!DI.hasScope(scopeId)) {
-      throw new InvalidBindingError(``)
+      throw new InvalidBindingError(
+        `Scope '${String(
+          scopeId
+        )}' is not registered! Register the scope using the method 'DI.bindScope()' before using it.`
+      )
     }
 
     this.binding.scopeId = scopeId
@@ -32,32 +36,45 @@ export class BindToOptions<T> implements BinderOptions<T> {
     return this
   }
 
-  lazy(lazy = true): BindToOptions<T> {
-    notNil(lazy)
-
+  lazy(lazy = true): BinderOptions<T> {
     this.binding.lazy = lazy
     this.di.configureBinding(this.token, this.binding)
 
     return this
   }
 
-  singletonScoped(): void {
+  primary(primary = true): BinderOptions<T> {
+    this.binding.primary = primary
+    this.di.configureBinding(this.token, this.binding)
+
+    return this
+  }
+
+  singletonScoped(): BinderOptions<T> {
     this.binding.scopeId = Lifecycle.SINGLETON
     this.di.configureBinding(this.token, this.binding)
+
+    return this
   }
 
-  transientScoped(): void {
+  transientScoped(): BinderOptions<T> {
     this.binding.scopeId = Lifecycle.TRANSIENT
     this.di.configureBinding(this.token, this.binding)
+
+    return this
   }
 
-  containerScoped(): void {
+  containerScoped(): BinderOptions<T> {
     this.binding.scopeId = Lifecycle.CONTAINER
     this.di.configureBinding(this.token, this.binding)
+
+    return this
   }
 
-  resolutionContextScoped(): void {
+  resolutionContextScoped(): BinderOptions<T> {
     this.binding.scopeId = Lifecycle.RESOLUTION_CONTEXT
     this.di.configureBinding(this.token, this.binding)
+
+    return this
   }
 }

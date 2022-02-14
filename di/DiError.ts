@@ -77,3 +77,9 @@ export class InvalidBindingError extends DiError {
     super(message, 'INVALID_BINDING')
   }
 }
+
+export class MultiplePrimaryError extends DiError {
+  constructor(message: string) {
+    super(message, 'MULTIPLE_PRIMARY_SAME_COMPONENT')
+  }
+}

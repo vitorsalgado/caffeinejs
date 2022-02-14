@@ -1,3 +1,4 @@
+import { MultiplePrimaryError } from './DiError.js'
 import { isNil } from './utils/isNil.js'
 import { Ctor } from './internal/types/Ctor.js'
 import { newBinding } from './Binding.js'
@@ -36,9 +37,18 @@ export namespace Resolver {
 
         di.configureBinding(token, newBinding({ rawProvider: new TokenProvider(tk) }))
       } else if (entries.length > 1) {
-        const primary = entries.find(x => x.binding.primary)
+        const primaries = entries.filter(x => x.binding.primary)
 
-        if (primary) {
+        if (primaries.length > 1) {
+          throw new MultiplePrimaryError(
+            `Found multiple primary bindings for token '${tokenStr(token)}'. ` +
+              `Check the following bindings: ${primaries.map(x => tokenStr(x.token)).join(', ')}`
+          )
+        }
+
+        if (primaries.length === 1) {
+          const primary = primaries[0]
+
           resolved = di.get<T>(primary.token, context)
 
           di.configureBinding(token, newBinding({ ...primary, rawProvider: new TokenProvider(primary.token) }))

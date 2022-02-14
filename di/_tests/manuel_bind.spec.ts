@@ -7,6 +7,7 @@ import { LateBind } from '../decorators/LateBind.js'
 import { Named } from '../decorators/Named.js'
 import { PreDestroy } from '../decorators/PreDestroy.js'
 import { DI } from '../DI.js'
+import { MultiplePrimaryError } from '../DiError.js'
 import { InvalidBindingError } from '../DiError.js'
 import { ProviderContext } from '../internal/Provider.js'
 import { Provider } from '../internal/Provider.js'
@@ -344,6 +345,62 @@ describe('Manual Binding', function () {
     it('should only accept previously registered scopes', function () {
       const di = DI.setup()
       expect(() => di.bind('test').toValue('value').as('nonexistent-scope')).toThrow(InvalidBindingError)
+    })
+  })
+
+  describe('setting a primary', function () {
+    class Base {}
+
+    class Impl1 extends Base {}
+
+    class Impl2 extends Base {}
+
+    it('should resolve the component marked as primary', function () {
+      const di = DI.setup()
+
+      di.bind(Impl1).toSelf().primary(false)
+      di.bind(Impl2).toSelf().primary()
+
+      const impl = di.get(Base)
+
+      expect(impl).toBeInstanceOf(Impl2)
+    })
+
+    it('should fail when there multiple primaries', function () {
+      const di = DI.setup()
+
+      di.bind(Impl1).toSelf().primary(true)
+      di.bind(Impl2).toSelf().primary(true)
+
+      expect(() => di.get(Base)).toThrow(MultiplePrimaryError)
+    })
+  })
+
+  describe('lazy', function () {
+    const lazySpy = jest.fn()
+    const nonLazySpy = jest.fn()
+
+    class Laziest {
+      constructor() {
+        lazySpy()
+      }
+    }
+
+    class NonLazy {
+      constructor() {
+        nonLazySpy()
+      }
+    }
+
+    it('should not init component on bootstrap when it is configured as lazy', function () {
+      const di = DI.setup()
+
+      di.bind(Laziest).toSelf().lazy()
+      di.bind(NonLazy).toSelf().lazy(false)
+      di.bootstrap()
+
+      expect(lazySpy).not.toHaveBeenCalled()
+      expect(nonLazySpy).toHaveBeenCalled()
     })
   })
 })
