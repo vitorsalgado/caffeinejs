@@ -3,7 +3,7 @@ import { Injectable } from '../decorators/Injectable.js'
 import { PreDestroy } from '../decorators/PreDestroy.js'
 import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
-import { Scopes } from '../Scopes.js'
+import { Lifecycle } from '../Lifecycle.js'
 
 describe('Hooks', function () {
   describe('Pre Destroy', function () {
@@ -20,7 +20,7 @@ describe('Hooks', function () {
     }
 
     @Injectable()
-    @ScopedAs(Scopes.CONTAINER)
+    @ScopedAs(Lifecycle.CONTAINER)
     class ContainerDep {
       @PreDestroy()
       destroy() {

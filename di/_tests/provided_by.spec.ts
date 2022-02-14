@@ -11,11 +11,10 @@ import { Ctor } from '../internal/types/Ctor.js'
 describe('Provided By', function () {
   const spy = jest.fn()
 
-  class LogSetterProvider<T> extends Provider<T> {
+  class LogSetterProvider<T> implements Provider<T> {
     private readonly clazzProvider: ClassProvider
 
     constructor(clazz: Ctor) {
-      super()
       this.clazzProvider = new ClassProvider<T>(clazz)
     }
 

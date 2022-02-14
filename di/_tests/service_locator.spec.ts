@@ -3,12 +3,12 @@ import { v4 } from 'uuid'
 import { Injectable } from '../decorators/Injectable.js'
 import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
-import { Scopes } from '../Scopes.js'
+import { Lifecycle } from '../Lifecycle.js'
 import { ServiceLocator } from '../ServiceLocator.js'
 
 describe('Service Locator', function () {
   @Injectable()
-  @ScopedAs(Scopes.CONTAINER)
+  @ScopedAs(Lifecycle.CONTAINER)
   class Svc {
     readonly id: string = v4()
 

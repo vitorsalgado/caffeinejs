@@ -1,4 +1,4 @@
-export const Scopes = {
+export const Lifecycle = {
   SINGLETON: 'singleton',
   TRANSIENT: 'transient',
   CONTAINER: 'container',

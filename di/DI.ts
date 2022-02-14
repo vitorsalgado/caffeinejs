@@ -11,14 +11,14 @@ import { NoUniqueInjectionForTokenError } from './DiError.js'
 import { NoResolutionForTokenError } from './DiError.js'
 import { DiVars } from './DiVars.js'
 import { Identifier } from './Identifier.js'
+import { InternalMetadataReader } from './internal/MetadataReader.js'
 import { PostConstructProvider } from './internal/PostConstructProvider.js'
 import { ClassProvider } from './internal/ClassProvider.js'
 import { ContainerScope } from './internal/ContainerScope.js'
-import { InternalMetadataReader } from './internal/InternalMetadataReader.js'
 import { MetadataReader } from './internal/MetadataReader.js'
 import { MethodInjectionPostProvider } from './internal/MethodInjectionPostProvider.js'
 import { PropertyInjectionPostProvider } from './internal/PropertyInjectionPostProvider.js'
-import { providerFromToken } from './internal/providerFromToken.js'
+import { providerFromToken } from './internal/Provider.js'
 import { ResolutionContextScope } from './internal/ResolutionContextScope.js'
 import { SingletonScope } from './internal/SingletonScope.js'
 import { TokenProvider } from './internal/TokenProvider.js'
@@ -29,8 +29,7 @@ import { Options } from './Options.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { Resolver } from './Resolver.js'
 import { Scope } from './Scope.js'
-import { Scopes } from './Scopes.js'
-import { Scopes as BuiltInScopes } from './Scopes.js'
+import { Lifecycle } from './Lifecycle.js'
 import { DefaultServiceLocator } from './ServiceLocator.js'
 import { ServiceLocator } from './ServiceLocator.js'
 import { tokenStr } from './Token.js'
@@ -42,7 +41,7 @@ import { notNil } from './utils/notNil.js'
 
 export class DI {
   static MetadataReader = new InternalMetadataReader()
-  protected static readonly Scopes = new Map(DI.builtInScopes().entries())
+  protected static readonly Scopes = new Map(DI.Lifecycle().entries())
 
   protected readonly bindingRegistry = new BindingRegistry()
   protected readonly bindingNames = new Map<Identifier, Binding[]>()
@@ -64,7 +63,7 @@ export class DI {
     this.namespace = opts.namespace || ''
     this.lazy = opts.lazy
     this.lateBind = opts.lateBind
-    this.scopeId = opts.scopeId || BuiltInScopes.SINGLETON
+    this.scopeId = opts.scopeId || Lifecycle.SINGLETON
   }
 
   static setup(options: Partial<Options> | Identifier = '', parent?: DI): DI {
@@ -284,7 +283,7 @@ export class DI {
 
     this.bindingRegistry
       .toArray()
-      .filter(x => x.binding.scopeId === BuiltInScopes.CONTAINER)
+      .filter(x => x.binding.scopeId === Lifecycle.CONTAINER)
       .forEach(({ token, binding }) => {
         const copiedBinding = {
           rawProvider: binding.rawProvider,
@@ -356,7 +355,7 @@ export class DI {
     binding.late = binding.late === undefined ? this.lateBind : binding.late
     binding.lazy = binding.lazy =
       binding.lazy === undefined && this.lazy === undefined
-        ? !(binding.scopeId === Scopes.SINGLETON || binding.scopeId === Scopes.CONTAINER)
+        ? !(binding.scopeId === Lifecycle.SINGLETON || binding.scopeId === Lifecycle.CONTAINER)
         : binding.lazy === undefined
         ? this.lazy
         : binding.lazy
@@ -500,16 +499,16 @@ export class DI {
 
   protected static registerInternalComponents(di: DI) {
     if (!di.has(ServiceLocator)) {
-      di.bind(ServiceLocator).toValue(new DefaultServiceLocator(di)).as(BuiltInScopes.SINGLETON)
+      di.bind(ServiceLocator).toValue(new DefaultServiceLocator(di)).as(Lifecycle.SINGLETON)
     }
   }
 
-  protected static builtInScopes() {
+  protected static Lifecycle() {
     return new Map<Identifier, Scope<unknown>>()
-      .set(BuiltInScopes.SINGLETON, new SingletonScope())
-      .set(BuiltInScopes.CONTAINER, new ContainerScope())
-      .set(BuiltInScopes.RESOLUTION_CONTEXT, new ResolutionContextScope())
-      .set(BuiltInScopes.TRANSIENT, new TransientScope())
+      .set(Lifecycle.SINGLETON, new SingletonScope())
+      .set(Lifecycle.CONTAINER, new ContainerScope())
+      .set(Lifecycle.RESOLUTION_CONTEXT, new ResolutionContextScope())
+      .set(Lifecycle.TRANSIENT, new TransientScope())
   }
 
   protected setup(): void {

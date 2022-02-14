@@ -3,7 +3,7 @@ import { Binding } from './Binding.js'
 import { DI } from './DI.js'
 import { InvalidBindingError } from './DiError.js'
 import { Identifier } from './Identifier.js'
-import { Scopes } from './Scopes.js'
+import { Lifecycle } from './Lifecycle.js'
 import { Token } from './Token.js'
 import { notNil } from './utils/notNil.js'
 
@@ -42,22 +42,22 @@ export class BindToOptions<T> implements BinderOptions<T> {
   }
 
   singletonScoped(): void {
-    this.binding.scopeId = Scopes.SINGLETON
+    this.binding.scopeId = Lifecycle.SINGLETON
     this.di.configureBinding(this.token, this.binding)
   }
 
   transientScoped(): void {
-    this.binding.scopeId = Scopes.TRANSIENT
+    this.binding.scopeId = Lifecycle.TRANSIENT
     this.di.configureBinding(this.token, this.binding)
   }
 
   containerScoped(): void {
-    this.binding.scopeId = Scopes.CONTAINER
+    this.binding.scopeId = Lifecycle.CONTAINER
     this.di.configureBinding(this.token, this.binding)
   }
 
   resolutionContextScoped(): void {
-    this.binding.scopeId = Scopes.RESOLUTION_CONTEXT
+    this.binding.scopeId = Lifecycle.RESOLUTION_CONTEXT
     this.di.configureBinding(this.token, this.binding)
   }
 }

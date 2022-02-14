@@ -3,7 +3,7 @@ import { Binding } from '../Binding.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
 import { DI } from '../DI.js'
-import { InternalMetadataReader } from '../internal/InternalMetadataReader.js'
+import { InternalMetadataReader } from '../internal/MetadataReader.js'
 import { MetadataReader } from '../internal/MetadataReader.js'
 import { Token } from '../Token.js'
 

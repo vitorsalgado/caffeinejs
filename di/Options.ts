@@ -1,5 +1,5 @@
 import { Identifier } from './Identifier.js'
-import { Scopes } from './Scopes.js'
+import { Lifecycle } from './Lifecycle.js'
 
 export interface Options {
   namespace: Identifier
@@ -10,5 +10,5 @@ export interface Options {
 
 export const InitialOptions: Options = {
   namespace: '',
-  scopeId: Scopes.SINGLETON
+  scopeId: Lifecycle.SINGLETON
 }

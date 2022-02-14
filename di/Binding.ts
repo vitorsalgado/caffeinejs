@@ -1,7 +1,7 @@
 import { Conditional } from './Conditional.js'
 import { Identifier } from './Identifier.js'
+import { ProviderFactory } from './internal/Provider.js'
 import { Provider } from './internal/Provider.js'
-import { ProviderFactory } from './internal/ProviderFactory.js'
 import { Scope } from './Scope.js'
 import { TokenSpec } from './Token.js'
 

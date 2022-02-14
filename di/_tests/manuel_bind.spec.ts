@@ -1,19 +1,16 @@
 import { expect } from '@jest/globals'
 import { jest } from '@jest/globals'
 import { v4 } from 'uuid'
-import { ContainerScoped } from '../decorators/ContainerScoped.js'
 import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { LateBind } from '../decorators/LateBind.js'
 import { Named } from '../decorators/Named.js'
 import { PreDestroy } from '../decorators/PreDestroy.js'
-import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
 import { InvalidBindingError } from '../DiError.js'
 import { ProviderContext } from '../internal/Provider.js'
 import { Provider } from '../internal/Provider.js'
 import { ResolutionContext } from '../ResolutionContext.js'
-import { Scopes } from '../Scopes.js'
 
 describe('Manual Binding', function () {
   describe('general bindings', function () {
@@ -258,7 +255,7 @@ describe('Manual Binding', function () {
         value!: string
       }
 
-      class TestProvider extends Provider<Dep> {
+      class TestProvider implements Provider<Dep> {
         provide(ctx: ProviderContext): Dep {
           const instance = new Dep()
 

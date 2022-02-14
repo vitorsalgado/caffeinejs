@@ -1,12 +1,9 @@
 import { Resolver } from '../Resolver.js'
 import { Provider } from './Provider.js'
 import { ProviderContext } from './Provider.js'
-import { ProviderFactory } from './ProviderFactory.js'
 
-export class MethodInjectionPostProvider<T> extends Provider<T> {
-  constructor(private readonly provider: Provider<T>) {
-    super()
-  }
+export class MethodInjectionPostProvider<T> implements Provider<T> {
+  constructor(private readonly provider: Provider<T>) {}
 
   provide(ctx: ProviderContext): T {
     const instance: any = this.provider.provide(ctx)
@@ -22,11 +19,5 @@ export class MethodInjectionPostProvider<T> extends Provider<T> {
     }
 
     return instance as T
-  }
-}
-
-export class Factory implements ProviderFactory {
-  provide(previous: Provider): Provider {
-    return new MethodInjectionPostProvider(previous)
   }
 }

@@ -5,14 +5,12 @@ import { ProviderContext } from './Provider.js'
 import { Provider } from './Provider.js'
 import { Ctor } from './types/Ctor.js'
 
-export class BeanFactoryProvider<T> extends Provider<T> {
+export class BeanFactoryProvider<T> implements Provider<T> {
   constructor(
     private readonly target: Ctor,
     private readonly method: string | symbol,
     private readonly options: ConfigurationProviderOptions
-  ) {
-    super()
-  }
+  ) {}
 
   provide(ctx: ProviderContext): T {
     const clazz = ctx.di.get<{ [key: symbol | string]: (...args: unknown[]) => T }>(this.target, ctx.resolutionContext)

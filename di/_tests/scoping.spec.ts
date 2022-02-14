@@ -9,7 +9,7 @@ import { ScopeAlreadyRegisteredError } from '../DiError.js'
 import { ScopeNotRegisteredError } from '../DiError.js'
 import { Provider } from '../internal/Provider.js'
 import { Scope } from '../Scope.js'
-import { Scopes } from '../Scopes.js'
+import { Lifecycle } from '../Lifecycle.js'
 
 describe('Scoping', function () {
   const kCustomScopeId = Symbol('custom')
@@ -72,7 +72,7 @@ describe('Scoping', function () {
   it('should fail when registering a scope with an existing identifier', function () {
     expect(() =>
       DI.bindScope(
-        Scopes.SINGLETON,
+        Lifecycle.SINGLETON,
         new (class implements Scope {
           wrap(unscoped: Provider): Provider {
             return unscoped

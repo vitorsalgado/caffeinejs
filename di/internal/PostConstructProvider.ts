@@ -1,10 +1,8 @@
 import { ProviderContext } from './Provider.js'
 import { Provider } from './Provider.js'
 
-export class PostConstructProvider<T> extends Provider<T> {
-  constructor(private readonly provider: Provider<T>) {
-    super()
-  }
+export class PostConstructProvider<T> implements Provider<T> {
+  constructor(private readonly provider: Provider<T>) {}
 
   provide(ctx: ProviderContext): T {
     const instance: any = this.provider.provide(ctx)
