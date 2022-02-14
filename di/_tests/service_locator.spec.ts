@@ -30,6 +30,9 @@ describe('Service Locator', function () {
     const svc22 = sl2.get(Svc)
     const svc23 = child.get(Svc)
 
+    expect(sl1.has(Svc)).toBeTruthy()
+    expect(sl2.has(Svc)).toBeTruthy()
+
     expect(sl1).toBeInstanceOf(ServiceLocator)
     expect(sl2).toBeInstanceOf(ServiceLocator)
 
