@@ -2,20 +2,28 @@ import { expect } from '@jest/globals'
 import { Binding } from '../Binding.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
+import { Optional } from '../decorators/Optional.js'
 import { DI } from '../DI.js'
 import { InternalMetadataReader } from '../internal/MetadataReader.js'
 import { MetadataReader } from '../internal/MetadataReader.js'
 import { Token } from '../Token.js'
 
 describe('DI', function () {
-  const kTestName = 'test-name'
+  const kTestName = Symbol('test-name')
 
   @Injectable()
   class Test {}
 
   @Injectable()
+  class Dep {}
+
+  class Opt {}
+
+  @Injectable()
   @Named(kTestName)
-  class NamedTest {}
+  class NamedTest {
+    constructor(readonly dep: Dep, @Optional() readonly opt?: Opt) {}
+  }
 
   it('should print the type name when calling toString()', function () {
     const di = DI.setup()
@@ -25,9 +33,11 @@ describe('DI', function () {
     const str = di.toString()
     const protoStr = Object.prototype.toString.call(di)
 
+    console.log(str)
+
     expect(str).toContain('Test')
     expect(str).toContain('NamedTest')
-    expect(str).toContain(kTestName)
+    expect(str).toContain(kTestName.description)
     expect(str).toContain('tk100')
     expect(str).toContain('tk200')
     expect(protoStr).toEqual('[object DI]')

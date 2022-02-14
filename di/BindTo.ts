@@ -15,16 +15,14 @@ import { ValueProvider } from './internal/ValueProvider.js'
 import { tokenStr } from './Token.js'
 import { isNamedToken } from './Token.js'
 import { Token } from './Token.js'
-import { isFn } from './utils/isFn.js'
+import { check } from './utils/check.js'
 import { notNil } from './utils/notNil.js'
 
-//TODO: create interface Binder
 export class BindTo<T> implements Binder<T> {
   constructor(private readonly di: DI, private readonly token: Token<T>, private readonly binding: Binding<T>) {}
 
   to(ctor: Ctor<T>): BindToOptions<T> {
-    notNil(ctor)
-    isFn(ctor)
+    check(typeof ctor === 'function', `Binding .to() parameter must be class reference. Received: ${typeof ctor}`)
 
     this.binding.rawProvider = new ClassProvider(ctor)
     this.di.configureBinding(this.token, this.binding)
@@ -59,8 +57,14 @@ export class BindTo<T> implements Binder<T> {
   }
 
   toFactory(factory: (ctx: ProviderContext) => T): BinderOptions<T> {
-    notNil(factory)
-    isFn(factory)
+    check(
+      typeof factory === 'function',
+      `Binding .toFactory() parameter must be function type. Received: ${typeof factory}`
+    )
+    check(
+      factory.length <= 1,
+      `Binding .toFactory() must receive a function with at most one argument, which is the provider context. Received a function with '${factory.length}' argument(s).`
+    )
 
     this.binding.rawProvider = new FactoryProvider(factory)
     this.di.configureBinding(this.token, this.binding)
@@ -69,7 +73,10 @@ export class BindTo<T> implements Binder<T> {
   }
 
   toProvider(provider: Provider<T>): BinderOptions<T> {
-    notNil(provider)
+    check(
+      typeof provider === 'object' && 'provide' in provider,
+      `Binding .toProvider() parameter must be a Provider<T> instance.`
+    )
 
     this.binding.rawProvider = provider
     this.di.configureBinding(this.token, this.binding)

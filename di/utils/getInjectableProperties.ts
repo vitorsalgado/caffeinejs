@@ -1,9 +1,9 @@
-import { DiVars } from '../DiVars.js'
+import { Vars } from '../internal/Vars.js'
 import { TokenSpec } from '../Token.js'
 
-export function getPropertyTypes<TFunction>(target: TFunction): [string, TokenSpec<unknown>][] {
+export function getInjectableProperties<TFunction>(target: TFunction): [string, TokenSpec<unknown>][] {
   const injectionTokens: Record<string, TokenSpec<unknown>> = Reflect.getOwnMetadata(
-    DiVars.CLASS_PROPERTIES_INJECTION_TOKENS,
+    Vars.CLASS_PROPERTIES_INJECTION_TOKENS,
     target
   ) || {}
 

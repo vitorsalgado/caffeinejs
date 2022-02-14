@@ -1,4 +1,4 @@
-export const DiVars = {
+export const Vars = {
   CONFIGURATION_PROVIDER: '__caffeine_di:bean_method',
   CONFIGURATION_TOKENS_PROVIDED: '__caffeine_di:beans_provided',
   CLASS_METADATA: '__caffeine_di:class_binding',

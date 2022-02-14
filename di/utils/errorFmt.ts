@@ -1,10 +1,11 @@
 import { tokenStr } from '../Token.js'
 import { TokenSpec } from '../Token.js'
 import { Token } from '../Token.js'
+import { isNil } from './isNil.js'
 
 export function fmtParamError(ctor: Token, indexOrProp: number | (string | symbol)): string {
   const isNum = typeof indexOrProp === 'number'
-  const msg = isNum ? `parameter at position ${indexOrProp}` : `property ${String(indexOrProp)}`
+  const msg = isNum ? `parameter at position ${indexOrProp}` : `property '${String(indexOrProp)}'`
 
   if (typeof ctor !== 'function') {
     return msg
@@ -24,7 +25,7 @@ export function fmtParamError(ctor: Token, indexOrProp: number | (string | symbo
 }
 
 export function fmtTokenError(spec: TokenSpec): string {
-  return `"${tokenStr(spec.token)}"${
-    spec.token !== spec.tokenType && spec.tokenType ? ' of type ' + tokenStr(spec.tokenType) : ''
+  return `'${tokenStr(spec.token)}'${
+    !isNil(spec.tokenType) && spec.token !== spec.tokenType ? ` of type '${tokenStr(spec.tokenType)}'` : ''
   }`
 }

@@ -6,9 +6,9 @@ import { Scope } from './Scope.js'
 import { TokenSpec } from './Token.js'
 
 export interface Binding<T = any> {
-  dependencies: TokenSpec<unknown>[]
-  propertyDependencies: [Identifier, TokenSpec<unknown>][]
-  methodInjections: [Identifier, TokenSpec<unknown>[]][]
+  injections: TokenSpec<unknown>[]
+  injectableProperties: [Identifier, TokenSpec<unknown>][]
+  injectableMethods: [Identifier, TokenSpec<unknown>[]][]
   postProviderFactories: ProviderFactory[]
   namespace: Identifier
   scopeId: Identifier
@@ -29,9 +29,9 @@ export interface Binding<T = any> {
 
 export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
   return {
-    dependencies: initial.dependencies || [],
-    propertyDependencies: initial.propertyDependencies || [],
-    methodInjections: initial.methodInjections || [],
+    injections: initial.injections || [],
+    injectableProperties: initial.injectableProperties || [],
+    injectableMethods: initial.injectableMethods || [],
     postProviderFactories: initial.postProviderFactories || [],
     namespace: initial.namespace || '',
     names: initial.names || [],

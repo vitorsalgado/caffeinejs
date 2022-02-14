@@ -1,7 +1,8 @@
 import { DI } from '../DI.js'
+import { Identifier } from '../Identifier.js'
 
-export function Namespace<T>(namespace: string) {
+export function Namespace<T>(namespace: Identifier) {
   return function <TFunction extends Function>(target: TFunction) {
-    DI.configureDecoratedType<T>(target, { namespace })
+    DI.configureType<T>(target, { namespace })
   }
 }

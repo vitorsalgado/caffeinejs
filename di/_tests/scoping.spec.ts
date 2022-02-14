@@ -1,3 +1,4 @@
+import { expect } from '@jest/globals'
 import { afterAll } from '@jest/globals'
 import { jest } from '@jest/globals'
 import { v4 } from 'uuid'
@@ -44,6 +45,8 @@ describe('Scoping', function () {
       DI.setup()
     } catch (e) {
       expect(e).toBeInstanceOf(ScopeNotRegisteredError)
+      expect(DI.getScope('none')).toBeUndefined()
+      expect(DI.hasScope('none')).toBeFalsy()
       return
     } finally {
       DI.unbindScope('none')
@@ -67,6 +70,8 @@ describe('Scoping', function () {
     expect(scoped1).not.toEqual(scoped2)
     expect(scope).toEqual(di.getScope(kCustomScopeId))
     expect(spy).toHaveBeenCalledTimes(1)
+    expect(DI.getScope(kCustomScopeId)).toBeInstanceOf(CustomScope)
+    expect(DI.getScope(kCustomScopeId)).toEqual(scope)
   })
 
   it('should fail when registering a scope with an existing identifier', function () {

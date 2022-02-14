@@ -1,12 +1,8 @@
 import { Token } from '../Token.js'
-import { getParamTypes } from '../utils/getParamTypes.js'
-import { configureBean } from './utils/beanUtils.js'
+import { Injectable } from './Injectable.js'
 
-export function Bean<T>(token: Token<T>): MethodDecorator {
-  return (target, propertyKey) => {
-    configureBean(target.constructor, propertyKey, {
-      dependencies: getParamTypes(target, propertyKey),
-      token
-    })
+export function Bean<T>(token: Token<T>) {
+  return function <TFunction extends Function>(target: TFunction | object, propertyKey?: string | symbol) {
+    return Injectable(token)(target, propertyKey)
   }
 }

@@ -1,11 +1,11 @@
-import { DiVars } from '../DiVars.js'
+import { Vars } from '../internal/Vars.js'
 import { Identifier } from '../Identifier.js'
 import { TokenSpec } from '../Token.js'
 
-export function getMethodInjections<TFunction extends Function>(
+export function getInjectableMethods<TFunction extends Function>(
   target: TFunction
 ): Array<[Identifier, TokenSpec<unknown>[]]> {
-  const setterMethods: string[] = Reflect.getOwnMetadata(DiVars.CLASS_SETTER_METHODS, target) || []
+  const setterMethods: string[] = Reflect.getOwnMetadata(Vars.CLASS_SETTER_METHODS, target) || []
 
   if (setterMethods.length === 0) {
     return []
@@ -14,7 +14,7 @@ export function getMethodInjections<TFunction extends Function>(
   const result = new Array<[Identifier, TokenSpec<unknown>[]]>()
 
   for (const method of setterMethods) {
-    const tokens = Reflect.getOwnMetadata(DiVars.CLASS_SETTER_METHODS_TOKENS, target, method)
+    const tokens = Reflect.getOwnMetadata(Vars.CLASS_SETTER_METHODS_TOKENS, target, method)
     result.push([method, tokens])
   }
 

@@ -7,7 +7,7 @@ import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
 import { Primary } from '../decorators/Primary.js'
 import { DI } from '../DI.js'
-import { RepeatedBeanNamesConfigurationError } from '../DiError.js'
+import { RepeatedNamesError } from '../DiError.js'
 
 describe('Named Dependencies', function () {
   const kAck = Symbol('ok')
@@ -78,7 +78,7 @@ describe('Named Dependencies', function () {
             return 'two'
           }
         }
-      }).toThrow(RepeatedBeanNamesConfigurationError)
+      }).toThrow(RepeatedNamesError)
     })
 
     it('should fail when trying to repeat a name for the same type', function () {
@@ -161,6 +161,19 @@ describe('Named Dependencies', function () {
       expect(two.type).toEqual('two_2')
       expect(am.type).toEqual('am')
       expect(eu.type).toEqual('eu')
+    })
+  })
+
+  describe('attempting to use same name multiple times', function () {
+    it('should fail to register the component', function () {
+      const kTest = Symbol('test')
+
+      expect(() => {
+        @Injectable()
+        @Named(kTest)
+        @Named(kTest)
+        class Dep {}
+      }).toThrow(RepeatedNamesError)
     })
   })
 })

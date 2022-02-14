@@ -52,7 +52,7 @@ export namespace Resolver {
   }
 
   export function construct<T>(di: DI, ctor: Ctor<T>, binding: Binding, context: ResolutionContext): T {
-    return new ctor(...binding.dependencies.map((dep, index) => resolveParam(di, ctor, dep, index, context)))
+    return new ctor(...binding.injections.map((dep, index) => resolveParam(di, ctor, dep, index, context)))
   }
 
   export function resolveParam<T>(

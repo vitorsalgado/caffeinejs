@@ -1,4 +1,4 @@
-import { DiVars } from '../../DiVars.js'
+import { Vars } from '../../internal/Vars.js'
 import { ConfigurationProviderOptions } from '../ConfigurationProviderOptions.js'
 
 export function configureBean(
@@ -7,18 +7,18 @@ export function configureBean(
   configurations: Partial<ConfigurationProviderOptions>
 ): void {
   const factories: Map<string | symbol, ConfigurationProviderOptions> =
-    Reflect.getOwnMetadata(DiVars.CONFIGURATION_PROVIDER, target) || new Map()
+    Reflect.getOwnMetadata(Vars.CONFIGURATION_PROVIDER, target) || new Map()
   const actual = factories.get(method) || def()
   const definition = { ...actual, method, ...configurations } as ConfigurationProviderOptions
 
   factories.set(method, definition)
 
-  Reflect.defineMetadata(DiVars.CONFIGURATION_PROVIDER, factories, target)
+  Reflect.defineMetadata(Vars.CONFIGURATION_PROVIDER, factories, target)
 }
 
 export function getBeanConfiguration(target: Function, method: string | symbol): ConfigurationProviderOptions {
   const factories: Map<string | symbol, ConfigurationProviderOptions> =
-    Reflect.getOwnMetadata(DiVars.CONFIGURATION_PROVIDER, target) || new Map()
+    Reflect.getOwnMetadata(Vars.CONFIGURATION_PROVIDER, target) || new Map()
   return factories.get(method) || def()
 }
 

@@ -25,18 +25,6 @@ export class NoUniqueInjectionForTokenError extends DiError {
   }
 }
 
-export class TypeNotRegisteredForInjectionError extends DiError {
-  constructor(token: Token) {
-    super(
-      `Type "${tokenStr(token)}" is not managed by the DI container. ` +
-        'Make sure the type is decorated with @Injectable() or any other injection decorators.',
-      'TYPE_NOT_REGISTERED'
-    )
-    Error.captureStackTrace(this, TypeNotRegisteredForInjectionError)
-    this.name = 'TypeNotRegisteredForInjectionError'
-  }
-}
-
 export class NoResolutionForTokenError extends DiError {
   constructor(spec: { token: Token; tokenType?: Token }, message?: string) {
     super(
@@ -77,13 +65,10 @@ export class ScopeAlreadyRegisteredError extends DiError {
   }
 }
 
-export class RepeatedBeanNamesConfigurationError extends DiError {
-  constructor(clazz: Ctor, identifier: string) {
-    super(
-      `Found multiple configurations with name ${identifier} on configuration class ${clazz.name}`,
-      'MULTIPLE_CONFIG_SAME_NAME'
-    )
-    this.name = 'RepeatedBeanNamesConfigurationError'
+export class RepeatedNamesError extends DiError {
+  constructor(message: string) {
+    super(message, 'REPEATED_NAMES')
+    this.name = 'RepeatedNamesError'
   }
 }
 

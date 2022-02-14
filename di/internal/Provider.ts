@@ -18,7 +18,7 @@ export interface Provider<T = any> {
 }
 
 export interface ProviderFactory {
-  provide(previous: Provider): Provider
+  newProvider(previous: Provider): Provider
 }
 
 export function providerFromToken<T>(token: Token<T>, provider?: Provider<T>): Provider<T> {

@@ -1,4 +1,4 @@
-import { DiVars } from '../DiVars.js'
+import { Vars } from '../internal/Vars.js'
 import { TokenSpec } from '../Token.js'
 
 export function getParamTypes(target: any, propertyKey?: string | symbol): TokenSpec<unknown>[] {
@@ -9,8 +9,8 @@ export function getParamTypes(target: any, propertyKey?: string | symbol): Token
   const params = [...paramTypes]
 
   const injectionTokens: Record<number, TokenSpec<unknown>> = (propertyKey === undefined
-    ? Reflect.getOwnMetadata(DiVars.CLASS_CTOR_INJECTION_TOKENS, target)
-    : Reflect.getOwnMetadata(DiVars.CLASS_CTOR_INJECTION_TOKENS, target.constructor, propertyKey)) || {}
+    ? Reflect.getOwnMetadata(Vars.CLASS_CTOR_INJECTION_TOKENS, target)
+    : Reflect.getOwnMetadata(Vars.CLASS_CTOR_INJECTION_TOKENS, target.constructor, propertyKey)) || {}
 
   for (let i = 0; i < params.length; i++) {
     const key = +i

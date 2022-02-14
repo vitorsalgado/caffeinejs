@@ -12,7 +12,7 @@ export class MethodInjectionPostProvider<T> implements Provider<T> {
       return instance
     }
 
-    for (const [method, spec] of ctx.binding.methodInjections) {
+    for (const [method, spec] of ctx.binding.injectableMethods) {
       const deps = spec.map((dep, index) => Resolver.resolveParam(ctx.di, ctx.token, dep, index, ctx.resolutionContext))
 
       instance[method](...deps)

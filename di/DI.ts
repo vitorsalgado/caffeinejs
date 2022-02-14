@@ -4,16 +4,16 @@ import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
 import { BindTo } from './BindTo.js'
 import { DecoratedInjectables } from './DecoratedInjectables.js'
+import { RepeatedNamesError } from './DiError.js'
 import { ScopeAlreadyRegisteredError } from './DiError.js'
 import { ScopeNotRegisteredError } from './DiError.js'
 import { CircularReferenceError } from './DiError.js'
 import { NoUniqueInjectionForTokenError } from './DiError.js'
 import { NoResolutionForTokenError } from './DiError.js'
-import { DiVars } from './DiVars.js'
+import { Vars } from './internal/Vars.js'
 import { Identifier } from './Identifier.js'
 import { InternalMetadataReader } from './internal/MetadataReader.js'
 import { PostConstructProvider } from './internal/PostConstructProvider.js'
-import { ClassProvider } from './internal/ClassProvider.js'
 import { ContainerScope } from './internal/ContainerScope.js'
 import { MetadataReader } from './internal/MetadataReader.js'
 import { MethodInjectionPostProvider } from './internal/MethodInjectionPostProvider.js'
@@ -23,7 +23,6 @@ import { ResolutionContextScope } from './internal/ResolutionContextScope.js'
 import { SingletonScope } from './internal/SingletonScope.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { TransientScope } from './internal/TransientScope.js'
-import { Ctor } from './internal/types/Ctor.js'
 import { InitialOptions } from './Options.js'
 import { Options } from './Options.js'
 import { ResolutionContext } from './ResolutionContext.js'
@@ -53,7 +52,7 @@ export class DI {
   readonly namespace: Identifier
   readonly parent?: DI
 
-  protected constructor(options: Partial<Options> | Identifier = '', parent?: DI) {
+  protected constructor(options: Partial<Options> | Identifier, parent?: DI) {
     const opts =
       typeof options === 'string' || typeof options === 'symbol'
         ? { ...InitialOptions, namespace: options }
@@ -73,7 +72,7 @@ export class DI {
     return di
   }
 
-  static configureDecoratedType<T>(token: Token<T>, additional?: Partial<Binding>): void {
+  static configureType<T>(token: Token<T>, additional?: Partial<Binding>): void {
     notNil(token)
 
     const opts = { ...DI.MetadataReader.read(token), ...additional }
@@ -85,28 +84,22 @@ export class DI {
 
       if (opts?.names) {
         if (names.some(value => opts.names!.includes(value))) {
-          throw new Error()
+          throw new RepeatedNamesError(
+            `Found repeated qualifiers for the class ${tokenStr(token)}. Qualifiers found: ${opts.names
+              .map(x => tokenStr(x))
+              .join(', ')}`
+          )
         }
 
         names.push(...opts.names)
 
         opts.names = names
+      } else {
+        opts.names = existing.names
       }
     }
 
-    const binding = newBinding({ ...existing, ...opts })
-
-    if (isNil(binding.rawProvider)) {
-      if (typeof tk === 'function') {
-        binding.rawProvider = new ClassProvider(tk as Ctor)
-      } else if (isNamedToken(tk)) {
-        binding.rawProvider = new TokenProvider(tk)
-      }
-    }
-
-    notNil(binding.rawProvider, `Could not determine a provider for token: ${tokenStr(token)}`)
-
-    DecoratedInjectables.instance().configure(tk, binding)
+    DecoratedInjectables.instance().configure(tk, newBinding({ ...existing, ...opts }))
   }
 
   static addBean<T>(token: Token<T>, binding: Binding<T>): void {
@@ -280,7 +273,7 @@ export class DI {
       .forEach(({ token, binding }) => {
         const copiedBinding = {
           rawProvider: binding.rawProvider,
-          dependencies: binding.dependencies,
+          injections: binding.injections,
           primary: binding.primary,
           scopeId: binding.scopeId,
           names: binding.names,
@@ -355,16 +348,16 @@ export class DI {
 
     let finalProvider = binding.scope.wrap(binding.rawProvider)
 
-    if (binding.propertyDependencies.length > 0) {
+    if (binding.injectableProperties.length > 0) {
       finalProvider = new PropertyInjectionPostProvider(finalProvider)
     }
 
-    if (binding.methodInjections.length > 0) {
+    if (binding.injectableMethods.length > 0) {
       finalProvider = new MethodInjectionPostProvider(finalProvider)
     }
 
     for (const postProviderFactory of binding.postProviderFactories) {
-      finalProvider = postProviderFactory.provide(finalProvider)
+      finalProvider = postProviderFactory.newProvider(finalProvider)
     }
 
     if (binding.postConstruct) {
@@ -457,11 +450,18 @@ export class DI {
         .map(
           x =>
             `${tokenStr(x.token)}: ` +
-            `names=[${x.binding.names?.join(', ')}], ` +
+            `names=[${x.binding.names?.map(x => tokenStr(x)).join(', ')}], ` +
             `scope=${x.binding.scopeId.toString()}, ` +
-            `dependencies=[${x.binding.dependencies?.join(', ')}], ` +
+            `injections=[${x.binding.injections
+              ?.map(
+                x =>
+                  '[' +
+                  (x.token ? tokenStr(x.token) : `${tokenStr(x.tokenType)}`) +
+                  `: optional=${x.optional || false}, multiple=${x.multiple || false}]`
+              )
+              .join(', ')}], ` +
             `lazy=${x.binding.lazy}, ` +
-            `providedBy=${x.binding.rawProvider?.constructor?.name}`
+            `provider=${x.binding.rawProvider?.constructor?.name}`
         )
         .join('\n, ') +
       '\n}'
@@ -522,12 +522,8 @@ export class DI {
         if (!pass) {
           this.bindingRegistry.delete(token)
 
-          if (isNamedToken(token)) {
-            this.bindingNames.delete(token)
-          }
-
           if (binding.configuration) {
-            const tokens = Reflect.getOwnMetadata(DiVars.CONFIGURATION_TOKENS_PROVIDED, token)
+            const tokens = Reflect.getOwnMetadata(Vars.CONFIGURATION_TOKENS_PROVIDED, token)
 
             for (const tk of tokens) {
               DecoratedInjectables.instance().deleteBean(tk)
@@ -542,7 +538,7 @@ export class DI {
         continue
       }
 
-      if (binding.conditionals) {
+      if (binding.conditionals?.length > 0) {
         const pass = binding.conditionals.every(conditional => conditional({ di: this }))
 
         if (pass) {
