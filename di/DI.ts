@@ -17,7 +17,7 @@ import { PostConstructProvider } from './internal/PostConstructProvider.js'
 import { ContainerScope } from './internal/ContainerScope.js'
 import { MetadataReader } from './internal/MetadataReader.js'
 import { MethodInjectionPostProvider } from './internal/MethodInjectionPostProvider.js'
-import { PropertyInjectionPostProvider } from './internal/PropertyInjectionPostProvider.js'
+import { ClassWithInjectablePropertiesProvider } from './internal/ClassWithInjectablePropertiesProvider.js'
 import { providerFromToken } from './internal/Provider.js'
 import { ResolutionContextScope } from './internal/ResolutionContextScope.js'
 import { SingletonScope } from './internal/SingletonScope.js'
@@ -239,10 +239,10 @@ export class DI {
       const binding = this.bindingRegistry.get(token)
 
       if (binding?.instance && binding?.preDestroy && destroy) {
-        return DI.destroyBinding(binding).finally(() => this.bindingRegistry.delete(token))
+        return DI.preDestroyBinding(binding).finally(() => this.unref(token))
       }
 
-      this.bindingRegistry.delete(token)
+      this.unref(token)
     }
 
     if (this.parent) {
@@ -270,26 +270,13 @@ export class DI {
     this.bindingRegistry
       .toArray()
       .filter(x => x.binding.scopeId === Lifecycle.CONTAINER)
-      .forEach(({ token, binding }) => {
-        const copiedBinding = {
-          rawProvider: binding.rawProvider,
-          injections: binding.injections,
-          primary: binding.primary,
-          scopeId: binding.scopeId,
-          names: binding.names,
-          namespace: binding.namespace,
-          scope: binding.scope,
-          type: binding.type,
-          conditionals: binding.conditionals,
-          configuration: binding.configuration,
-          late: binding.late,
-          lazy: binding.lazy,
-          preDestroy: binding.preDestroy
-        } as Binding
-
-        copiedBinding.scopedProvider = binding.scope.wrap(binding.rawProvider)
-        child.bindingRegistry.register(token, copiedBinding)
-      })
+      .forEach(({ token, binding }) =>
+        child.bindingRegistry.register(token, {
+          ...binding,
+          instance: undefined,
+          scopedProvider: binding.scope.wrap(binding.rawProvider)
+        })
+      )
 
     DI.registerInternalComponents(child)
 
@@ -335,8 +322,11 @@ export class DI {
       throw new ScopeNotRegisteredError(scopeId)
     }
 
+    const hasPropertyInjections = binding.injectableProperties.length > 0
+    const hasMethodInjections = binding.injectableMethods.length > 0
+
     binding.scopeId = scopeId
-    binding.rawProvider = provider
+    binding.rawProvider = hasPropertyInjections ? new ClassWithInjectablePropertiesProvider(provider) : provider
     binding.scope = scope
     binding.late = binding.late === undefined ? this.lateBind : binding.late
     binding.lazy = binding.lazy =
@@ -348,11 +338,7 @@ export class DI {
 
     let finalProvider = binding.scope.wrap(binding.rawProvider)
 
-    if (binding.injectableProperties.length > 0) {
-      finalProvider = new PropertyInjectionPostProvider(finalProvider)
-    }
-
-    if (binding.injectableMethods.length > 0) {
+    if (hasMethodInjections) {
       finalProvider = new MethodInjectionPostProvider(finalProvider)
     }
 
@@ -425,7 +411,7 @@ export class DI {
       this.bindingRegistry
         .toArray()
         .filter(({ binding }) => binding.preDestroy && binding.instance)
-        .map(({ binding }) => DI.destroyBinding(binding))
+        .map(({ binding }) => DI.preDestroyBinding(binding))
     ).then(() => this.resetInstances())
   }
 
@@ -476,7 +462,7 @@ export class DI {
     return DI.name
   }
 
-  protected static destroyBinding(binding: Binding): Promise<void> {
+  protected static preDestroyBinding(binding: Binding): Promise<void> {
     const d = binding.instance[binding.preDestroy as Identifier]()
 
     if (d && 'then' in d && typeof d.then === 'function') {
@@ -566,6 +552,15 @@ export class DI {
         named.push(binding)
         this.bindingNames.set(name, named)
       }
+    }
+  }
+
+  protected unref(token: Token) {
+    this.bindingRegistry.delete(token)
+    this.multipleBeansRefCache.delete(token)
+
+    if (isNamedToken(token)) {
+      this.bindingNames.delete(token)
     }
   }
 }
