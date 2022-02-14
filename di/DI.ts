@@ -316,7 +316,7 @@ export class DI {
       }
     }
 
-    const scope = this.getScope<T>(scopeId)
+    const scope = DI.getScope<T>(scopeId)
 
     if (!scope) {
       throw new ScopeNotRegisteredError(scopeId)
@@ -370,10 +370,6 @@ export class DI {
     }
 
     return []
-  }
-
-  getScope<T>(scopeId: Identifier): Scope<T> | undefined {
-    return DI.Scopes.get(notNil(scopeId)) as Scope<T> | undefined
   }
 
   clear(): void {

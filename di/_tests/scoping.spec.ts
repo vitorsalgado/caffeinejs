@@ -68,7 +68,7 @@ describe('Scoping', function () {
     expect(scoped1).toBeInstanceOf(Dep)
     expect(scoped2).toBeInstanceOf(Dep)
     expect(scoped1).not.toEqual(scoped2)
-    expect(scope).toEqual(di.getScope(kCustomScopeId))
+    expect(scope).toEqual(DI.getScope(kCustomScopeId))
     expect(spy).toHaveBeenCalledTimes(1)
     expect(DI.getScope(kCustomScopeId)).toBeInstanceOf(CustomScope)
     expect(DI.getScope(kCustomScopeId)).toEqual(scope)
