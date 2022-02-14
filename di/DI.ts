@@ -184,17 +184,10 @@ export class DI {
         return bindings.map(binding => Resolver.resolve(this, token, binding, context))
       }
 
-      let entries: BindingEntry[]
+      let entries = this.search(tk => tk !== token && token.isPrototypeOf(tk))
 
-      if (isNamedToken(token)) {
-        //TODO: change this to nameMap
-        entries = this.search((tk, b) => isNamedToken(tk) && b.names.includes(token))
-      } else {
-        entries = this.search(tk => tk !== token && token.isPrototypeOf(tk))
-
-        if (entries.length === 0) {
-          entries = this.search((tk, binding) => binding.type === token)
-        }
+      if (entries.length === 0) {
+        entries = this.search((tk, binding) => binding.type === token)
       }
 
       if (entries.length === 0) {
@@ -394,11 +387,7 @@ export class DI {
     }
 
     if (isNamedToken(token)) {
-      const namedBinding = this.bindingNames.get(token)
-
-      if (namedBinding) {
-        return namedBinding
-      }
+      return this.bindingNames.get(token) || []
     }
 
     return []
@@ -532,6 +521,10 @@ export class DI {
 
         if (!pass) {
           this.bindingRegistry.delete(token)
+
+          if (isNamedToken(token)) {
+            this.bindingNames.delete(token)
+          }
 
           if (binding.configuration) {
             const tokens = Reflect.getOwnMetadata(DiVars.CONFIGURATION_TOKENS_PROVIDED, token)

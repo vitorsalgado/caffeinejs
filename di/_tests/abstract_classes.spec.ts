@@ -1,4 +1,6 @@
+import { expect } from '@jest/globals'
 import { jest } from '@jest/globals'
+import { Extends } from '../decorators/Extends.js'
 import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
@@ -98,6 +100,28 @@ describe('Abstract Classes', function () {
         expect(service.repo).toBeInstanceOf(MongoRepo)
         expect(service.list()).toEqual('mongodb')
       })
+    })
+  })
+
+  describe('using extends decorator to explicitly ref the abstract class', function () {
+    abstract class Base {
+      abstract test(): string
+    }
+
+    @Injectable()
+    @Extends(Base)
+    class Impl extends Base {
+      test(): string {
+        return 'ok'
+      }
+    }
+
+    it('should resolve instance based on abstract class token', function () {
+      const di = DI.setup()
+      const impl = di.get(Base)
+
+      expect(impl).toBeInstanceOf(Impl)
+      expect(impl.test()).toEqual('ok')
     })
   })
 })
