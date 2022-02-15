@@ -10,6 +10,8 @@ import { ScopeNotRegisteredError } from './DiError.js'
 import { CircularReferenceError } from './DiError.js'
 import { NoUniqueInjectionForTokenError } from './DiError.js'
 import { NoResolutionForTokenError } from './DiError.js'
+import { AfterInitProvider } from './internal/AfterInitProvider.js'
+import { PreInitProvider } from './internal/PreInitProvider.js'
 import { Vars } from './internal/Vars.js'
 import { Identifier } from './Identifier.js'
 import { InternalMetadataReader } from './internal/MetadataReader.js'
@@ -25,6 +27,7 @@ import { TokenProvider } from './internal/TokenProvider.js'
 import { TransientScope } from './internal/TransientScope.js'
 import { InitialOptions } from './Options.js'
 import { Options } from './Options.js'
+import { PostProcessor } from './PostProcessor.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { Resolver } from './Resolver.js'
 import { Scope } from './Scope.js'
@@ -37,10 +40,12 @@ import { check } from './utils/check.js'
 import { isNil } from './utils/isNil.js'
 import { loadModule } from './utils/loadModule.js'
 import { notNil } from './utils/notNil.js'
+import { promisify } from './utils/promisify.js'
 
 export class DI {
   static MetadataReader = new InternalMetadataReader()
   protected static readonly Scopes = new Map(DI.builtInScopes().entries())
+  protected static readonly PostProcessors = new Set<PostProcessor>()
 
   protected readonly bindingRegistry = new BindingRegistry()
   protected readonly bindingNames = new Map<Identifier, Binding[]>()
@@ -127,6 +132,10 @@ export class DI {
 
   static getScope<T = unknown>(scopeId: Identifier): Scope<T> | undefined {
     return DI.Scopes.get(scopeId) as Scope<T> | undefined
+  }
+
+  static bindPostProcessor(postProcessor: PostProcessor) {
+    DI.PostProcessors.add(notNil(postProcessor))
   }
 
   static async scan(paths: string[]): Promise<void> {
@@ -288,13 +297,13 @@ export class DI {
     notNil(binding)
 
     const scopeId = binding.scopeId ? binding.scopeId : this.scopeId
-    const provider = providerFromToken(token, binding.rawProvider)
+    const rawProvider = providerFromToken(token, binding.rawProvider)
 
-    notNil(provider, `Could not determine a provider for token: ${tokenStr(token)}`)
+    notNil(rawProvider, `Could not determine a provider for token: ${tokenStr(token)}`)
 
-    if (provider instanceof TokenProvider) {
+    if (rawProvider instanceof TokenProvider) {
       const path = [token]
-      let tokenProvider: TokenProvider<any> | null = provider
+      let tokenProvider: TokenProvider<any> | null = rawProvider
       const ctx = { di: this, token, binding, resolutionContext: ResolutionContext.INSTANCE }
 
       while (tokenProvider !== null) {
@@ -326,7 +335,7 @@ export class DI {
     const hasMethodInjections = binding.injectableMethods.length > 0
 
     binding.scopeId = scopeId
-    binding.rawProvider = hasPropertyInjections ? new ClassWithInjectablePropertiesProvider(provider) : provider
+    binding.rawProvider = hasPropertyInjections ? new ClassWithInjectablePropertiesProvider(rawProvider) : rawProvider
     binding.scope = scope
     binding.late = binding.late === undefined ? this.lateBind : binding.late
     binding.lazy = binding.lazy =
@@ -336,21 +345,29 @@ export class DI {
         ? this.lazy
         : binding.lazy
 
-    let finalProvider = binding.scope.wrap(binding.rawProvider)
+    let provider = binding.scope.wrap(binding.rawProvider)
 
     if (hasMethodInjections) {
-      finalProvider = new MethodInjectionPostProvider(finalProvider)
+      provider = new MethodInjectionPostProvider(provider)
     }
 
     for (const postProviderFactory of binding.postProviderFactories) {
-      finalProvider = postProviderFactory.newProvider(finalProvider)
+      provider = postProviderFactory.newProvider(provider)
+    }
+
+    for (const postProcessor of DI.PostProcessors) {
+      provider = new PreInitProvider(provider, postProcessor)
     }
 
     if (binding.postConstruct) {
-      finalProvider = new PostConstructProvider(finalProvider)
+      provider = new PostConstructProvider(provider)
     }
 
-    binding.scopedProvider = finalProvider
+    for (const postProcessor of DI.PostProcessors) {
+      provider = new AfterInitProvider(provider, postProcessor)
+    }
+
+    binding.scopedProvider = provider
 
     this.mapNamed(binding)
     this.bindingRegistry.register(token, binding)
@@ -459,13 +476,7 @@ export class DI {
   }
 
   protected static preDestroyBinding(binding: Binding): Promise<void> {
-    const d = binding.instance[binding.preDestroy as Identifier]()
-
-    if (d && 'then' in d && typeof d.then === 'function') {
-      return d
-    }
-
-    return Promise.resolve()
+    return promisify(binding.instance[binding.preDestroy as Identifier]())
   }
 
   protected static registerInternalComponents(di: DI) {
