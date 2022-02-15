@@ -10,28 +10,28 @@ import { ScopeNotRegisteredError } from './DiError.js'
 import { CircularReferenceError } from './DiError.js'
 import { NoUniqueInjectionForTokenError } from './DiError.js'
 import { NoResolutionForTokenError } from './DiError.js'
-import { AfterInitProvider } from './internal/AfterInitProvider.js'
-import { PreInitProvider } from './internal/PreInitProvider.js'
-import { Vars } from './internal/Vars.js'
 import { Identifier } from './Identifier.js'
-import { InternalMetadataReader } from './internal/MetadataReader.js'
-import { PostConstructProvider } from './internal/PostConstructProvider.js'
+import { AfterInitProvider } from './internal/AfterInitProvider.js'
+import { ClassWithInjectablePropertiesProvider } from './internal/ClassWithInjectablePropertiesProvider.js'
 import { ContainerScope } from './internal/ContainerScope.js'
+import { InternalMetadataReader } from './internal/MetadataReader.js'
 import { MetadataReader } from './internal/MetadataReader.js'
 import { MethodInjectionPostProvider } from './internal/MethodInjectionPostProvider.js'
-import { ClassWithInjectablePropertiesProvider } from './internal/ClassWithInjectablePropertiesProvider.js'
+import { PostConstructProvider } from './internal/PostConstructProvider.js'
+import { PreInitProvider } from './internal/PreInitProvider.js'
 import { providerFromToken } from './internal/Provider.js'
 import { ResolutionContextScope } from './internal/ResolutionContextScope.js'
 import { SingletonScope } from './internal/SingletonScope.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { TransientScope } from './internal/TransientScope.js'
+import { Vars } from './internal/Vars.js'
+import { Lifecycle } from './Lifecycle.js'
 import { InitialOptions } from './Options.js'
 import { Options } from './Options.js'
 import { PostProcessor } from './PostProcessor.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { Resolver } from './Resolver.js'
 import { Scope } from './Scope.js'
-import { Lifecycle } from './Lifecycle.js'
 import { DefaultServiceLocator } from './ServiceLocator.js'
 import { ServiceLocator } from './ServiceLocator.js'
 import { tokenStr } from './Token.js'
@@ -136,6 +136,10 @@ export class DI {
 
   static bindPostProcessor(postProcessor: PostProcessor) {
     DI.PostProcessors.add(notNil(postProcessor))
+  }
+
+  static unbindPostProcessor(posProcessor: PostProcessor) {
+    DI.PostProcessors.delete(posProcessor)
   }
 
   static async scan(paths: string[]): Promise<void> {
@@ -283,7 +287,7 @@ export class DI {
         child.bindingRegistry.register(token, {
           ...binding,
           instance: undefined,
-          scopedProvider: binding.scope.wrap(binding.rawProvider)
+          scopedProvider: binding.scope.scope(token, binding.rawProvider)
         })
       )
 
@@ -345,7 +349,7 @@ export class DI {
         ? this.lazy
         : binding.lazy
 
-    let provider = binding.scope.wrap(binding.rawProvider)
+    let provider = binding.scope.scope(token, binding.rawProvider)
 
     if (hasMethodInjections) {
       provider = new MethodInjectionPostProvider(provider)
@@ -476,7 +480,7 @@ export class DI {
   }
 
   protected static preDestroyBinding(binding: Binding): Promise<void> {
-    return promisify(binding.instance[binding.preDestroy as Identifier]())
+    return promisify(binding.instance[binding.preDestroy as Identifier])
   }
 
   protected static registerInternalComponents(di: DI) {

@@ -9,8 +9,9 @@ import { DI } from '../DI.js'
 import { ScopeAlreadyRegisteredError } from '../DiError.js'
 import { ScopeNotRegisteredError } from '../DiError.js'
 import { Provider } from '../internal/Provider.js'
-import { Scope } from '../Scope.js'
 import { Lifecycle } from '../Lifecycle.js'
+import { Scope } from '../Scope.js'
+import { Token } from '../Token.js'
 
 describe('Scoping', function () {
   const kCustomScopeId = Symbol('custom')
@@ -19,7 +20,7 @@ describe('Scoping', function () {
   class CustomScope<T> implements Scope<T> {
     readonly id: string = v4()
 
-    wrap(unscoped: Provider<T>): Provider<T> {
+    scope(token: Token, unscoped: Provider<T>): Provider<T> {
       spy()
       return unscoped
     }
@@ -79,7 +80,7 @@ describe('Scoping', function () {
       DI.bindScope(
         Lifecycle.SINGLETON,
         new (class implements Scope {
-          wrap(unscoped: Provider): Provider {
+          scope(token: Token, unscoped: Provider): Provider {
             return unscoped
           }
         })()
