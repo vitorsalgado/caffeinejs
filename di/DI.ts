@@ -13,14 +13,14 @@ import { NoResolutionForTokenError } from './DiError.js'
 import { Identifier } from './Identifier.js'
 import { AfterInitInterceptor } from './internal/AfterInitInterceptor.js'
 import { BeforeInitInterceptor } from './internal/BeforeInitInterceptor.js'
-import { ClassWithInjectablePropertiesInterceptor } from './internal/ClassWithInjectablePropertiesInterceptor.js'
 import { ContainerScope } from './internal/ContainerScope.js'
-import { PostResolutionInterceptor } from './internal/PostResolutionInterceptor.js'
 import { InterceptorChainExecutorProvider } from './internal/InterceptorChainExecutorProvider.js'
 import { InternalMetadataReader } from './internal/MetadataReader.js'
 import { MetadataReader } from './internal/MetadataReader.js'
-import { MethodInjectionPostInterceptor } from './internal/MethodInjectionPostInterceptor.js'
+import { MethodInjectorInterceptor } from './internal/MethodInjectorInterceptor.js'
 import { PostConstructInterceptor } from './internal/PostConstructInterceptor.js'
+import { PostResolutionInterceptor } from './internal/PostResolutionInterceptor.js'
+import { PropertiesInjectorInterceptor } from './internal/PropertiesInjectorInterceptor.js'
 import { providerFromToken } from './internal/Provider.js'
 import { ResolutionContextScope } from './internal/ResolutionContextScope.js'
 import { ScopedProvider } from './internal/ScopedProvider.js'
@@ -43,6 +43,7 @@ import { check } from './utils/check.js'
 import { isNil } from './utils/isNil.js'
 import { loadModule } from './utils/loadModule.js'
 import { notNil } from './utils/notNil.js'
+import { RequestScope } from './internal/RequestScope.js'
 
 export class DI {
   static MetadataReader = new InternalMetadataReader()
@@ -132,8 +133,14 @@ export class DI {
     return DI.Scopes.has(scopeId)
   }
 
-  static getScope<T extends Scope = Scope>(scopeId: Identifier): T | undefined {
-    return DI.Scopes.get(scopeId) as T | undefined
+  static getScope<T extends Scope = Scope>(scopeId: Identifier): T {
+    const scope = DI.Scopes.get(scopeId)
+
+    if (scope === undefined) {
+      throw new ScopeNotRegisteredError(scopeId)
+    }
+
+    return scope as T
   }
 
   static bindPostProcessor(postProcessor: PostProcessor) {
@@ -342,11 +349,11 @@ export class DI {
     const chain: PostResolutionInterceptor<T>[] = []
 
     if (hasPropertyInjections) {
-      chain.push(new ClassWithInjectablePropertiesInterceptor())
+      chain.push(new PropertiesInjectorInterceptor())
     }
 
     if (hasMethodInjections) {
-      chain.push(new MethodInjectionPostInterceptor())
+      chain.push(new MethodInjectorInterceptor())
     }
 
     for (const interceptor of binding.interceptors) {
@@ -363,6 +370,12 @@ export class DI {
 
     for (const postProcessor of DI.PostProcessors) {
       chain.push(new AfterInitInterceptor(postProcessor))
+    }
+
+    if (scope.registerDestructionCallback) {
+      if (binding.preDestroy) {
+        scope.registerDestructionCallback(() => scope.cachedInstance<any>(binding)?.[binding.preDestroy!]())
+      }
     }
 
     binding.scopeId = scopeId
@@ -482,17 +495,21 @@ export class DI {
     return DI.name
   }
 
-  protected static preDestroyBinding(binding: Binding): Promise<void> {
+  protected static async preDestroyBinding(binding: Binding): Promise<void> {
     const scope = DI.Scopes.get(binding.scopeId) as Scope
     const instance: any = scope.cachedInstance(binding)
 
+    await this.destroyInstance(instance, binding).finally(() => scope.remove(binding))
+
+    scope.remove(binding)
+  }
+
+  static destroyInstance(instance: any, binding: Binding): Promise<void> {
     const r = instance?.[binding.preDestroy as Identifier]()
 
     if (r && 'then' in r && typeof r.then === 'function') {
-      return r.finally(() => scope.remove(binding))
+      return r
     }
-
-    scope.remove(binding)
 
     return Promise.resolve()
   }
@@ -509,6 +526,7 @@ export class DI {
       .set(Lifecycle.CONTAINER, new ContainerScope())
       .set(Lifecycle.RESOLUTION_CONTEXT, new ResolutionContextScope())
       .set(Lifecycle.TRANSIENT, new TransientScope())
+      .set(Lifecycle.REQUEST, new RequestScope())
   }
 
   protected setup(): void {

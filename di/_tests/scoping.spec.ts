@@ -13,7 +13,6 @@ import { ProviderContext } from '../internal/Provider.js'
 import { Provider } from '../internal/Provider.js'
 import { Lifecycle } from '../Lifecycle.js'
 import { Scope } from '../Scope.js'
-import { Token } from '../Token.js'
 
 describe('Scoping', function () {
   const kCustomScopeId = Symbol('custom')
@@ -54,7 +53,7 @@ describe('Scoping', function () {
       DI.setup()
     } catch (e) {
       expect(e).toBeInstanceOf(ScopeNotRegisteredError)
-      expect(DI.getScope('none')).toBeUndefined()
+      expect(() => DI.getScope('none')).toThrow(ScopeNotRegisteredError)
       expect(DI.hasScope('none')).toBeFalsy()
       return
     } finally {
@@ -97,10 +96,6 @@ describe('Scoping', function () {
           }
 
           remove(binding: Binding): void {}
-
-          scope(token: Token, unscoped: Provider): Provider {
-            return unscoped
-          }
         })()
       )
     ).toThrow(ScopeAlreadyRegisteredError)

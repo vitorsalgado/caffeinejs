@@ -8,4 +8,6 @@ export interface Scope {
   cachedInstance<T>(binding: Binding): T | undefined
 
   remove(binding: Binding): void
+
+  registerDestructionCallback?(callback: () => Promise<void> | void): void
 }

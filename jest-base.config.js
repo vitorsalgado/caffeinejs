@@ -1,13 +1,12 @@
-'use strict'
-
-module.exports = {
+export default {
   verbose: true,
   testTimeout: 15000,
   collectCoverage: false,
   resetModules: true,
   restoreMocks: true,
   testEnvironment: 'node',
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm',
+  extensionsToTreatAsEsm: ['.ts'],
   setupFilesAfterEnv: ['../test/jest.setup.js'],
   testMatch: ['**/?(*.)+(spec|test).[jt]s?(x)'],
   moduleNameMapper: {
@@ -15,7 +14,8 @@ module.exports = {
   },
   globals: {
     'ts-jest': {
-      tsconfig: '../tsconfig.test.json'
+      tsconfig: '../tsconfig.test.json',
+      useESM: true
     }
   },
   collectCoverageFrom: [

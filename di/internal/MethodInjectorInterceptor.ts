@@ -2,7 +2,7 @@ import { Resolver } from '../Resolver.js'
 import { PostResolutionInterceptor } from './PostResolutionInterceptor.js'
 import { ProviderContext } from './Provider.js'
 
-export class MethodInjectionPostInterceptor<T> implements PostResolutionInterceptor<T> {
+export class MethodInjectorInterceptor<T> implements PostResolutionInterceptor<T> {
   intercept(instance: any, ctx: ProviderContext): T {
     if (instance === null || instance === undefined) {
       return instance

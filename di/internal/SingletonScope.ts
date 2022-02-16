@@ -21,6 +21,6 @@ export class SingletonScope implements Scope {
   }
 
   remove(binding: Binding): void {
-    binding.cachedInstance = undefined
+    binding.cachedInstance = null
   }
 }

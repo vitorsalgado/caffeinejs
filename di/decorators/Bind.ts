@@ -13,7 +13,7 @@ export function Bind<T>(
   notNil(options)
   check(typeof options === 'object', '@Bind parameter must be an object')
   check(options.id === undefined, 'Setting the binding id is forbidden')
-  check(typeof options.scopedProvider === undefined, 'Setting the scopedProvider here is forbidden')
+  check(options.scopedProvider === undefined, 'Setting the scopedProvider here is forbidden')
 
   return function <TFunction extends Function>(target: TFunction | object, propertyKey?: string | symbol) {
     if (typeof target === 'function') {

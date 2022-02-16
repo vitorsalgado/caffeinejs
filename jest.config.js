@@ -8,7 +8,8 @@ module.exports = {
   projects: ['<rootDir>'],
   globals: {
     'ts-jest': {
-      tsconfig: './tsconfig.test.json'
+      tsconfig: './tsconfig.test.json',
+      useESM: true
     }
   },
   setupFilesAfterEnv: ['<rootDir>/test/jest.setup.js'],

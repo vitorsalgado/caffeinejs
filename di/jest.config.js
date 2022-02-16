@@ -1,8 +1,8 @@
 'use strict'
 
-const Base =  require('../jest-base.config.js')
+import Base from '../jest-base.config.js'
 
-module.exports = {
+export default {
   ...Base,
   displayName: 'DI'
 }

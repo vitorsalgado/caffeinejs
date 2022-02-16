@@ -81,3 +81,17 @@ export class MultiplePrimaryError extends DiError {
     this.name = 'MultiplePrimaryError'
   }
 }
+
+export class IllegalScopeStateError extends DiError {
+  constructor(message: string) {
+    super(message, 'ILLEGAL_SCOPE_STATE')
+    this.name = 'IllegalScopeStateError'
+  }
+}
+
+export class OutOfScopeError extends DiError {
+  constructor(message: string) {
+    super(message, 'OUT_OF_SCOPE')
+    this.name = 'OutOfScopeError'
+  }
+}
