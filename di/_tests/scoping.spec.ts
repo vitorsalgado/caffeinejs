@@ -2,12 +2,14 @@ import { expect } from '@jest/globals'
 import { afterAll } from '@jest/globals'
 import { jest } from '@jest/globals'
 import { v4 } from 'uuid'
+import { Binding } from '../Binding.js'
 import { DecoratedInjectables } from '../DecoratedInjectables.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
 import { ScopeAlreadyRegisteredError } from '../DiError.js'
 import { ScopeNotRegisteredError } from '../DiError.js'
+import { ProviderContext } from '../internal/Provider.js'
 import { Provider } from '../internal/Provider.js'
 import { Lifecycle } from '../Lifecycle.js'
 import { Scope } from '../Scope.js'
@@ -17,13 +19,19 @@ describe('Scoping', function () {
   const kCustomScopeId = Symbol('custom')
   const spy = jest.fn()
 
-  class CustomScope<T> implements Scope<T> {
+  class CustomScope implements Scope {
     readonly id: string = v4()
 
-    scope(token: Token, unscoped: Provider<T>): Provider<T> {
+    get<T>(ctx: ProviderContext, provider: Provider<T>): T {
       spy()
-      return unscoped
+      return provider.provide(ctx)
     }
+
+    cachedInstance<T>(binding: Binding): T | undefined {
+      return undefined
+    }
+
+    remove(binding: Binding): void {}
   }
 
   @Injectable()
@@ -70,7 +78,7 @@ describe('Scoping', function () {
     expect(scoped2).toBeInstanceOf(Dep)
     expect(scoped1).not.toEqual(scoped2)
     expect(scope).toEqual(DI.getScope(kCustomScopeId))
-    expect(spy).toHaveBeenCalledTimes(1)
+    expect(spy).toHaveBeenCalledTimes(2)
     expect(DI.getScope(kCustomScopeId)).toBeInstanceOf(CustomScope)
     expect(DI.getScope(kCustomScopeId)).toEqual(scope)
   })
@@ -80,6 +88,16 @@ describe('Scoping', function () {
       DI.bindScope(
         Lifecycle.SINGLETON,
         new (class implements Scope {
+          get<T>(ctx: ProviderContext, provider: Provider<T>): T {
+            return provider.provide(ctx)
+          }
+
+          cachedInstance<T>(binding: Binding): T | undefined {
+            return undefined
+          }
+
+          remove(binding: Binding): void {}
+
           scope(token: Token, unscoped: Provider): Provider {
             return unscoped
           }

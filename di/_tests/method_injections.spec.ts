@@ -54,7 +54,7 @@ describe('Method Injections', function () {
       }
     }
 
-    it('should inject a new transient instance for every resolution call', function () {
+    it('should inject a transient dependency just one time', function () {
       const di = DI.setup()
 
       const r1 = di.get(SingleInject)
@@ -67,7 +67,7 @@ describe('Method Injections', function () {
       expect(r1.transient).toBeInstanceOf(TransientDep)
       expect(r2.transient).toBeInstanceOf(TransientDep)
       expect(r1.transient.id).toEqual(r2.transient.id)
-      expect(id1).not.toEqual(id2)
+      expect(id1).toEqual(id2)
     })
   })
 
@@ -166,7 +166,7 @@ describe('Method Injections', function () {
       expect(r1.transient).toBeInstanceOf(TransientDep)
       expect(r2.transient).toBeInstanceOf(TransientDep)
       expect(r1.transient.id).toEqual(r2.transient.id)
-      expect(id1).not.toEqual(id2)
+      expect(id1).toEqual(id2)
       expect(r1.val).toEqual('test')
       expect(r1.bases).toHaveLength(2)
       expect(r1.base).toBeInstanceOf(B2)

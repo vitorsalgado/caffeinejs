@@ -1,26 +1,26 @@
+import { Binding } from '../Binding.js'
 import { Scope } from '../Scope.js'
-import { Token } from '../Token.js'
 import { ProviderContext } from './Provider.js'
 import { Provider } from './Provider.js'
 
-class ResolutionContextScopeProvider<T> implements Provider<T> {
-  constructor(private readonly unscoped: Provider<T>) {}
-
-  provide(ctx: ProviderContext): T {
+export class ResolutionContextScope implements Scope {
+  get<T>(ctx: ProviderContext, unscoped: Provider<T>): T {
     if (ctx.resolutionContext.resolutions.has(ctx.binding)) {
       return ctx.resolutionContext.resolutions.get(ctx.binding)
     }
 
-    const resolved = this.unscoped.provide(ctx)
+    const resolved = unscoped.provide(ctx)
 
     ctx.resolutionContext.resolutions.set(ctx.binding, resolved)
 
     return resolved
   }
-}
 
-export class ResolutionContextScope<T> implements Scope<T> {
-  scope(token: Token, unscoped: Provider): Provider {
-    return new ResolutionContextScopeProvider(unscoped)
+  cachedInstance<T>(_binding: Binding): T | undefined {
+    return undefined
+  }
+
+  remove(_binding: Binding): void {
+    // not needed in this scope
   }
 }

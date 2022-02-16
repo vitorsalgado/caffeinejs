@@ -2,15 +2,14 @@ import { beforeAll } from '@jest/globals'
 import { afterAll } from '@jest/globals'
 import { expect } from '@jest/globals'
 import { jest } from '@jest/globals'
+import { Binding } from '../Binding.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
 import { Provider } from '../internal/Provider.js'
 import { ProviderContext } from '../internal/Provider.js'
-import { TransientScope } from '../internal/TransientScope.js'
 import { PostProcessor } from '../PostProcessor.js'
 import { Scope } from '../Scope.js'
-import { Token } from '../Token.js'
 
 describe('Post Processors', function () {
   const ppSpy = jest.fn()
@@ -18,12 +17,16 @@ describe('Post Processors', function () {
   const kScope = Symbol('custom_transient')
 
   class CustomTransient implements Scope {
-    private readonly transient = new TransientScope()
-
-    scope(token: Token, unscoped: Provider<any>): Provider<any> {
+    get<T>(ctx: ProviderContext, provider: Provider<T>): T {
       sSpy()
-      return this.transient.scope(token, unscoped)
+      return provider.provide(ctx)
     }
+
+    cachedInstance<T>(binding: Binding): T | undefined {
+      return undefined
+    }
+
+    remove(binding: Binding): void {}
   }
 
   @Injectable()

@@ -1,6 +1,11 @@
+import { Binding } from './Binding.js'
+import { ProviderContext } from './internal/Provider.js'
 import { Provider } from './internal/Provider.js'
-import { Token } from './Token.js'
 
-export interface Scope<T = any> {
-  scope(token: Token, unscoped: Provider<T>): Provider<T>
+export interface Scope {
+  get<T>(ctx: ProviderContext, provider: Provider<T>): T
+
+  cachedInstance<T>(binding: Binding): T | undefined
+
+  remove(binding: Binding): void
 }

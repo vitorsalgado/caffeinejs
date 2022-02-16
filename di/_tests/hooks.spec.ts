@@ -117,14 +117,14 @@ describe('Hooks', function () {
       }
     }
 
-    it('should execute after resolution hook in all resolutions request and after constructor, properties and setter methods injection', function () {
+    it('should execute after property, method and any other post providers', function () {
       const di = DI.setup()
 
       di.get(Component)
       di.get(Component)
 
-      expect(spy).toHaveBeenCalledTimes(2)
-      expect(stack).toEqual(['ctor', 'method', 'init', 'method', 'init'])
+      expect(spy).toHaveBeenCalledTimes(1)
+      expect(stack).toEqual(['ctor', 'method', 'init'])
     })
   })
 })

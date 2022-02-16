@@ -33,8 +33,6 @@ describe('DI', function () {
     const str = di.toString()
     const protoStr = Object.prototype.toString.call(di)
 
-    console.log(str)
-
     expect(str).toContain('Test')
     expect(str).toContain('NamedTest')
     expect(str).toContain(kTestName.description)

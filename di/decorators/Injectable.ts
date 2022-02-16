@@ -1,10 +1,11 @@
+import { Binding } from '../Binding.js'
 import { DI } from '../DI.js'
 import { InvalidBindingError } from '../DiError.js'
 import { isNamedToken } from '../Token.js'
 import { Token } from '../Token.js'
 import { getInjectableMethods } from '../utils/getInjectableMethods.js'
-import { getParamTypes } from '../utils/getParamTypes.js'
 import { getInjectableProperties } from '../utils/getInjectableProperties.js'
+import { getParamTypes } from '../utils/getParamTypes.js'
 import { isNil } from '../utils/isNil.js'
 import { configureBean } from './utils/beanUtils.js'
 
@@ -22,8 +23,9 @@ export function Injectable<T>(token?: Token) {
         injections: getParamTypes(target),
         injectableProperties: getInjectableProperties(target),
         injectableMethods: getInjectableMethods(target),
+        type: target,
         names: token ? [token] : undefined
-      })
+      } as Partial<Binding>)
 
       return
     }
@@ -35,9 +37,12 @@ export function Injectable<T>(token?: Token) {
       )
     }
 
+    const type = typeof token === 'function' ? token : undefined
+
     configureBean(target.constructor, propertyKey!, {
       dependencies: getParamTypes(target, propertyKey),
-      token
-    })
+      token,
+      type
+    } as Partial<Binding>)
   }
 }

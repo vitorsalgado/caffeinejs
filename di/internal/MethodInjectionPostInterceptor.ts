@@ -1,13 +1,9 @@
 import { Resolver } from '../Resolver.js'
-import { Provider } from './Provider.js'
+import { PostResolutionInterceptor } from './PostResolutionInterceptor.js'
 import { ProviderContext } from './Provider.js'
 
-export class MethodInjectionPostProvider<T> implements Provider<T> {
-  constructor(private readonly provider: Provider<T>) {}
-
-  provide(ctx: ProviderContext): T {
-    const instance: any = this.provider.provide(ctx)
-
+export class MethodInjectionPostInterceptor<T> implements PostResolutionInterceptor<T> {
+  intercept(instance: any, ctx: ProviderContext): T {
     if (instance === null || instance === undefined) {
       return instance
     }

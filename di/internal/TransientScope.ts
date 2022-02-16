@@ -1,14 +1,18 @@
+import { Binding } from '../Binding.js'
 import { Scope } from '../Scope.js'
-import { Token } from '../Token.js'
 import { ProviderContext } from './Provider.js'
 import { Provider } from './Provider.js'
 
-export class TransientScope<T> implements Scope<T> {
-  scope(token: Token, unscoped: Provider): Provider {
-    return new (class implements Provider {
-      provide(ctx: ProviderContext): T {
-        return unscoped.provide(ctx)
-      }
-    })()
+export class TransientScope implements Scope {
+  get<T>(ctx: ProviderContext, provider: Provider<T>): T {
+    return provider.provide(ctx)
+  }
+
+  cachedInstance<T>(_binding: Binding): T | undefined {
+    return undefined
+  }
+
+  remove(_binding: Binding): void {
+    //
   }
 }

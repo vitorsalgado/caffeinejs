@@ -11,16 +11,19 @@ import { CircularReferenceError } from './DiError.js'
 import { NoUniqueInjectionForTokenError } from './DiError.js'
 import { NoResolutionForTokenError } from './DiError.js'
 import { Identifier } from './Identifier.js'
-import { AfterInitProvider } from './internal/AfterInitProvider.js'
-import { ClassWithInjectablePropertiesProvider } from './internal/ClassWithInjectablePropertiesProvider.js'
+import { AfterInitInterceptor } from './internal/AfterInitInterceptor.js'
+import { BeforeInitInterceptor } from './internal/BeforeInitInterceptor.js'
+import { ClassWithInjectablePropertiesInterceptor } from './internal/ClassWithInjectablePropertiesInterceptor.js'
 import { ContainerScope } from './internal/ContainerScope.js'
+import { PostResolutionInterceptor } from './internal/PostResolutionInterceptor.js'
+import { InterceptorChainExecutorProvider } from './internal/InterceptorChainExecutorProvider.js'
 import { InternalMetadataReader } from './internal/MetadataReader.js'
 import { MetadataReader } from './internal/MetadataReader.js'
-import { MethodInjectionPostProvider } from './internal/MethodInjectionPostProvider.js'
-import { PostConstructProvider } from './internal/PostConstructProvider.js'
-import { PreInitProvider } from './internal/PreInitProvider.js'
+import { MethodInjectionPostInterceptor } from './internal/MethodInjectionPostInterceptor.js'
+import { PostConstructInterceptor } from './internal/PostConstructInterceptor.js'
 import { providerFromToken } from './internal/Provider.js'
 import { ResolutionContextScope } from './internal/ResolutionContextScope.js'
+import { ScopedProvider } from './internal/ScopedProvider.js'
 import { SingletonScope } from './internal/SingletonScope.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { TransientScope } from './internal/TransientScope.js'
@@ -40,7 +43,6 @@ import { check } from './utils/check.js'
 import { isNil } from './utils/isNil.js'
 import { loadModule } from './utils/loadModule.js'
 import { notNil } from './utils/notNil.js'
-import { promisify } from './utils/promisify.js'
 
 export class DI {
   static MetadataReader = new InternalMetadataReader()
@@ -111,7 +113,7 @@ export class DI {
     DecoratedInjectables.instance().addBean(token, binding)
   }
 
-  static bindScope<T>(scopeId: Identifier, scope: Scope<T>): void {
+  static bindScope(scopeId: Identifier, scope: Scope): void {
     notNil(scopeId)
     notNil(scope)
 
@@ -130,8 +132,8 @@ export class DI {
     return DI.Scopes.has(scopeId)
   }
 
-  static getScope<T = unknown>(scopeId: Identifier): Scope<T> | undefined {
-    return DI.Scopes.get(scopeId) as Scope<T> | undefined
+  static getScope<T extends Scope = Scope>(scopeId: Identifier): T | undefined {
+    return DI.Scopes.get(scopeId) as T | undefined
   }
 
   static bindPostProcessor(postProcessor: PostProcessor) {
@@ -251,7 +253,7 @@ export class DI {
     if (this.has(token)) {
       const binding = this.bindingRegistry.get(token)
 
-      if (binding?.instance && binding?.preDestroy && destroy) {
+      if (binding?.cachedInstance && binding?.preDestroy && destroy) {
         return DI.preDestroyBinding(binding).finally(() => this.unref(token))
       }
 
@@ -286,8 +288,8 @@ export class DI {
       .forEach(({ token, binding }) =>
         child.bindingRegistry.register(token, {
           ...binding,
-          instance: undefined,
-          scopedProvider: binding.scope.scope(token, binding.rawProvider)
+          cachedInstance: undefined
+          //scopedProvider: binding.scope.scope(token, binding.rawProvider)
         })
       )
 
@@ -329,7 +331,7 @@ export class DI {
       }
     }
 
-    const scope = DI.getScope<T>(scopeId)
+    const scope = DI.getScope(scopeId)
 
     if (!scope) {
       throw new ScopeNotRegisteredError(scopeId)
@@ -337,10 +339,35 @@ export class DI {
 
     const hasPropertyInjections = binding.injectableProperties.length > 0
     const hasMethodInjections = binding.injectableMethods.length > 0
+    const chain: PostResolutionInterceptor<T>[] = []
+
+    if (hasPropertyInjections) {
+      chain.push(new ClassWithInjectablePropertiesInterceptor())
+    }
+
+    if (hasMethodInjections) {
+      chain.push(new MethodInjectionPostInterceptor())
+    }
+
+    for (const interceptor of binding.interceptors) {
+      chain.push(interceptor)
+    }
+
+    for (const postProcessor of DI.PostProcessors) {
+      chain.push(new BeforeInitInterceptor(postProcessor))
+    }
+
+    if (binding.postConstruct) {
+      chain.push(new PostConstructInterceptor())
+    }
+
+    for (const postProcessor of DI.PostProcessors) {
+      chain.push(new AfterInitInterceptor(postProcessor))
+    }
 
     binding.scopeId = scopeId
-    binding.rawProvider = hasPropertyInjections ? new ClassWithInjectablePropertiesProvider(rawProvider) : rawProvider
-    binding.scope = scope
+    binding.rawProvider = rawProvider
+    binding.scopedProvider = new ScopedProvider(scope, new InterceptorChainExecutorProvider(rawProvider, chain))
     binding.late = binding.late === undefined ? this.lateBind : binding.late
     binding.lazy = binding.lazy =
       binding.lazy === undefined && this.lazy === undefined
@@ -348,30 +375,6 @@ export class DI {
         : binding.lazy === undefined
         ? this.lazy
         : binding.lazy
-
-    let provider = binding.scope.scope(token, binding.rawProvider)
-
-    if (hasMethodInjections) {
-      provider = new MethodInjectionPostProvider(provider)
-    }
-
-    for (const postProviderFactory of binding.postProviderFactories) {
-      provider = postProviderFactory.newProvider(provider)
-    }
-
-    for (const postProcessor of DI.PostProcessors) {
-      provider = new PreInitProvider(provider, postProcessor)
-    }
-
-    if (binding.postConstruct) {
-      provider = new PostConstructProvider(provider)
-    }
-
-    for (const postProcessor of DI.PostProcessors) {
-      provider = new AfterInitProvider(provider, postProcessor)
-    }
-
-    binding.scopedProvider = provider
 
     this.mapNamed(binding)
     this.bindingRegistry.register(token, binding)
@@ -399,7 +402,7 @@ export class DI {
 
   resetInstances(): void {
     for (const [, binding] of this.bindingRegistry.entries()) {
-      binding.instance = undefined
+      binding.cachedInstance = undefined
     }
   }
 
@@ -409,7 +412,7 @@ export class DI {
     const bindings = this.getBindings(token)
 
     for (const binding of bindings) {
-      binding.instance = undefined
+      binding.cachedInstance = undefined
     }
   }
 
@@ -427,7 +430,7 @@ export class DI {
     return Promise.all(
       this.bindingRegistry
         .toArray()
-        .filter(({ binding }) => binding.preDestroy && binding.instance)
+        .filter(({ binding }) => binding.preDestroy)
         .map(({ binding }) => DI.preDestroyBinding(binding))
     ).then(() => this.resetInstances())
   }
@@ -480,7 +483,18 @@ export class DI {
   }
 
   protected static preDestroyBinding(binding: Binding): Promise<void> {
-    return promisify(binding.instance[binding.preDestroy as Identifier])
+    const scope = DI.Scopes.get(binding.scopeId) as Scope
+    const instance: any = scope.cachedInstance(binding)
+
+    const r = instance?.[binding.preDestroy as Identifier]()
+
+    if (r && 'then' in r && typeof r.then === 'function') {
+      return r.finally(() => scope.remove(binding))
+    }
+
+    scope.remove(binding)
+
+    return Promise.resolve()
   }
 
   protected static registerInternalComponents(di: DI) {
@@ -490,7 +504,7 @@ export class DI {
   }
 
   protected static builtInScopes() {
-    return new Map<Identifier, Scope<unknown>>()
+    return new Map<Identifier, Scope>()
       .set(Lifecycle.SINGLETON, new SingletonScope())
       .set(Lifecycle.CONTAINER, new ContainerScope())
       .set(Lifecycle.RESOLUTION_CONTEXT, new ResolutionContextScope())

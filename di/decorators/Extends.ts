@@ -9,6 +9,5 @@ export function Extends<T>(base: Ctor<T> | AbstractCtor<T>) {
 
   return function <TFunction extends Function>(target: TFunction) {
     DI.configureType<T>(base, { rawProvider: new TokenProvider(target) })
-    return
   }
 }

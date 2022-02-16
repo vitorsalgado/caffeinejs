@@ -1,25 +1,26 @@
+import { Binding } from '../Binding.js'
 import { Scope } from '../Scope.js'
-import { Token } from '../Token.js'
 import { ProviderContext } from './Provider.js'
 import { Provider } from './Provider.js'
 
-export class SingletonScopeProvider<T> implements Provider<T> {
-  constructor(private readonly unscoped: Provider<T>) {}
-
-  provide(ctx: ProviderContext): T {
-    if (ctx.binding.instance) {
-      return ctx.binding.instance
+export class SingletonScope implements Scope {
+  get<T>(ctx: ProviderContext, unscoped: Provider<T>): T {
+    if (ctx.binding.cachedInstance) {
+      return ctx.binding.cachedInstance
     }
 
-    const resolved = this.unscoped.provide(ctx)
-    ctx.binding.instance = resolved
+    const resolved = unscoped.provide(ctx)
+
+    ctx.binding.cachedInstance = resolved
 
     return resolved
   }
-}
 
-export class SingletonScope<T> implements Scope<T> {
-  scope(token: Token, unscoped: Provider): Provider {
-    return new SingletonScopeProvider(unscoped)
+  cachedInstance<T>(binding: Binding): T | undefined {
+    return binding.cachedInstance
+  }
+
+  remove(binding: Binding): void {
+    binding.cachedInstance = undefined
   }
 }

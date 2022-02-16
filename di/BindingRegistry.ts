@@ -1,6 +1,6 @@
-import { notNil } from './utils/notNil.js'
 import { Binding } from './Binding.js'
 import { Token } from './Token.js'
+import { notNil } from './utils/notNil.js'
 
 export interface BindingEntry {
   token: Token
@@ -14,7 +14,9 @@ export class BindingRegistry {
     notNil(token)
     notNil(binding)
 
-    this._types.set(token, { ...this.getEntry(token), ...binding })
+    const entry = this.getEntry(token)
+
+    this._types.set(token, { ...entry, ...binding })
   }
 
   get<T>(token: Token<T>): Binding<T> | undefined {
@@ -54,6 +56,6 @@ export class BindingRegistry {
 
     this._types.set(token, {} as Binding)
 
-    return this._types.get(token) ?? ({} as Binding)
+    return this._types.get(token) as Binding
   }
 }
