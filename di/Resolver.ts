@@ -91,19 +91,6 @@ export namespace Resolver {
       resolution = di.get(dep.token, context)
     }
 
-    if (isNil(resolution)) {
-      const byType = di.searchBy(dep.tokenType)
-
-      if (byType) {
-        resolution = resolve(di, dep.token, byType, context)
-
-        if (!isNil(resolution)) {
-          di.configureBinding(dep.token, byType)
-          return resolution
-        }
-      }
-    }
-
     if (!isNil(resolution)) {
       return resolution
     }
