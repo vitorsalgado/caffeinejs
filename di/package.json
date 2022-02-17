@@ -21,7 +21,8 @@
     "build": "rm -rf dist && tsc --build --force tsconfig.build.json",
     "test": "jest --detectOpenHandles",
     "test:coverage": "jest --detectOpenHandles --coverage",
-    "bench": "node --loader ts-node/esm _bench/bench.ts"
+    "bench": "node --loader ts-node/esm _bench/bench.ts",
+    "bench:compare": "node --loader ts-node/esm _bench/compare.ts"
   },
   "files": [
     "dist",
