@@ -239,11 +239,6 @@ export class DI {
     return result
   }
 
-  searchBy<T>(token: Token<T>): Binding<T> | undefined {
-    notNil(token)
-    return this.bindingRegistry.get(token)
-  }
-
   bind<T>(token: Token<T>): Binder<T> {
     notNil(token)
 

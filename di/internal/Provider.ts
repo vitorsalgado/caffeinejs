@@ -17,10 +17,6 @@ export interface Provider<T = any> {
   provide(ctx: ProviderContext): T
 }
 
-export interface ProviderFactory {
-  newProvider(previous: Provider): Provider
-}
-
 export function providerFromToken<T>(token: Token<T>, provider?: Provider<T>): Provider<T> {
   if (typeof provider === 'undefined') {
     if (typeof token === 'function') {
