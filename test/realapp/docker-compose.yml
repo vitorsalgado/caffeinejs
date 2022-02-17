@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  mongodb_1:
+    image: mongo
+    container_name: mongodb_1
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+
+  mongodb_2:
+    image: mongo
+    container_name: mongodb_1
+    restart: always
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root

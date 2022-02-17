@@ -1,8 +1,12 @@
-import { Conditional } from './Conditional.js'
-import { DecoratedInjectables } from './DecoratedInjectables.js'
-import { getBeanConfiguration } from './decorators/utils/beanUtils.js'
-import { configureBean } from './decorators/utils/beanUtils.js'
-import { DI } from './DI.js'
+import { DecoratedInjectables } from '../DecoratedInjectables.js'
+import { DI } from '../DI.js'
+import { configureBean, getBeanConfiguration } from './utils/beanUtils.js'
+
+export interface ConditionContext {
+  di: DI
+}
+
+export type Conditional = (ctx: ConditionContext) => boolean
 
 export function ConditionalOn<T>(...conditionals: Conditional[]) {
   return function <TFunction extends Function>(target: TFunction | object, propertyKey?: string | symbol) {

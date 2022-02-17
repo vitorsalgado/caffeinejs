@@ -34,7 +34,7 @@ module.exports = {
     'import/no-useless-path-segments': [
       'error',
       {
-        noUselessIndex: true
+        noUselessIndex: false
       }
     ],
     'import/no-self-import': ['error'],

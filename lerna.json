@@ -5,7 +5,9 @@
   "packages": [
     "core",
     "di",
-    "examples/*"
+    "examples/*",
+    "internal/*",
+    "test/*"
   ],
   "ignoreChanges": [
     "**/*.md"

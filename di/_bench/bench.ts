@@ -2,6 +2,7 @@ import 'reflect-metadata'
 import Fastify from 'fastify'
 import cronometro from 'cronometro'
 import Supertest from 'supertest'
+import { printResults } from '@caffeinejs/internal-perf'
 import { DI } from '../DI.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { RequestScope } from '../internal/RequestScope.js'
@@ -11,7 +12,6 @@ import { parallelRequests } from './vars.js'
 import { errorThreshold } from './vars.js'
 import { connections } from './vars.js'
 import { iterations } from './vars.js'
-import { printResults } from './printResults.js'
 
 abstract class Repo {
   abstract find(): string

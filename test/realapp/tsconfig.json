@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "src",
+    "allowJs": true
+  },
+  "references": [
+    { "path": "../../di", "prepend": false }
+  ],
+  "ts-node": {
+    "transpileOnly": true,
+    "emit": true
+  }
+}

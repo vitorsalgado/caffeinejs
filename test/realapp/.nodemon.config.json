@@ -1,0 +1,6 @@
+{
+  "verbose": false,
+  "ignore": ["*.spec.ts", "/__fixtures__/", "/__tests__"],
+  "ext": "js,ts,json,env,yaml,yml",
+  "exec": "node --loader ts-node/esm src/main.ts --emit"
+}

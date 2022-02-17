@@ -22,7 +22,9 @@
   "workspaces": [
     "core",
     "di",
-    "examples/*"
+    "examples/*",
+    "internal/*",
+    "test/*"
   ],
   "engines": {
     "node": ">=16"
@@ -61,6 +63,7 @@
     "jest": "27.5.1",
     "lerna": "^4.0.0",
     "lint-staged": "^12.3.4",
+    "nodemon": "^2.0.15",
     "pinst": "^2.1.6",
     "prettier": "^2.5.1",
     "reflect-metadata": "^0.1.13",

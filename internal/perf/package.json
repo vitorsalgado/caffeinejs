@@ -1,0 +1,17 @@
+{
+  "name": "@caffeinejs/internal-perf",
+  "version": "0.0.0",
+  "description": "",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "rm -rf dist && tsc --build --force tsconfig.build.json",
+    "test": "jest --detectOpenHandles"
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  }
+}
