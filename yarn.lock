@@ -506,9 +506,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@caffeinejs/test-realapp@workspace:test/realworld":
+"@caffeinejs/test-realapp@workspace:test/realapp":
   version: 0.0.0-use.local
-  resolution: "@caffeinejs/test-realapp@workspace:test/realworld"
+  resolution: "@caffeinejs/test-realapp@workspace:test/realapp"
   dependencies:
     "@caffeinejs/di": "workspace:^"
     mongodb: ^4.3.1
