@@ -44,6 +44,7 @@ import { isNil } from './utils/isNil.js'
 import { loadModule } from './utils/loadModule.js'
 import { notNil } from './utils/notNil.js'
 import { RequestScope } from './internal/RequestScope.js'
+import { ValueProvider } from './internal/index.js'
 
 export class DI {
   static MetadataReader = new InternalMetadataReader()
@@ -296,7 +297,6 @@ export class DI {
         child.bindingRegistry.register(token, {
           ...binding,
           cachedInstance: undefined
-          //scopedProvider: binding.scope.scope(token, binding.rawProvider)
         })
       )
 
@@ -338,11 +338,10 @@ export class DI {
       }
     }
 
-    const scope = DI.getScope(scopeId)
-
-    if (!scope) {
-      throw new ScopeNotRegisteredError(scopeId)
-    }
+    const scope =
+      rawProvider instanceof TokenProvider || rawProvider instanceof ValueProvider
+        ? DI.getScope(Lifecycle.TRANSIENT)
+        : DI.getScope(scopeId)
 
     const hasPropertyInjections = binding.injectableProperties.length > 0
     const hasMethodInjections = binding.injectableMethods.length > 0
