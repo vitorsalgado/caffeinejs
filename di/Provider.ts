@@ -1,10 +1,10 @@
-import { Binding } from '../Binding.js'
-import { DI } from '../DI.js'
-import { ResolutionContext } from '../ResolutionContext.js'
-import { Token } from '../Token.js'
-import { ClassProvider } from './ClassProvider.js'
-import { TokenProvider } from './TokenProvider.js'
-import { Ctor } from './types/Ctor.js'
+import { Binding } from './Binding.js'
+import { DI } from './DI.js'
+import { ResolutionContext } from './ResolutionContext.js'
+import { Token } from './Token.js'
+import { ClassProvider } from './internal/ClassProvider.js'
+import { TokenProvider } from './internal/TokenProvider.js'
+import { Ctor } from './internal/types/Ctor.js'
 
 export interface ProviderContext {
   di: DI

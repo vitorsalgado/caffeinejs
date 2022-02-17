@@ -1,11 +1,11 @@
 import { BinderOptions } from './BinderOptions.js'
 import { Binding } from './Binding.js'
 import { DI } from './DI.js'
-import { InvalidBindingError } from './DiError.js'
-import { Identifier } from './Identifier.js'
+import { InvalidBindingError } from './internal/DiError.js'
+import { Identifier } from './internal/types/Identifier.js'
 import { Lifecycle } from './Lifecycle.js'
 import { Token } from './Token.js'
-import { notNil } from './utils/notNil.js'
+import { notNil } from './internal/utils/notNil.js'
 
 export class BindToOptions<T> implements BinderOptions<T> {
   constructor(private readonly di: DI, private readonly token: Token<T>, private readonly binding: Binding<T>) {}

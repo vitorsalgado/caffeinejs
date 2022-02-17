@@ -1,4 +1,4 @@
-import { ProviderContext } from './internal/Provider.js'
+import { ProviderContext } from './Provider.js'
 
 export interface PostProcessor {
   beforeInit(instance: unknown, ctx: ProviderContext): unknown

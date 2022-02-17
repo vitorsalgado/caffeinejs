@@ -1,8 +1,8 @@
-import { PostResolutionInterceptor } from './PostResolutionInterceptor.js'
-import { ProviderContext } from './Provider.js'
-import { Provider } from './Provider.js'
+import { PostResolutionInterceptor } from '../PostResolutionInterceptor.js'
+import { ProviderContext } from '../Provider.js'
+import { Provider } from '../Provider.js'
 
-export class InterceptorChainExecutorProvider<T> implements Provider<T> {
+export class EntrypointProvider<T> implements Provider<T> {
   constructor(private readonly rawProvider: Provider<T>, private readonly interceptors: PostResolutionInterceptor[]) {}
 
   provide(ctx: ProviderContext): T {

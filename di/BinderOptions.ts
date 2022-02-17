@@ -1,4 +1,4 @@
-import { Identifier } from './Identifier.js'
+import { Identifier } from './internal/types/Identifier.js'
 
 export interface BinderOptions<T> {
   as(scopeId: Identifier): BinderOptions<T>

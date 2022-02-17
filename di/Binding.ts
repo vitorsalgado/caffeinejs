@@ -1,7 +1,7 @@
-import { Identifier } from './Identifier.js'
-import { id } from './internal/id.js'
-import { PostResolutionInterceptor } from './internal/PostResolutionInterceptor.js'
-import { Provider } from './internal/Provider.js'
+import { Identifier } from './internal/types/Identifier.js'
+import { newId } from './internal/utils/newId.js'
+import { PostResolutionInterceptor } from './PostResolutionInterceptor.js'
+import { Provider } from './Provider.js'
 import { TokenSpec } from './Token.js'
 import { Conditional } from './decorators/ConditionalOn.js'
 
@@ -29,7 +29,7 @@ export interface Binding<T = any> {
 
 export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
   return {
-    id: initial.id === undefined ? id() : initial.id,
+    id: initial.id === undefined ? newId() : initial.id,
     injections: initial.injections || [],
     injectableProperties: initial.injectableProperties || [],
     injectableMethods: initial.injectableMethods || [],

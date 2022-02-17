@@ -1,7 +1,7 @@
 import { expect } from '@jest/globals'
 import { newBinding } from '../Binding.js'
 import { DI } from '../DI.js'
-import { CircularReferenceError } from '../DiError.js'
+import { CircularReferenceError } from '../internal/DiError.js'
 import { TokenProvider } from '../internal/TokenProvider.js'
 import { Bar } from './_fixtures/circular/Bar.js'
 import { BarFail } from './_fixtures/circular/BarFail.js'

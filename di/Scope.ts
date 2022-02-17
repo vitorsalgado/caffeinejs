@@ -1,6 +1,6 @@
 import { Binding } from './Binding.js'
-import { ProviderContext } from './internal/Provider.js'
-import { Provider } from './internal/Provider.js'
+import { ProviderContext } from './Provider.js'
+import { Provider } from './Provider.js'
 
 export interface Scope {
   get<T>(ctx: ProviderContext, provider: Provider<T>): T

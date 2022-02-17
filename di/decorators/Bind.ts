@@ -1,10 +1,10 @@
 import { Binding } from '../Binding.js'
 import { DI } from '../DI.js'
-import { check } from '../utils/check.js'
-import { getInjectableMethods } from '../utils/getInjectableMethods.js'
-import { getInjectableProperties } from '../utils/getInjectableProperties.js'
-import { getParamTypes } from '../utils/getParamTypes.js'
-import { notNil } from '../utils/notNil.js'
+import { check } from '../internal/utils/check.js'
+import { getInjectableMethods } from '../internal/utils/getInjectableMethods.js'
+import { getInjectableProperties } from '../internal/utils/getInjectableProperties.js'
+import { getParamTypes } from '../internal/utils/getParamTypes.js'
+import { notNil } from '../internal/utils/notNil.js'
 import { configureBean } from './utils/beanUtils.js'
 
 export function Bind<T>(

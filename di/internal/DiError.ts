@@ -1,6 +1,6 @@
-import { Identifier } from './Identifier.js'
-import { tokenStr } from './Token.js'
-import { Token } from './Token.js'
+import { tokenStr } from '../Token.js'
+import { Token } from '../Token.js'
+import { Identifier } from './types/Identifier.js'
 
 export class DiError extends Error {
   static CODE_DEFAULT = 'DI_ERR'

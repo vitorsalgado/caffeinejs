@@ -1,6 +1,6 @@
 import { AbstractCtor } from './internal/types/AbstractCtor.js'
 import { Ctor } from './internal/types/Ctor.js'
-import { DeferredCtor } from './DeferredCtor.js'
+import { DeferredCtor } from './internal/DeferredCtor.js'
 
 export type Token<T = any> = Ctor<T> | DeferredCtor<T> | AbstractCtor<T> | string | symbol | Function
 

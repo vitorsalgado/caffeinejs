@@ -1,5 +1,5 @@
-import { NoResolutionForTokenError } from '../DiError.js'
-import { DiError } from '../DiError.js'
+import { NoResolutionForTokenError } from '../internal/DiError.js'
+import { DiError } from '../internal/DiError.js'
 
 describe('Errors', function () {
   it('should init error with default code when none is provided', function () {

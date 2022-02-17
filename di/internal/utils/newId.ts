@@ -1,5 +1,5 @@
 let count = 0
 
-export function id() {
+export function newId() {
   return count++
 }

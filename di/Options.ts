@@ -1,4 +1,4 @@
-import { Identifier } from './Identifier.js'
+import { Identifier } from './internal/types/Identifier.js'
 import { Lifecycle } from './Lifecycle.js'
 
 export interface Options {

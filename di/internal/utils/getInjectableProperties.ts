@@ -1,5 +1,5 @@
-import { Vars } from '../internal/Vars.js'
-import { TokenSpec } from '../Token.js'
+import { Vars } from '../Vars.js'
+import { TokenSpec } from '../../Token.js'
 
 export function getInjectableProperties<TFunction>(target: TFunction): [string, TokenSpec<unknown>][] {
   const injectionTokens: Record<string, TokenSpec<unknown>> = Reflect.getOwnMetadata(

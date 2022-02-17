@@ -1,6 +1,6 @@
 import { PostProcessor } from '../PostProcessor.js'
-import { PostResolutionInterceptor } from './PostResolutionInterceptor.js'
-import { ProviderContext } from './Provider.js'
+import { PostResolutionInterceptor } from '../PostResolutionInterceptor.js'
+import { ProviderContext } from '../Provider.js'
 
 export class BeforeInitInterceptor<T> implements PostResolutionInterceptor<T> {
   constructor(private readonly postProcessor: PostProcessor) {}

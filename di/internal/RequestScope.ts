@@ -1,10 +1,10 @@
 import { Binding } from '../Binding.js'
 import { Scope } from '../Scope.js'
-import { OutOfScopeError } from '../DiError.js'
-import { IllegalScopeStateError } from '../DiError.js'
 import { tokenStr } from '../Token.js'
-import { Provider } from './Provider.js'
-import { ProviderContext } from './Provider.js'
+import { Provider } from '../Provider.js'
+import { ProviderContext } from '../Provider.js'
+import { IllegalScopeStateError } from './DiError.js'
+import { OutOfScopeError } from './DiError.js'
 
 export class RequestScope implements Scope {
   private readonly instances = new Map<number, unknown>()

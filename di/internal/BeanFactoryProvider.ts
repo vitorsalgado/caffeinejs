@@ -1,8 +1,8 @@
 import { ConfigurationProviderOptions } from '../decorators/ConfigurationProviderOptions.js'
 import { ResolutionContext } from '../ResolutionContext.js'
 import { Resolver } from '../Resolver.js'
-import { ProviderContext } from './Provider.js'
-import { Provider } from './Provider.js'
+import { ProviderContext } from '../Provider.js'
+import { Provider } from '../Provider.js'
 import { Ctor } from './types/Ctor.js'
 
 export class BeanFactoryProvider<T> implements Provider<T> {

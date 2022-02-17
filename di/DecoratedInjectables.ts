@@ -1,4 +1,4 @@
-import { notNil } from './utils/notNil.js'
+import { notNil } from './internal/utils/notNil.js'
 import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { Token } from './Token.js'

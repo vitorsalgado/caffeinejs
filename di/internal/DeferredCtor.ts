@@ -1,4 +1,4 @@
-import { Token } from './Token.js'
+import { Token } from '../Token.js'
 
 export class DeferredCtor<T> {
   private static readonly PROXY_METHODS: ReadonlyArray<keyof ProxyHandler<object>> = [

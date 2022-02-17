@@ -1,5 +1,5 @@
-import { PostResolutionInterceptor } from './PostResolutionInterceptor.js'
-import { ProviderContext } from './Provider.js'
+import { PostResolutionInterceptor } from '../PostResolutionInterceptor.js'
+import { ProviderContext } from '../Provider.js'
 
 export class PostConstructInterceptor<T> implements PostResolutionInterceptor<T> {
   intercept(instance: any, ctx: ProviderContext): T {

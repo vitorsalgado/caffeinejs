@@ -1,12 +1,12 @@
 import { Binding } from '../Binding.js'
 import { DI } from '../DI.js'
-import { InvalidBindingError } from '../DiError.js'
+import { InvalidBindingError } from '../internal/DiError.js'
 import { isNamedToken } from '../Token.js'
 import { Token } from '../Token.js'
-import { getInjectableMethods } from '../utils/getInjectableMethods.js'
-import { getInjectableProperties } from '../utils/getInjectableProperties.js'
-import { getParamTypes } from '../utils/getParamTypes.js'
-import { isNil } from '../utils/isNil.js'
+import { getInjectableMethods } from '../internal/utils/getInjectableMethods.js'
+import { getInjectableProperties } from '../internal/utils/getInjectableProperties.js'
+import { getParamTypes } from '../internal/utils/getParamTypes.js'
+import { isNil } from '../internal/utils/isNil.js'
 import { configureBean } from './utils/beanUtils.js'
 
 export function Injectable<T>(token?: Token) {

@@ -1,6 +1,6 @@
-import { tokenStr } from '../Token.js'
-import { TokenSpec } from '../Token.js'
-import { Token } from '../Token.js'
+import { tokenStr } from '../../Token.js'
+import { TokenSpec } from '../../Token.js'
+import { Token } from '../../Token.js'
 import { isNil } from './isNil.js'
 
 export function fmtParamError(ctor: Token, indexOrProp: number | (string | symbol)): string {

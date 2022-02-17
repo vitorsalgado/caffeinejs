@@ -1,5 +1,5 @@
 import { DI } from '../DI.js'
-import { Identifier } from '../Identifier.js'
+import { Identifier } from '../internal/types/Identifier.js'
 import { Token } from '../Token.js'
 import { configureBean } from './utils/beanUtils.js'
 

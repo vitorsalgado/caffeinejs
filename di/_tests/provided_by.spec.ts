@@ -4,8 +4,8 @@ import { Injectable } from '../decorators/Injectable.js'
 import { ProvidedBy } from '../decorators/ProvidedBy.js'
 import { DI } from '../DI.js'
 import { ClassProvider } from '../internal/ClassProvider.js'
-import { ProviderContext } from '../internal/Provider.js'
-import { Provider } from '../internal/Provider.js'
+import { ProviderContext } from '../Provider.js'
+import { Provider } from '../Provider.js'
 import { Ctor } from '../internal/types/Ctor.js'
 
 describe('Provided By', function () {

@@ -1,5 +1,5 @@
-import { Vars } from '../internal/Vars.js'
-import { TokenSpec } from '../Token.js'
+import { Vars } from '../Vars.js'
+import { TokenSpec } from '../../Token.js'
 
 export function getParamTypes(target: any, propertyKey?: string | symbol): TokenSpec<unknown>[] {
   const paramTypes: unknown[] =

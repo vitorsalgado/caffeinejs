@@ -7,7 +7,7 @@ import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
 import { Primary } from '../decorators/Primary.js'
 import { DI } from '../DI.js'
-import { RepeatedNamesError } from '../DiError.js'
+import { RepeatedNamesError } from '../internal/DiError.js'
 
 describe('Named Dependencies', function () {
   const kAck = Symbol('ok')
