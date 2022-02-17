@@ -13,7 +13,7 @@ describe('Error Fmt', function () {
     const fromFn = fmtParamError(fn, 0)
     const fromClazz = fmtParamError(Dep, 'prop')
 
-    expect(fromFn).toContain('parameter at position 0')
+    expect(fromFn).toContain("parameter at position '0'")
     expect(fromClazz).toContain(`property 'prop'`)
   })
 

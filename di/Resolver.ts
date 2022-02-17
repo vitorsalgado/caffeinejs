@@ -1,13 +1,12 @@
 import { MultiplePrimaryError } from './DiError.js'
-import { isNil } from './utils/isNil.js'
+import { NoUniqueInjectionForTokenError } from './DiError.js'
+import { NoResolutionForTokenError } from './DiError.js'
+import { CircularReferenceError } from './DiError.js'
 import { Ctor } from './internal/types/Ctor.js'
 import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { DeferredCtor } from './DeferredCtor.js'
 import { DI } from './DI.js'
-import { NoUniqueInjectionForTokenError } from './DiError.js'
-import { NoResolutionForTokenError } from './DiError.js'
-import { CircularReferenceError } from './DiError.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { tokenStr } from './Token.js'
@@ -72,14 +71,14 @@ export namespace Resolver {
     indexOrProp: number | string | symbol,
     context: ResolutionContext
   ): T {
-    if (isNil(dep.token) && isNil(dep.tokenType)) {
+    if (dep.token === undefined || dep.token === null) {
       throw new CircularReferenceError(
-        `Cannot resolve ${fmtParamError(target, indexOrProp)} from type ${tokenStr(
+        `Cannot resolve ${fmtParamError(target, indexOrProp)} from type '${tokenStr(
           target
-        )} because the injection token is undefined.\n` +
-          `This could mean that the component ${tokenStr(target)} has a circular reference.\n` +
+        )}' because the injection token is undefined.\n` +
+          `This could mean that the component '${tokenStr(target)}' has a circular reference.\n` +
           'If this was intentional, make sure to decorate your circular constructor/provider parameters with @Defer to correctly resolve ' +
-          'its dependencies'
+          'its dependencies.'
       )
     }
 
@@ -91,8 +90,8 @@ export namespace Resolver {
       resolution = di.get(dep.token, context)
     }
 
-    if (!isNil(resolution)) {
-      return resolution
+    if (resolution !== undefined && resolution !== null) {
+      return resolution as T
     }
 
     if (dep.optional) {

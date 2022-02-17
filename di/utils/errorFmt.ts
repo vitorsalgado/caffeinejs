@@ -5,7 +5,7 @@ import { isNil } from './isNil.js'
 
 export function fmtParamError(ctor: Token, indexOrProp: number | (string | symbol)): string {
   const isNum = typeof indexOrProp === 'number'
-  const msg = isNum ? `parameter at position ${indexOrProp}` : `property '${String(indexOrProp)}'`
+  const msg = isNum ? `parameter at position '${indexOrProp}'` : `property '${String(indexOrProp)}'`
 
   if (typeof ctor !== 'function') {
     return msg
@@ -18,7 +18,7 @@ export function fmtParamError(ctor: Token, indexOrProp: number | (string | symbo
   }
 
   if (isNum) {
-    return `parameter ${params.split(',')[indexOrProp].trim()} at position ${indexOrProp}`
+    return `parameter '${params.split(',')[indexOrProp].trim()}' at position '${indexOrProp}'`
   }
 
   return msg

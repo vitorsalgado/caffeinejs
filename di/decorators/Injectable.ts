@@ -19,6 +19,8 @@ export function Injectable<T>(token?: Token) {
         )
       }
 
+      const i = getParamTypes(target)
+
       DI.configureType<T>(target, {
         injections: getParamTypes(target),
         injectableProperties: getInjectableProperties(target),

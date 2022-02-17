@@ -15,7 +15,8 @@ export function getParamTypes(target: any, propertyKey?: string | symbol): Token
   for (let i = 0; i < params.length; i++) {
     const key = +i
     if (injectionTokens[key]) {
-      params[key] = { ...injectionTokens[key], tokenType: params[key] }
+      const token = injectionTokens[key].token ? injectionTokens[key].token : params[key]
+      params[key] = { ...injectionTokens[key], token, tokenType: params[key] }
     } else {
       params[key] = { token: params[key], tokenType: params[key] }
     }
