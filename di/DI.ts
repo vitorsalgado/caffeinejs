@@ -493,17 +493,13 @@ export class DI {
     const scope = DI.Scopes.get(binding.scopeId) as Scope
     const instance: any = scope.cachedInstance(binding)
 
-    await this.destroyInstance(instance, binding).finally(() => scope.remove(binding))
-
-    scope.remove(binding)
-  }
-
-  static destroyInstance(instance: any, binding: Binding): Promise<void> {
     const r = instance?.[binding.preDestroy as Identifier]()
 
     if (r && 'then' in r && typeof r.then === 'function') {
-      return r
+      return r.finally(() => scope.remove(binding))
     }
+
+    scope.remove(binding)
 
     return Promise.resolve()
   }
