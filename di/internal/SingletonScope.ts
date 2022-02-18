@@ -1,10 +1,10 @@
 import { Binding } from '../Binding.js'
 import { Scope } from '../Scope.js'
-import { ProviderContext } from '../Provider.js'
 import { Provider } from '../Provider.js'
+import { ResolutionContext } from './ResolutionContext.js'
 
 export class SingletonScope implements Scope {
-  get<T>(ctx: ProviderContext, unscoped: Provider<T>): T {
+  get<T>(ctx: ResolutionContext, unscoped: Provider<T>): T {
     if (ctx.binding.cachedInstance) {
       return ctx.binding.cachedInstance
     }

@@ -5,9 +5,9 @@ import { Lifecycle } from '../Lifecycle.js'
 import { ContextResolutions } from '../ContextResolutions.js'
 import { ScopedAs } from '../decorators/ScopedAs.js'
 
-describe('Context Scoped', function () {
+describe('Context Resolution Scoped', function () {
   @Injectable()
-  @ScopedAs(Lifecycle.RESOLUTION_CONTEXT)
+  @ScopedAs(Lifecycle.CONTEXT_RESOLUTION)
   class ResScopedDep {
     readonly id: string
 

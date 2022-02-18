@@ -1,10 +1,10 @@
 import { Binding } from '../Binding.js'
 import { tokenStr } from '../Token.js'
 import { Provider } from '../Provider.js'
-import { ProviderContext } from '../Provider.js'
 import { IllegalScopeStateError } from './DiError.js'
 import { OutOfScopeError } from './DiError.js'
 import { DestructionAwareScope } from './DestructionAwareScope.js'
+import { ResolutionContext } from './ResolutionContext.js'
 
 export class RequestScope extends DestructionAwareScope {
   private readonly instances = new Map<number, unknown>()
@@ -49,7 +49,7 @@ export class RequestScope extends DestructionAwareScope {
     return this.instances.get(binding.id) as T | undefined
   }
 
-  get<T>(ctx: ProviderContext, provider: Provider<T>): T {
+  get<T>(ctx: ResolutionContext, provider: Provider<T>): T {
     if (!this.entered) {
       throw new OutOfScopeError(`Cannot access the key '${tokenStr(ctx.token)}' outside of a request scoping block.`)
     }

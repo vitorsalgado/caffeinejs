@@ -8,7 +8,6 @@ import { Identifier } from './internal/types/Identifier.js'
 import { ClassProvider } from './internal/ClassProvider.js'
 import { FactoryProvider } from './internal/FactoryProvider.js'
 import { Provider } from './Provider.js'
-import { ProviderContext } from './Provider.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { Ctor } from './internal/types/Ctor.js'
 import { ValueProvider } from './internal/ValueProvider.js'
@@ -17,6 +16,7 @@ import { isNamedToken } from './Token.js'
 import { Token } from './Token.js'
 import { check } from './internal/utils/check.js'
 import { notNil } from './internal/utils/notNil.js'
+import { ResolutionContext } from './internal/index.js'
 
 export class BindTo<T> implements Binder<T> {
   constructor(private readonly di: DI, private readonly token: Token<T>, private readonly binding: Binding<T>) {}
@@ -56,7 +56,7 @@ export class BindTo<T> implements Binder<T> {
     return new BindToOptions<T>(this.di, this.token, this.binding)
   }
 
-  toFactory(factory: (ctx: ProviderContext) => T): BinderOptions<T> {
+  toFactory(factory: (ctx: ResolutionContext) => T): BinderOptions<T> {
     check(
       typeof factory === 'function',
       `Binding .toFactory() parameter must be function type. Received: ${typeof factory}`

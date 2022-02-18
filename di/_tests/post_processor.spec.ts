@@ -7,9 +7,9 @@ import { Injectable } from '../decorators/Injectable.js'
 import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
 import { Provider } from '../Provider.js'
-import { ProviderContext } from '../Provider.js'
 import { PostProcessor } from '../PostProcessor.js'
 import { Scope } from '../Scope.js'
+import { ResolutionContext } from '../internal/index.js'
 
 describe('Post Processors', function () {
   const ppSpy = jest.fn()
@@ -17,7 +17,7 @@ describe('Post Processors', function () {
   const kScope = Symbol('custom_transient')
 
   class CustomTransient implements Scope {
-    get<T>(ctx: ProviderContext, provider: Provider<T>): T {
+    get<T>(ctx: ResolutionContext, provider: Provider<T>): T {
       sSpy()
       return provider.provide(ctx)
     }
@@ -51,7 +51,7 @@ describe('Post Processors', function () {
   }
 
   class PpOne implements PostProcessor {
-    afterInit(instance: unknown, ctx: ProviderContext): unknown {
+    afterInit(instance: unknown, ctx: ResolutionContext): unknown {
       ppSpy()
 
       if (instance instanceof Dep) {
@@ -61,19 +61,19 @@ describe('Post Processors', function () {
       return instance
     }
 
-    beforeInit(instance: unknown, ctx: ProviderContext): unknown {
+    beforeInit(instance: unknown, ctx: ResolutionContext): unknown {
       ppSpy()
       return instance
     }
   }
 
   class PpTwo implements PostProcessor {
-    afterInit(instance: unknown, ctx: ProviderContext): unknown {
+    afterInit(instance: unknown, ctx: ResolutionContext): unknown {
       ppSpy()
       return instance
     }
 
-    beforeInit(instance: unknown, ctx: ProviderContext): unknown {
+    beforeInit(instance: unknown, ctx: ResolutionContext): unknown {
       ppSpy()
       return instance
     }

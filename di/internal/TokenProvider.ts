@@ -1,11 +1,11 @@
 import { Token } from '../Token.js'
-import { ProviderContext } from '../Provider.js'
 import { Provider } from '../Provider.js'
+import { ResolutionContext } from './ResolutionContext.js'
 
 export class TokenProvider<T> implements Provider<T> {
   constructor(private readonly token: Token<T>) {}
 
-  provide(ctx: ProviderContext): T {
+  provide(ctx: ResolutionContext): T {
     return ctx.di.get(this.token, ctx.resolutionContext)
   }
 }

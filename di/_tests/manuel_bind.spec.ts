@@ -9,9 +9,9 @@ import { PreDestroy } from '../decorators/PreDestroy.js'
 import { DI } from '../DI.js'
 import { MultiplePrimaryError } from '../internal/DiError.js'
 import { InvalidBindingError } from '../internal/DiError.js'
-import { ProviderContext } from '../Provider.js'
 import { Provider } from '../Provider.js'
 import { ContextResolutions } from '../ContextResolutions.js'
+import { ResolutionContext } from '../internal/index.js'
 
 describe('Manual Binding', function () {
   describe('general bindings', function () {
@@ -272,7 +272,7 @@ describe('Manual Binding', function () {
       }
 
       class TestProvider implements Provider<Dep> {
-        provide(ctx: ProviderContext): Dep {
+        provide(ctx: ResolutionContext): Dep {
           const instance = new Dep()
 
           instance.value = 'test'

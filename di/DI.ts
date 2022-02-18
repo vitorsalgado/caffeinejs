@@ -22,7 +22,7 @@ import { PostConstructInterceptor } from './internal/PostConstructInterceptor.js
 import { PostResolutionInterceptor } from './PostResolutionInterceptor.js'
 import { PropertiesInjectorInterceptor } from './internal/PropertiesInjectorInterceptor.js'
 import { providerFromToken } from './Provider.js'
-import { ResolutionContextScope } from './internal/ResolutionContextScope.js'
+import { ContextResolutionScope } from './internal/ContextResolutionScope.js'
 import { ScopedProvider } from './internal/ScopedProvider.js'
 import { SingletonScope } from './internal/SingletonScope.js'
 import { TokenProvider } from './internal/TokenProvider.js'
@@ -565,7 +565,7 @@ export class DI {
     return new Map<Identifier, Scope>()
       .set(Lifecycle.SINGLETON, new SingletonScope())
       .set(Lifecycle.CONTAINER, new ContainerScope())
-      .set(Lifecycle.RESOLUTION_CONTEXT, new ResolutionContextScope())
+      .set(Lifecycle.CONTEXT_RESOLUTION, new ContextResolutionScope())
       .set(Lifecycle.TRANSIENT, new TransientScope())
       .set(Lifecycle.REQUEST, new RequestScope())
       .set(Lifecycle.REFRESH, new RefreshScope())

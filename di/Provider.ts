@@ -1,20 +1,11 @@
-import { Binding } from './Binding.js'
-import { DI } from './DI.js'
-import { ContextResolutions } from './ContextResolutions.js'
 import { Token } from './Token.js'
 import { ClassProvider } from './internal/ClassProvider.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { Ctor } from './internal/types/Ctor.js'
-
-export interface ProviderContext {
-  di: DI
-  token: Token
-  binding: Binding
-  resolutionContext: ContextResolutions
-}
+import { ResolutionContext } from './internal/index.js'
 
 export interface Provider<T = any> {
-  provide(ctx: ProviderContext): T
+  provide(ctx: ResolutionContext): T
 }
 
 export function providerFromToken<T>(token: Token<T>, provider?: Provider<T>): Provider<T> {

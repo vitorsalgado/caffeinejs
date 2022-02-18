@@ -1,9 +1,9 @@
 import { Binding } from './Binding.js'
-import { ProviderContext } from './Provider.js'
 import { Provider } from './Provider.js'
+import { ResolutionContext } from './internal/index.js'
 
 export interface Scope {
-  get<T>(ctx: ProviderContext, provider: Provider<T>): T
+  get<T>(ctx: ResolutionContext, provider: Provider<T>): T
 
   cachedInstance<T>(binding: Binding): T | undefined
 

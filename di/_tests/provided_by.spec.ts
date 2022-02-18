@@ -4,9 +4,9 @@ import { Injectable } from '../decorators/Injectable.js'
 import { ProvidedBy } from '../decorators/ProvidedBy.js'
 import { DI } from '../DI.js'
 import { ClassProvider } from '../internal/ClassProvider.js'
-import { ProviderContext } from '../Provider.js'
 import { Provider } from '../Provider.js'
 import { Ctor } from '../internal/types/Ctor.js'
+import { ResolutionContext } from '../internal/index.js'
 
 describe('Provided By', function () {
   const spy = jest.fn()
@@ -18,7 +18,7 @@ describe('Provided By', function () {
       this.clazzProvider = new ClassProvider<T>(clazz)
     }
 
-    provide(ctx: ProviderContext): T {
+    provide(ctx: ResolutionContext): T {
       const instance = this.clazzProvider.provide(ctx)
 
       if ('Log' in instance.constructor) {

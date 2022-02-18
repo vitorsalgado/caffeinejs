@@ -9,10 +9,10 @@ import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
 import { ScopeAlreadyRegisteredError } from '../internal/DiError.js'
 import { ScopeNotRegisteredError } from '../internal/DiError.js'
-import { ProviderContext } from '../Provider.js'
 import { Provider } from '../Provider.js'
 import { Lifecycle } from '../Lifecycle.js'
 import { Scope } from '../Scope.js'
+import { ResolutionContext } from '../internal/index.js'
 
 describe('Scoping', function () {
   const kCustomScopeId = Symbol('custom')
@@ -21,7 +21,7 @@ describe('Scoping', function () {
   class CustomScope implements Scope {
     readonly id: string = v4()
 
-    get<T>(ctx: ProviderContext, provider: Provider<T>): T {
+    get<T>(ctx: ResolutionContext, provider: Provider<T>): T {
       spy()
       return provider.provide(ctx)
     }
@@ -87,7 +87,7 @@ describe('Scoping', function () {
       DI.bindScope(
         Lifecycle.SINGLETON,
         new (class implements Scope {
-          get<T>(ctx: ProviderContext, provider: Provider<T>): T {
+          get<T>(ctx: ResolutionContext, provider: Provider<T>): T {
             return provider.provide(ctx)
           }
 

@@ -1,10 +1,10 @@
 import { Binding } from '../Binding.js'
 import { Scope } from '../Scope.js'
-import { ProviderContext } from '../Provider.js'
 import { Provider } from '../Provider.js'
+import { ResolutionContext } from './ResolutionContext.js'
 
-export class ResolutionContextScope implements Scope {
-  get<T>(ctx: ProviderContext, unscoped: Provider<T>): T {
+export class ContextResolutionScope implements Scope {
+  get<T>(ctx: ResolutionContext, unscoped: Provider<T>): T {
     if (ctx.resolutionContext.resolutions.has(ctx.binding)) {
       return ctx.resolutionContext.resolutions.get(ctx.binding)
     }

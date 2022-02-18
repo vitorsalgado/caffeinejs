@@ -1,12 +1,12 @@
 import { Binding } from '../Binding.js'
-import { ProviderContext } from '../Provider.js'
 import { Provider } from '../Provider.js'
 import { DestructionAwareScope } from './DestructionAwareScope.js'
+import { ResolutionContext } from './ResolutionContext.js'
 
 export class RefreshScope extends DestructionAwareScope {
   private readonly instances = new Map<number, unknown>()
 
-  get<T>(ctx: ProviderContext, unscoped: Provider<T>): T {
+  get<T>(ctx: ResolutionContext, unscoped: Provider<T>): T {
     if (this.instances.has(ctx.binding.id)) {
       return this.instances.get(ctx.binding.id) as T
     }

@@ -1,8 +1,8 @@
 import { BinderOptions } from './BinderOptions.js'
 import { Identifier } from './internal/types/Identifier.js'
 import { Provider } from './Provider.js'
-import { ProviderContext } from './Provider.js'
 import { Ctor } from './internal/types/Ctor.js'
+import { ResolutionContext } from './internal/index.js'
 
 export interface Binder<T> {
   to(ctor: Ctor<T>): BinderOptions<T>
@@ -13,7 +13,7 @@ export interface Binder<T> {
 
   toToken(token: Identifier): BinderOptions<T>
 
-  toFactory(factory: (ctx: ProviderContext) => T): BinderOptions<T>
+  toFactory(factory: (ctx: ResolutionContext) => T): BinderOptions<T>
 
   toProvider(provider: Provider<T>): BinderOptions<T>
 }
