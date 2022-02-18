@@ -3,15 +3,15 @@ import { Scope } from '../Scope.js'
 import { Provider } from '../Provider.js'
 import { ResolutionContext } from './ResolutionContext.js'
 
-export class ContextResolutionScope implements Scope {
+export class LocalResolutionScope implements Scope {
   get<T>(ctx: ResolutionContext, unscoped: Provider<T>): T {
-    if (ctx.resolutionContext.resolutions.has(ctx.binding)) {
-      return ctx.resolutionContext.resolutions.get(ctx.binding)
+    if (ctx.localResolutions.resolutions.has(ctx.binding)) {
+      return ctx.localResolutions.resolutions.get(ctx.binding)
     }
 
     const resolved = unscoped.provide(ctx)
 
-    ctx.resolutionContext.resolutions.set(ctx.binding, resolved)
+    ctx.localResolutions.resolutions.set(ctx.binding, resolved)
 
     return resolved
   }

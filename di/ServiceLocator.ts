@@ -1,9 +1,9 @@
 import { DI } from './DI.js'
-import { ContextResolutions } from './ContextResolutions.js'
+import { LocalResolutions } from './LocalResolutions.js'
 import { Token } from './Token.js'
 
 export interface LocatorOptions {
-  resolutionContext: ContextResolutions
+  resolutionContext: LocalResolutions
 }
 
 export abstract class ServiceLocator {

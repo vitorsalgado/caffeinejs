@@ -9,7 +9,7 @@ export class MethodInjectorInterceptor<T> implements PostResolutionInterceptor<T
     }
 
     for (const [method, spec] of ctx.binding.injectableMethods) {
-      const deps = spec.map((dep, index) => Resolver.resolveParam(ctx.di, ctx.token, dep, index, ctx.resolutionContext))
+      const deps = spec.map((dep, index) => Resolver.resolveParam(ctx.di, ctx.token, dep, index, ctx.localResolutions))
 
       instance[method](...deps)
     }

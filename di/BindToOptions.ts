@@ -72,7 +72,7 @@ export class BindToOptions<T> implements BinderOptions<T> {
   }
 
   resolutionContextScoped(): BinderOptions<T> {
-    this.binding.scopeId = Lifecycle.CONTEXT_RESOLUTION
+    this.binding.scopeId = Lifecycle.LOCAL_RESOLUTION
     this.di.configureBinding(this.token, this.binding)
 
     return this

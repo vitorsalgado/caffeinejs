@@ -22,7 +22,7 @@ import { PostConstructInterceptor } from './internal/PostConstructInterceptor.js
 import { PostResolutionInterceptor } from './PostResolutionInterceptor.js'
 import { PropertiesInjectorInterceptor } from './internal/PropertiesInjectorInterceptor.js'
 import { providerFromToken } from './Provider.js'
-import { ContextResolutionScope } from './internal/ContextResolutionScope.js'
+import { LocalResolutionScope } from './internal/LocalResolutionScope.js'
 import { ScopedProvider } from './internal/ScopedProvider.js'
 import { SingletonScope } from './internal/SingletonScope.js'
 import { TokenProvider } from './internal/TokenProvider.js'
@@ -32,7 +32,7 @@ import { Lifecycle } from './Lifecycle.js'
 import { InitialOptions } from './Options.js'
 import { Options } from './Options.js'
 import { PostProcessor } from './PostProcessor.js'
-import { ContextResolutions } from './ContextResolutions.js'
+import { LocalResolutions } from './LocalResolutions.js'
 import { Resolver } from './Resolver.js'
 import { Scope } from './Scope.js'
 import { DefaultServiceLocator } from './ServiceLocator.js'
@@ -45,6 +45,7 @@ import { loadModule } from './internal/utils/loadModule.js'
 import { notNil } from './internal/utils/notNil.js'
 import { RequestScope } from './internal/RequestScope.js'
 import { ValueProvider } from './internal/index.js'
+import { ResolutionContext } from './internal/index.js'
 import { RefreshScope } from './internal/RefreshScope.js'
 
 export class DI {
@@ -177,7 +178,7 @@ export class DI {
     if (rawProvider instanceof TokenProvider) {
       const path = [token]
       let tokenProvider: TokenProvider<any> | null = rawProvider
-      const ctx = { di: this, token, binding, resolutionContext: ContextResolutions.INSTANCE }
+      const ctx: ResolutionContext = { di: this, token, binding, localResolutions: LocalResolutions.INSTANCE }
 
       while (tokenProvider !== null) {
         const currentToken: Token = tokenProvider.provide(ctx)
@@ -214,11 +215,11 @@ export class DI {
 
         if (descriptor && typeof descriptor.get === 'function') {
           Object.defineProperty(token.prototype, propertyKey, {
-            get: () => Resolver.resolveParam(this, token, spec, propertyKey, ContextResolutions.INSTANCE)
+            get: () => Resolver.resolveParam(this, token, spec, propertyKey, LocalResolutions.INSTANCE)
           })
         } else {
           token.prototype[propertyKey] = () =>
-            Resolver.resolveParam(this, token, spec, propertyKey, ContextResolutions.INSTANCE)
+            Resolver.resolveParam(this, token, spec, propertyKey, LocalResolutions.INSTANCE)
         }
       }
     }
@@ -268,7 +269,7 @@ export class DI {
     this.mapNamed(binding)
   }
 
-  get<T>(token: Token<T>, context: ContextResolutions = ContextResolutions.INSTANCE): T {
+  get<T>(token: Token<T>, context: LocalResolutions = LocalResolutions.INSTANCE): T {
     const bindings = this.getBindings<T>(token)
 
     if (bindings.length > 1) {
@@ -284,7 +285,7 @@ export class DI {
     return Resolver.resolve<T>(this, token, bindings[0], context)
   }
 
-  getRequired<T>(token: Token<T>, context: ContextResolutions = ContextResolutions.INSTANCE): T {
+  getRequired<T>(token: Token<T>, context: LocalResolutions = LocalResolutions.INSTANCE): T {
     const result = this.get(token, context)
 
     if (isNil(result)) {
@@ -294,7 +295,7 @@ export class DI {
     return result
   }
 
-  getMany<T>(token: Token<T>, context: ContextResolutions = ContextResolutions.INSTANCE): T[] {
+  getMany<T>(token: Token<T>, context: LocalResolutions = LocalResolutions.INSTANCE): T[] {
     const bindings = this.getBindings(token)
 
     if (bindings.length === 0) {
@@ -480,7 +481,7 @@ export class DI {
         continue
       }
 
-      Resolver.resolve(this, token, binding, ContextResolutions.INSTANCE)
+      Resolver.resolve(this, token, binding, LocalResolutions.INSTANCE)
     }
   }
 
@@ -565,7 +566,7 @@ export class DI {
     return new Map<Identifier, Scope>()
       .set(Lifecycle.SINGLETON, new SingletonScope())
       .set(Lifecycle.CONTAINER, new ContainerScope())
-      .set(Lifecycle.CONTEXT_RESOLUTION, new ContextResolutionScope())
+      .set(Lifecycle.LOCAL_RESOLUTION, new LocalResolutionScope())
       .set(Lifecycle.TRANSIENT, new TransientScope())
       .set(Lifecycle.REQUEST, new RequestScope())
       .set(Lifecycle.REFRESH, new RefreshScope())

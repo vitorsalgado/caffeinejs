@@ -10,7 +10,7 @@ import { DI } from '../DI.js'
 import { MultiplePrimaryError } from '../internal/DiError.js'
 import { InvalidBindingError } from '../internal/DiError.js'
 import { Provider } from '../Provider.js'
-import { ContextResolutions } from '../ContextResolutions.js'
+import { LocalResolutions } from '../LocalResolutions.js'
 import { ResolutionContext } from '../internal/index.js'
 
 describe('Manual Binding', function () {
@@ -336,7 +336,7 @@ describe('Manual Binding', function () {
       describe('when calling .resolutionContextScoped()', function () {
         it('should bind component as resolution context scoped', function () {
           const di = DI.setup()
-          const ctx = new ContextResolutions()
+          const ctx = new LocalResolutions()
 
           di.bind(CtxDep).toSelf().resolutionContextScoped()
 

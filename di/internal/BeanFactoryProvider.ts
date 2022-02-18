@@ -1,5 +1,5 @@
 import { ConfigurationProviderOptions } from '../decorators/ConfigurationProviderOptions.js'
-import { ContextResolutions } from '../ContextResolutions.js'
+import { LocalResolutions } from '../LocalResolutions.js'
 import { Resolver } from '../Resolver.js'
 import { Provider } from '../Provider.js'
 import { Ctor } from './types/Ctor.js'
@@ -13,15 +13,9 @@ export class BeanFactoryProvider<T> implements Provider<T> {
   ) {}
 
   provide(ctx: ResolutionContext): T {
-    const clazz = ctx.di.get<{ [key: symbol | string]: (...args: unknown[]) => T }>(this.target, ctx.resolutionContext)
+    const clazz = ctx.di.get<{ [key: symbol | string]: (...args: unknown[]) => T }>(this.target, ctx.localResolutions)
     const deps = this.options.dependencies.map((dep, index) =>
-      Resolver.resolveParam(
-        ctx.di,
-        this.options.token,
-        dep,
-        index,
-        ctx.resolutionContext || ContextResolutions.INSTANCE
-      )
+      Resolver.resolveParam(ctx.di, this.options.token, dep, index, ctx.localResolutions || LocalResolutions.INSTANCE)
     )
 
     return clazz[this.method](...deps)

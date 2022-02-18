@@ -2,12 +2,12 @@ import { v4 } from 'uuid'
 import { DI } from '../DI.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Lifecycle } from '../Lifecycle.js'
-import { ContextResolutions } from '../ContextResolutions.js'
+import { LocalResolutions } from '../LocalResolutions.js'
 import { ScopedAs } from '../decorators/ScopedAs.js'
 
 describe('Context Resolution Scoped', function () {
   @Injectable()
-  @ScopedAs(Lifecycle.CONTEXT_RESOLUTION)
+  @ScopedAs(Lifecycle.LOCAL_RESOLUTION)
   class ResScopedDep {
     readonly id: string
 
@@ -27,7 +27,7 @@ describe('Context Resolution Scoped', function () {
   }
 
   it('should return instance stored in the resolution context when one is provided', function () {
-    const context = new ContextResolutions()
+    const context = new LocalResolutions()
     const di = DI.setup()
     const result1 = di.get(ResScopedRoot, context)
     const result2 = di.get(ResScopedRoot, context)
