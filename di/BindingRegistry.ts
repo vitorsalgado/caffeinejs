@@ -13,6 +13,7 @@ export class BindingRegistry {
   register<T>(token: Token<T>, binding: Binding<T>): void {
     notNil(token)
     notNil(binding)
+    notNil(binding.id)
 
     const entry = this.getEntry(token)
 
