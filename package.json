@@ -20,6 +20,7 @@
     "postpublish": "pinst --enable"
   },
   "workspaces": [
+    "application",
     "core",
     "di",
     "examples/*",

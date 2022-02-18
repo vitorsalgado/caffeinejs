@@ -1,0 +1,20 @@
+{
+  "name": "@caffeinejs/application",
+  "version": "0.0.0",
+  "description": "CaffeineJs Application",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "rm -rf dist && tsc --build --force tsconfig.build.json",
+    "test": "jest --detectOpenHandles",
+    "test:coverage": "jest --detectOpenHandles --coverage"
+  },
+  "files": [
+    "dist",
+    "package.json"
+  ],
+  "devDependencies": {
+    "@caffeinejs/internal-perf": "^0.0.0"
+  }
+}

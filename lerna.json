@@ -3,6 +3,7 @@
   "npmClient": "yarn",
   "useWorkspaces": true,
   "packages": [
+    "application",
     "core",
     "di",
     "examples/*",

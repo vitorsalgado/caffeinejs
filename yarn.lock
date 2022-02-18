@@ -441,6 +441,14 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@caffeinejs/application@workspace:application":
+  version: 0.0.0-use.local
+  resolution: "@caffeinejs/application@workspace:application"
+  dependencies:
+    "@caffeinejs/internal-perf": ^0.0.0
+  languageName: unknown
+  linkType: soft
+
 "@caffeinejs/core@0.0.0, @caffeinejs/core@workspace:core":
   version: 0.0.0-use.local
   resolution: "@caffeinejs/core@workspace:core"
