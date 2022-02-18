@@ -151,7 +151,7 @@ describe('Manual Binding', function () {
 
         expect(di.has(Late)).toBeTruthy()
 
-        await di.unbind(Late)
+        await di.unbindAsync(Late)
 
         expect(di.has(Late)).toBeFalsy()
       })
@@ -164,7 +164,7 @@ describe('Manual Binding', function () {
 
         const has = child.has(Late, true)
 
-        await child.unbind(Late)
+        await child.unbindAsync(Late)
 
         expect(has).toBeTruthy()
         expect(child.has(Late, true)).toBeFalsy()
@@ -177,19 +177,19 @@ describe('Manual Binding', function () {
         di.bind(LateDestroyable).toSelf()
         di.get(LateDestroyable)
 
-        await di.unbind(LateDestroyable)
+        await di.unbindAsync(LateDestroyable)
 
         expect(di.has(LateDestroyable)).toBeFalsy()
         expect(destroySpy).toHaveBeenCalledTimes(1)
       })
 
-      it('should call pre destroy only if requested', async function () {
+      it('should call pre destroy only if requested', function () {
         const di = DI.setup()
 
         di.bind(LateDestroyable).toSelf()
         di.get(LateDestroyable)
 
-        await di.unbind(LateDestroyable, false)
+        di.unbind(LateDestroyable)
 
         expect(di.has(LateDestroyable)).toBeFalsy()
         expect(destroySpy).toHaveBeenCalledTimes(0)
@@ -204,7 +204,22 @@ describe('Manual Binding', function () {
 
         const dep1 = di.get(Late)
 
-        const bindTo = await di.rebind(Late)
+        const bindTo = await di.rebindAsync(Late)
+        bindTo.toFactory(() => new Late())
+
+        const dep2 = di.get(Late)
+
+        expect(dep1).not.toEqual(dep2)
+      })
+
+      it('should rebinding component with a different configuration sync', function () {
+        const di = DI.setup()
+
+        di.bind(Late).toSelf()
+
+        const dep1 = di.get(Late)
+
+        const bindTo = di.rebind(Late)
         bindTo.toFactory(() => new Late())
 
         const dep2 = di.get(Late)

@@ -353,13 +353,25 @@ export class DI {
     return new BindTo<T>(this, token, { ...binding })
   }
 
-  unbind<T>(token: Token<T>, destroy = true): Promise<void> {
+  unbind<T>(token: Token<T>): void {
+    notNil(token)
+
+    if (this.has(token)) {
+      return this.unref(token)
+    }
+
+    if (this.parent) {
+      this.parent.unbind(token)
+    }
+  }
+
+  unbindAsync<T>(token: Token<T>): Promise<void> {
     notNil(token)
 
     if (this.has(token)) {
       const binding = this.bindingRegistry.get(token)
 
-      if (binding?.cachedInstance && binding?.preDestroy && destroy) {
+      if (binding?.cachedInstance && binding?.preDestroy) {
         return DI.preDestroyBinding(binding).finally(() => this.unref(token))
       }
 
@@ -367,14 +379,19 @@ export class DI {
     }
 
     if (this.parent) {
-      return this.parent.unbind(token)
+      return this.parent.unbindAsync(token)
     }
 
     return Promise.resolve()
   }
 
-  rebind<T>(token: Token<T>, destroy = true): Promise<Binder<T>> {
-    return this.unbind(token, destroy).then(() => this.bind(token))
+  rebind<T>(token: Token<T>): Binder<T> {
+    this.unbind(token)
+    return this.bind(token)
+  }
+
+  rebindAsync<T>(token: Token<T>): Promise<Binder<T>> {
+    return this.unbindAsync(token).then(() => this.bind(token))
   }
 
   newChild(): DI {
