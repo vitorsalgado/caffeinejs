@@ -1,5 +1,5 @@
-import { Vars } from '../../internal/Vars.js'
-import { ConfigurationProviderOptions } from '../ConfigurationProviderOptions.js'
+import { Vars } from '../Vars.js'
+import { ConfigurationProviderOptions } from '../../decorators/ConfigurationProviderOptions.js'
 
 export function configureBean(
   target: Function,

@@ -1,5 +1,5 @@
 import { DI } from '../DI.js'
-import { configureBean } from './utils/beanUtils.js'
+import { configureBean } from '../internal/utils/beanUtils.js'
 
 export function Lazy<T>(lazy = true) {
   return function <TFunction extends Function>(target: TFunction | object, propertyKey?: string | symbol) {

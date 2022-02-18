@@ -1,6 +1,6 @@
 import { DecoratedInjectables } from '../DecoratedInjectables.js'
 import { DI } from '../DI.js'
-import { configureBean, getBeanConfiguration } from './utils/beanUtils.js'
+import { configureBean, getBeanConfiguration } from '../internal/utils/beanUtils.js'
 
 export interface ConditionContext {
   di: DI

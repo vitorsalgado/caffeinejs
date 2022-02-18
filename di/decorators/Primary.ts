@@ -1,5 +1,5 @@
 import { DI } from '../DI.js'
-import { configureBean } from './utils/beanUtils.js'
+import { configureBean } from '../internal/utils/beanUtils.js'
 
 export function Primary() {
   return function (target: Function | object, propertyKey?: string | symbol) {

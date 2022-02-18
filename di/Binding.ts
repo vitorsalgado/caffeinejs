@@ -10,6 +10,7 @@ export interface Binding<T = any> {
   injections: TokenSpec<unknown>[]
   injectableProperties: [Identifier, TokenSpec<unknown>][]
   injectableMethods: [Identifier, TokenSpec<unknown>[]][]
+  lookupProperties: [Identifier, TokenSpec<unknown>][]
   interceptors: PostResolutionInterceptor[]
   namespace: Identifier
   scopeId: Identifier
@@ -33,6 +34,7 @@ export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
     injections: initial.injections || [],
     injectableProperties: initial.injectableProperties || [],
     injectableMethods: initial.injectableMethods || [],
+    lookupProperties: initial.lookupProperties || [],
     interceptors: initial.interceptors || [],
     namespace: initial.namespace || '',
     names: initial.names || [],

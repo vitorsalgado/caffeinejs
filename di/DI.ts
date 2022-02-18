@@ -164,6 +164,109 @@ export class DI {
     DI.MetadataReader = other
   }
 
+  configureBinding<T>(token: Token<T>, binding: Binding<T>): void {
+    notNil(token)
+    notNil(binding)
+
+    const scopeId = binding.scopeId ? binding.scopeId : this.scopeId
+    const rawProvider = providerFromToken(token, binding.rawProvider)
+
+    notNil(rawProvider, `Could not determine a provider for token: ${tokenStr(token)}`)
+
+    if (rawProvider instanceof TokenProvider) {
+      const path = [token]
+      let tokenProvider: TokenProvider<any> | null = rawProvider
+      const ctx = { di: this, token, binding, resolutionContext: ResolutionContext.INSTANCE }
+
+      while (tokenProvider !== null) {
+        const currentToken: Token = tokenProvider.provide(ctx)
+
+        if (path.includes(currentToken)) {
+          throw new CircularReferenceError(`Token registration cycle detected! ${[...path, currentToken].join(' -> ')}`)
+        }
+
+        path.push(currentToken)
+
+        const binding: Binding | undefined = this.bindingRegistry.get(currentToken)
+
+        if (binding && binding.rawProvider instanceof TokenProvider) {
+          tokenProvider = binding.rawProvider
+        } else {
+          tokenProvider = null
+        }
+      }
+    }
+
+    const scope =
+      rawProvider instanceof TokenProvider || rawProvider instanceof ValueProvider
+        ? DI.getScope(Lifecycle.TRANSIENT)
+        : DI.getScope(scopeId)
+
+    const hasPropertyInjections = binding.injectableProperties.length > 0
+    const hasMethodInjections = binding.injectableMethods.length > 0
+    const hasLookups = binding.lookupProperties.length > 0
+    const chain: PostResolutionInterceptor<T>[] = []
+
+    if (hasLookups && typeof token === 'function') {
+      for (const [propertyKey, spec] of binding.lookupProperties) {
+        const descriptor = Object.getOwnPropertyDescriptor(token.prototype, propertyKey)
+
+        if (descriptor && typeof descriptor.get === 'function') {
+          Object.defineProperty(token.prototype, propertyKey, {
+            get: () => Resolver.resolveParam(this, token, spec, propertyKey, ResolutionContext.INSTANCE)
+          })
+        } else {
+          token.prototype[propertyKey] = () =>
+            Resolver.resolveParam(this, token, spec, propertyKey, ResolutionContext.INSTANCE)
+        }
+      }
+    }
+
+    if (hasPropertyInjections) {
+      chain.push(new PropertiesInjectorInterceptor())
+    }
+
+    if (hasMethodInjections) {
+      chain.push(new MethodInjectorInterceptor())
+    }
+
+    for (const interceptor of binding.interceptors) {
+      chain.push(interceptor)
+    }
+
+    for (const postProcessor of DI.PostProcessors) {
+      chain.push(new BeforeInitInterceptor(postProcessor))
+    }
+
+    if (binding.postConstruct) {
+      chain.push(new PostConstructInterceptor())
+    }
+
+    for (const postProcessor of DI.PostProcessors) {
+      chain.push(new AfterInitInterceptor(postProcessor))
+    }
+
+    if (scope.registerDestructionCallback) {
+      if (binding.preDestroy) {
+        scope.registerDestructionCallback(() => scope.cachedInstance<any>(binding)?.[binding.preDestroy!]())
+      }
+    }
+
+    binding.scopeId = scopeId
+    binding.rawProvider = rawProvider
+    binding.scopedProvider = new ScopedProvider(scope, new EntrypointProvider(rawProvider, chain))
+    binding.late = binding.late === undefined ? this.lateBind : binding.late
+    binding.lazy = binding.lazy =
+      binding.lazy === undefined && this.lazy === undefined
+        ? !(binding.scopeId === Lifecycle.SINGLETON || binding.scopeId === Lifecycle.CONTAINER)
+        : binding.lazy === undefined
+        ? this.lazy
+        : binding.lazy
+
+    this.bindingRegistry.register(token, binding)
+    this.mapNamed(binding)
+  }
+
   get<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
     const bindings = this.getBindings<T>(token)
 
@@ -298,93 +401,6 @@ export class DI {
     DI.registerInternalComponents(child)
 
     return child
-  }
-
-  configureBinding<T>(token: Token<T>, binding: Binding<T>): void {
-    notNil(token)
-    notNil(binding)
-
-    const scopeId = binding.scopeId ? binding.scopeId : this.scopeId
-    const rawProvider = providerFromToken(token, binding.rawProvider)
-
-    notNil(rawProvider, `Could not determine a provider for token: ${tokenStr(token)}`)
-
-    if (rawProvider instanceof TokenProvider) {
-      const path = [token]
-      let tokenProvider: TokenProvider<any> | null = rawProvider
-      const ctx = { di: this, token, binding, resolutionContext: ResolutionContext.INSTANCE }
-
-      while (tokenProvider !== null) {
-        const currentToken: Token = tokenProvider.provide(ctx)
-
-        if (path.includes(currentToken)) {
-          throw new CircularReferenceError(`Token registration cycle detected! ${[...path, currentToken].join(' -> ')}`)
-        }
-
-        path.push(currentToken)
-
-        const binding: Binding | undefined = this.bindingRegistry.get(currentToken)
-
-        if (binding && binding.rawProvider instanceof TokenProvider) {
-          tokenProvider = binding.rawProvider
-        } else {
-          tokenProvider = null
-        }
-      }
-    }
-
-    const scope =
-      rawProvider instanceof TokenProvider || rawProvider instanceof ValueProvider
-        ? DI.getScope(Lifecycle.TRANSIENT)
-        : DI.getScope(scopeId)
-
-    const hasPropertyInjections = binding.injectableProperties.length > 0
-    const hasMethodInjections = binding.injectableMethods.length > 0
-    const chain: PostResolutionInterceptor<T>[] = []
-
-    if (hasPropertyInjections) {
-      chain.push(new PropertiesInjectorInterceptor())
-    }
-
-    if (hasMethodInjections) {
-      chain.push(new MethodInjectorInterceptor())
-    }
-
-    for (const interceptor of binding.interceptors) {
-      chain.push(interceptor)
-    }
-
-    for (const postProcessor of DI.PostProcessors) {
-      chain.push(new BeforeInitInterceptor(postProcessor))
-    }
-
-    if (binding.postConstruct) {
-      chain.push(new PostConstructInterceptor())
-    }
-
-    for (const postProcessor of DI.PostProcessors) {
-      chain.push(new AfterInitInterceptor(postProcessor))
-    }
-
-    if (scope.registerDestructionCallback) {
-      if (binding.preDestroy) {
-        scope.registerDestructionCallback(() => scope.cachedInstance<any>(binding)?.[binding.preDestroy!]())
-      }
-    }
-
-    binding.scopeId = scopeId
-    binding.rawProvider = rawProvider
-    binding.scopedProvider = new ScopedProvider(scope, new EntrypointProvider(rawProvider, chain))
-    binding.late = binding.late === undefined ? this.lateBind : binding.late
-    binding.lazy = binding.lazy =
-      binding.lazy === undefined && this.lazy === undefined
-        ? !(binding.scopeId === Lifecycle.SINGLETON || binding.scopeId === Lifecycle.CONTAINER)
-        : binding.lazy === undefined
-        ? this.lazy
-        : binding.lazy
-
-    this.mapNamed(binding)
-    this.bindingRegistry.register(token, binding)
   }
 
   getBindings<T>(token: Token<T>): Binding<T>[] {

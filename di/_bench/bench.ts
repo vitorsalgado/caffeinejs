@@ -8,6 +8,7 @@ import { Injectable } from '../decorators/Injectable.js'
 import { RequestScope } from '../internal/RequestScope.js'
 import { RequestScoped } from '../decorators/RequestScoped.js'
 import { Lifecycle } from '../Lifecycle.js'
+import { TransientScoped } from '../decorators/index.js'
 import { parallelRequests } from './vars.js'
 import { errorThreshold } from './vars.js'
 import { connections } from './vars.js'
@@ -52,6 +53,34 @@ class SingletonController {
   }
 }
 
+@Injectable()
+@TransientScoped()
+class TrRepo {
+  find() {
+    return 'repository'
+  }
+}
+
+@Injectable()
+@TransientScoped()
+class TrService {
+  constructor(readonly repo: TrRepo) {}
+
+  find() {
+    return `service_${this.repo.find()}`
+  }
+}
+
+@Injectable()
+@TransientScoped()
+class TrController {
+  constructor(readonly service: TrService) {}
+
+  find() {
+    return `controller_${this.service.find()}`
+  }
+}
+
 const di = DI.setup()
 const scope = DI.getScope<RequestScope>(Lifecycle.REQUEST)
 const controller = new Controller(new Service(new RepoImpl()))
@@ -60,9 +89,7 @@ const fastify = Fastify()
 fastify.get('/request', async (req, res) => {
   scope.begin()
 
-  const ctrl = di.get(Controller)
-
-  res.status(200).send(ctrl.find)
+  res.status(200).send(di.get(Controller).find())
 
   await scope.finish()
 })
@@ -70,16 +97,13 @@ fastify.get('/request', async (req, res) => {
 fastify.get('/request-with-singleton', async (req, res) => {
   scope.begin()
 
-  const ctrl = di.get(SingletonController)
-
-  res.status(200).send(ctrl.find)
+  res.status(200).send(di.get(SingletonController).find())
 
   await scope.finish()
 })
 
 fastify.get('/singleton', (req, res) => {
-  const ctrl = di.get(SingletonController)
-  res.status(200).send(ctrl.find)
+  res.status(200).send(di.get(SingletonController).find())
 })
 
 fastify.get('/singleton-no-container', (req, res) => {
@@ -87,12 +111,13 @@ fastify.get('/singleton-no-container', (req, res) => {
 })
 
 fastify.get('/no-container', (req, res) => {
-  const ctrl = new Controller(new Service(new RepoImpl()))
-  res.status(200).send(ctrl.find)
+  res.status(200).send(new Controller(new Service(new RepoImpl())).find())
 })
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
+fastify.get('/transient', (req, res) => {
+  res.status(200).send(di.get(TrController).find())
+})
+
 await fastify.ready()
 
 export function makeParallelRequests(n: number, callback: any): Promise<unknown> {
@@ -101,6 +126,12 @@ export function makeParallelRequests(n: number, callback: any): Promise<unknown>
 
 cronometro(
   {
+    transient() {
+      return makeParallelRequests(parallelRequests, (callback: any) =>
+        Supertest(fastify.server).get('/transient').expect(200).end(callback)
+      )
+    },
+
     'singleton-no-container'() {
       return makeParallelRequests(parallelRequests, (callback: any) =>
         Supertest(fastify.server).get('/singleton-no-container').expect(200).end(callback)

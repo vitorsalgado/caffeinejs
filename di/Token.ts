@@ -18,3 +18,7 @@ export function isNamedToken(dep: unknown): dep is string | symbol {
 export function tokenStr(token: Token): string {
   return typeof token === 'function' ? token.name : token.toString()
 }
+
+export function isValidToken(token: Token): boolean {
+  return token !== undefined && token !== null && (isNamedToken(token) || typeof token === 'function')
+}

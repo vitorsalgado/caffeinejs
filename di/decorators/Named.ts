@@ -1,7 +1,7 @@
 import { Identifier } from '../internal/types/Identifier.js'
 import { Ctor } from '../internal/types/Ctor.js'
 import { DI } from '../DI.js'
-import { configureBean } from './utils/beanUtils.js'
+import { configureBean } from '../internal/utils/beanUtils.js'
 
 export function Named<T>(name: Identifier) {
   return function (target: Ctor<T> | object, propertyKey?: string | symbol) {

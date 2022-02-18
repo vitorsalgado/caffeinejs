@@ -95,3 +95,10 @@ export class OutOfScopeError extends DiError {
     this.name = 'OutOfScopeError'
   }
 }
+
+export class InvalidInjectionToken extends DiError {
+  constructor(message: string) {
+    super(message, 'INVALID_INJECTION_TOKEN')
+    this.name = 'InvalidInjectionToken'
+  }
+}

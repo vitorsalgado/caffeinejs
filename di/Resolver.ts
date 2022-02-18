@@ -21,11 +21,11 @@ export namespace Resolver {
       return binding.scopedProvider.provide({ di, token, binding, resolutionContext: context }) as T
     }
 
-    let resolved: T | undefined
-
     if (token instanceof DeferredCtor) {
-      resolved = token.createProxy(target => di.get(target, context))
+      return token.createProxy(target => di.get(target, context))
     }
+
+    let resolved: T | undefined
 
     if (typeof token === 'function') {
       const entries = di.search(tk => typeof tk === 'function' && tk.name !== token.name && token.isPrototypeOf(tk))
@@ -82,7 +82,7 @@ export namespace Resolver {
       )
     }
 
-    let resolution
+    let resolution: unknown
 
     if (dep.multiple) {
       resolution = di.getMany(dep.token, context)

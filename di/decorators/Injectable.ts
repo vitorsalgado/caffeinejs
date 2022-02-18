@@ -7,7 +7,8 @@ import { getInjectableMethods } from '../internal/utils/getInjectableMethods.js'
 import { getInjectableProperties } from '../internal/utils/getInjectableProperties.js'
 import { getParamTypes } from '../internal/utils/getParamTypes.js'
 import { isNil } from '../internal/utils/isNil.js'
-import { configureBean } from './utils/beanUtils.js'
+import { configureBean } from '../internal/utils/beanUtils.js'
+import { getLookupProperties } from '../internal/utils/getLookupProperties.js'
 
 export function Injectable<T>(token?: Token) {
   return function <TFunction extends Function>(target: TFunction | object, propertyKey?: string | symbol) {
@@ -19,12 +20,11 @@ export function Injectable<T>(token?: Token) {
         )
       }
 
-      const i = getParamTypes(target)
-
       DI.configureType<T>(target, {
         injections: getParamTypes(target),
         injectableProperties: getInjectableProperties(target),
         injectableMethods: getInjectableMethods(target),
+        lookupProperties: getLookupProperties(target),
         type: target,
         names: token ? [token] : undefined
       } as Partial<Binding>)

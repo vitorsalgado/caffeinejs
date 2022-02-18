@@ -5,7 +5,7 @@ import { getInjectableMethods } from '../internal/utils/getInjectableMethods.js'
 import { getInjectableProperties } from '../internal/utils/getInjectableProperties.js'
 import { getParamTypes } from '../internal/utils/getParamTypes.js'
 import { notNil } from '../internal/utils/notNil.js'
-import { configureBean } from './utils/beanUtils.js'
+import { configureBean } from '../internal/utils/beanUtils.js'
 
 export function Bind<T>(
   options: Partial<Exclude<Binding<T>, 'id' | 'namespace' | 'scopedProvider' | 'configuration' | 'cachedInstance'>>
