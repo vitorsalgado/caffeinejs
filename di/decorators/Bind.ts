@@ -8,7 +8,7 @@ import { notNil } from '../internal/utils/notNil.js'
 import { configureBean } from '../internal/utils/beanUtils.js'
 
 export function Bind<T>(
-  options: Partial<Exclude<Binding<T>, 'id' | 'namespace' | 'scopedProvider' | 'configuration' | 'cachedInstance'>>
+  options: Partial<Exclude<Binding<T>, 'id' | 'scopedProvider' | 'configuration' | 'cachedInstance'>>
 ) {
   notNil(options)
   check(typeof options === 'object', '@Bind parameter must be an object')
