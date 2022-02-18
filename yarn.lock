@@ -521,9 +521,9 @@ __metadata:
   resolution: "@caffeinejs/test-realapp@workspace:test/realapp"
   dependencies:
     "@caffeinejs/di": "workspace:^"
-    mongodb: ^4.3.1
+    mongodb: ^4.4.0
     reflect-metadata: ^0.1.13
-    typeorm: ^0.2.42
+    typeorm: ^0.2.43
   languageName: unknown
   linkType: soft
 
@@ -7624,9 +7624,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:^4.3.1":
-  version: 4.3.1
-  resolution: "mongodb@npm:4.3.1"
+"mongodb@npm:^4.4.0":
+  version: 4.4.0
+  resolution: "mongodb@npm:4.4.0"
   dependencies:
     bson: ^4.6.1
     denque: ^2.0.1
@@ -7636,7 +7636,7 @@ __metadata:
   dependenciesMeta:
     saslprep:
       optional: true
-  checksum: 5684b5481bfbf73e4628b8bad7018cd4436fdb23b9548fb38dece3e079b1716fe870d41070a505d13ae4d86c107315afaf34891ba2b64925eb4fa4cd5bb70300
+  checksum: e485927d1def94f28564bdcb98d82144914bf23854e8bd15437fcef0d9a36f36997f7e97e0aad730ebf299c6a919430669198e02b5e2f4410f74a4002409b182
   languageName: node
   linkType: hard
 
@@ -10468,9 +10468,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typeorm@npm:^0.2.42":
-  version: 0.2.42
-  resolution: "typeorm@npm:0.2.42"
+"typeorm@npm:^0.2.43":
+  version: 0.2.43
+  resolution: "typeorm@npm:0.2.43"
   dependencies:
     "@sqltools/formatter": ^1.2.2
     app-root-path: ^3.0.0
@@ -10538,7 +10538,7 @@ __metadata:
       optional: true
   bin:
     typeorm: cli.js
-  checksum: 6bec3a1c58658cd0d2bfa2fe89486f0b3d8d6b480a7a30bb26bd2faf0fc768d2fa454b87280b02ad9bb861ec848f94b7ea616a6f40e92073dae0abff2f248f8e
+  checksum: cd9dd1f5804ac2b56f8b913d5fe58cb371d27f28fe31297c2588d875927de92ad3dbb00b10e0cd8ed638e570ddc0e6813e69cf9251aefc97406f1f3578cbfa81
   languageName: node
   linkType: hard
 
