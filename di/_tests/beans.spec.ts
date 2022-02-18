@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals'
+import { expect } from '@jest/globals'
 import { v4 } from 'uuid'
 import { Bean } from '../decorators/Bean.js'
 import { Configuration } from '../decorators/Configuration.js'
@@ -7,6 +8,12 @@ import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
 import { Primary } from '../decorators/Primary.js'
 import { DI } from '../DI'
+import { TypeOf } from '../TypeOf.js'
+import { Defer } from '../decorators/index.js'
+import { ScopedAs } from '../decorators/index.js'
+import { Lifecycle } from '../Lifecycle.js'
+import { Foo } from './_fixtures/circular_beans/Foo.js'
+import { Bar } from './_fixtures/circular_beans/Bar.js'
 
 describe('Configuration', function () {
   describe('class provider', function () {
@@ -183,6 +190,74 @@ describe('Configuration', function () {
 
       expect(abs.test()).toEqual('abs-bean')
       expect(i.test()).toEqual('interface-bean')
+    })
+  })
+
+  describe('when beans have dependencies inside same configuration context', function () {
+    class Dep {
+      readonly id: string = v4()
+    }
+
+    class Root {
+      constructor(readonly dep: Dep) {}
+    }
+
+    @Configuration()
+    class Conf {
+      @Bean(Dep)
+      dep() {
+        return new Dep()
+      }
+
+      @Bean(Root)
+      root(dep: Dep) {
+        return new Root(dep)
+      }
+    }
+
+    it('should resolve components referencing another dependencies inside same configuration context', function () {
+      const di = DI.setup()
+      const root = di.get(Root)
+      const dep = di.get(Dep)
+
+      expect(root.dep.id).toEqual(dep.id)
+    })
+  })
+
+  describe('circular references inside configuration class', function () {
+    @Configuration()
+    class CircularConf {
+      @Bean(Foo)
+      foo(@Defer(() => Bar) bar: TypeOf<Bar>) {
+        return new Foo(bar)
+      }
+
+      @Bean(Bar)
+      @ScopedAs(Lifecycle.TRANSIENT)
+      bar(@Defer(() => Foo) foo: TypeOf<Foo>) {
+        return new Bar(foo)
+      }
+    }
+
+    it('should resolve circular dependencies', function () {
+      const di = DI.setup()
+
+      const foo = di.get(Foo)
+      const bar = di.get(Bar)
+      const foo2 = di.get(Foo)
+      const bar2 = di.get(Bar)
+
+      di.get(Foo)
+      di.get(Bar)
+
+      expect(foo.test()).toEqual('foo-bar')
+      expect(bar.test()).toEqual('bar-foo')
+
+      expect(foo2.test()).toEqual('foo-bar')
+      expect(bar2.test()).toEqual('bar-foo')
+
+      expect(foo.uuid).toEqual(foo2.uuid)
+      expect(bar.uuid).not.toEqual(bar2.uuid)
     })
   })
 })
