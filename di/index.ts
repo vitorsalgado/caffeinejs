@@ -1,4 +1,5 @@
 export * from './decorators/index.js'
+export * from './internal/index.js'
 
 export * from './Binder.js'
 export * from './BinderOptions.js'
@@ -16,4 +17,3 @@ export * from './Scope.js'
 export * from './ServiceLocator.js'
 export * from './Token.js'
 export * from './TypeOf.js'
-export { ResolutionContext } from './internal/index.js'
