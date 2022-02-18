@@ -15,5 +15,9 @@ export interface BinderOptions<T> {
 
   containerScoped(): BinderOptions<T>
 
-  resolutionContextScoped(): BinderOptions<T>
+  localScoped(): BinderOptions<T>
+
+  requestScoped(): BinderOptions<T>
+
+  refreshableScoped(): BinderOptions<T>
 }

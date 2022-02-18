@@ -71,8 +71,22 @@ export class BindToOptions<T> implements BinderOptions<T> {
     return this
   }
 
-  resolutionContextScoped(): BinderOptions<T> {
+  localScoped(): BinderOptions<T> {
     this.binding.scopeId = Lifecycle.LOCAL_RESOLUTION
+    this.di.configureBinding(this.token, this.binding)
+
+    return this
+  }
+
+  refreshableScoped(): BinderOptions<T> {
+    this.binding.scopeId = Lifecycle.REFRESH
+    this.di.configureBinding(this.token, this.binding)
+
+    return this
+  }
+
+  requestScoped(): BinderOptions<T> {
+    this.binding.scopeId = Lifecycle.REQUEST
     this.di.configureBinding(this.token, this.binding)
 
     return this

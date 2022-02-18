@@ -3,8 +3,8 @@ import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { Token } from './Token.js'
 
-export class DecoratedInjectables {
-  private static INSTANCE = new DecoratedInjectables()
+export class DiTypes {
+  private static INSTANCE = new DiTypes()
   private readonly _entries = new Map<Token, Binding>()
   private readonly _beans: Array<[Token, Binding]> = []
 
@@ -12,11 +12,11 @@ export class DecoratedInjectables {
     // internal
   }
 
-  static instance(): DecoratedInjectables {
-    return DecoratedInjectables.INSTANCE
+  static instance(): DiTypes {
+    return DiTypes.INSTANCE
   }
 
-  configure<T>(ctor: Token<T>, info: Partial<Binding>): DecoratedInjectables {
+  configure<T>(ctor: Token<T>, info: Partial<Binding>): DiTypes {
     notNil(ctor)
 
     const entry = this._entries.get(ctor)
@@ -30,7 +30,7 @@ export class DecoratedInjectables {
     return this
   }
 
-  addBean<T>(token: Token<T>, binding: Binding<T>): DecoratedInjectables {
+  addBean<T>(token: Token<T>, binding: Binding<T>): DiTypes {
     notNil(token)
     notNil(binding)
 

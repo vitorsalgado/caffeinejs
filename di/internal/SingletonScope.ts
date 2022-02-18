@@ -9,11 +9,9 @@ export class SingletonScope implements Scope {
       return ctx.binding.cachedInstance
     }
 
-    const resolved = unscoped.provide(ctx)
+    ctx.binding.cachedInstance = unscoped.provide(ctx)
 
-    ctx.binding.cachedInstance = resolved
-
-    return resolved
+    return ctx.binding.cachedInstance
   }
 
   cachedInstance<T>(binding: Binding): T | undefined {

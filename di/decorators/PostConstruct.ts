@@ -1,7 +1,7 @@
-import { DecoratedInjectables } from '../DecoratedInjectables.js'
+import { DiTypes } from '../DiTypes.js'
 
 export function PostConstruct(): MethodDecorator {
   return function (target, propertyKey) {
-    DecoratedInjectables.instance().configure(target.constructor, { postConstruct: propertyKey })
+    DiTypes.instance().configure(target.constructor, { postConstruct: propertyKey })
   }
 }

@@ -12,6 +12,7 @@ import { InvalidBindingError } from '../internal/DiError.js'
 import { Provider } from '../Provider.js'
 import { LocalResolutions } from '../LocalResolutions.js'
 import { ResolutionContext } from '../internal/index.js'
+import { Lifecycle } from '../Lifecycle.js'
 
 describe('Manual Binding', function () {
   describe('general bindings', function () {
@@ -306,47 +307,61 @@ describe('Manual Binding', function () {
         readonly id: string = v4()
       }
 
-      describe('when calling .transientScoped()', function () {
-        it('should bind component as transient scoped', function () {
-          const di = DI.setup()
+      class ReqDep {}
 
-          di.bind(TransientDep).toSelf().transientScoped()
+      class RefreshDep {}
 
-          const one = di.get(TransientDep)
-          const two = di.get(TransientDep)
+      it('should bind component as transient scoped', function () {
+        const di = DI.setup()
 
-          expect(one).not.toEqual(two)
-        })
+        di.bind(TransientDep).toSelf().transientScoped()
+
+        const one = di.get(TransientDep)
+        const two = di.get(TransientDep)
+
+        expect(one).not.toEqual(two)
       })
 
-      describe('when calling .containerScoped()', function () {
-        it('should bind component as container scoped', function () {
-          const di = DI.setup()
+      it('should bind component as container scoped', function () {
+        const di = DI.setup()
 
-          di.bind(ContainerDep).toSelf().containerScoped()
+        di.bind(ContainerDep).toSelf().containerScoped()
 
-          const child = di.newChild()
+        const child = di.newChild()
 
-          expect(di.get(ContainerDep)).not.toEqual(child.get(ContainerDep))
-          expect(di.get(ContainerDep)).toEqual(di.get(ContainerDep))
-          expect(child.get(ContainerDep)).toEqual(child.get(ContainerDep))
-        })
+        expect(di.get(ContainerDep)).not.toEqual(child.get(ContainerDep))
+        expect(di.get(ContainerDep)).toEqual(di.get(ContainerDep))
+        expect(child.get(ContainerDep)).toEqual(child.get(ContainerDep))
       })
 
-      describe('when calling .resolutionContextScoped()', function () {
-        it('should bind component as resolution context scoped', function () {
-          const di = DI.setup()
-          const ctx = new LocalResolutions()
+      it('should bind component as local resolution scoped', function () {
+        const di = DI.setup()
+        const ctx = new LocalResolutions()
 
-          di.bind(CtxDep).toSelf().resolutionContextScoped()
+        di.bind(CtxDep).toSelf().localScoped()
 
-          const depOne = di.get(CtxDep, ctx)
+        const depOne = di.get(CtxDep, ctx)
 
-          expect(depOne).toBeInstanceOf(CtxDep)
-          expect(depOne).toEqual(di.get(CtxDep, ctx))
-          expect(depOne).not.toEqual(di.get(CtxDep))
-          expect(ctx.resolutions.size).toEqual(1)
-        })
+        expect(depOne).toBeInstanceOf(CtxDep)
+        expect(depOne).toEqual(di.get(CtxDep, ctx))
+        expect(depOne).not.toEqual(di.get(CtxDep))
+        expect(ctx.resolutions.size).toEqual(1)
+      })
+
+      it('should bind component as request scoped', function () {
+        const di = DI.setup()
+
+        di.bind(ReqDep).toSelf().requestScoped()
+
+        expect(di.getBindings(ReqDep)[0].scopeId).toEqual(Lifecycle.REQUEST)
+      })
+
+      it('should bind component as refresh scoped', function () {
+        const di = DI.setup()
+
+        di.bind(RefreshDep).toSelf().refreshableScoped()
+
+        expect(di.getBindings(RefreshDep)[0].scopeId).toEqual(Lifecycle.REFRESH)
       })
     })
   })

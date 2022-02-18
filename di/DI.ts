@@ -3,7 +3,7 @@ import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
 import { BindTo } from './BindTo.js'
-import { DecoratedInjectables } from './DecoratedInjectables.js'
+import { DiTypes } from './DiTypes.js'
 import { RepeatedNamesError } from './internal/DiError.js'
 import { ScopeAlreadyRegisteredError } from './internal/DiError.js'
 import { ScopeNotRegisteredError } from './internal/DiError.js'
@@ -88,7 +88,7 @@ export class DI {
 
     const opts = { ...DI.MetadataReader.read(token), ...additional }
     const tk = typeof token === 'object' ? token.constructor : token
-    const existing = DecoratedInjectables.instance().get(tk)
+    const existing = DiTypes.instance().get(tk)
 
     if (existing) {
       const names = existing.names
@@ -110,11 +110,11 @@ export class DI {
       }
     }
 
-    DecoratedInjectables.instance().configure(tk, newBinding({ ...existing, ...opts }))
+    DiTypes.instance().configure(tk, newBinding({ ...existing, ...opts }))
   }
 
   static addBean<T>(token: Token<T>, binding: Binding<T>): void {
-    DecoratedInjectables.instance().addBean(token, binding)
+    DiTypes.instance().addBean(token, binding)
   }
 
   static bindScope(scopeId: Identifier, scope: Scope): void {
@@ -347,7 +347,7 @@ export class DI {
   bind<T>(token: Token<T>): Binder<T> {
     notNil(token)
 
-    const type = DecoratedInjectables.instance().get(token)
+    const type = DiTypes.instance().get(token)
     const binding = newBinding(type)
 
     this.configureBinding(token, binding)
@@ -575,7 +575,7 @@ export class DI {
   protected setup(): void {
     const conditionals = new Map<Token, Binding>()
 
-    for (const [key, binding] of DecoratedInjectables.instance().entries()) {
+    for (const [key, binding] of DiTypes.instance().entries()) {
       if (!this.isRegistrable(binding)) {
         continue
       }
@@ -598,14 +598,14 @@ export class DI {
             const tokens = Reflect.getOwnMetadata(Vars.CONFIGURATION_TOKENS_PROVIDED, token)
 
             for (const tk of tokens) {
-              DecoratedInjectables.instance().deleteBean(tk)
+              DiTypes.instance().deleteBean(tk)
             }
           }
         }
       }
     }
 
-    for (const [token, binding] of DecoratedInjectables.instance().beans()) {
+    for (const [token, binding] of DiTypes.instance().beans()) {
       if (!this.isRegistrable(binding)) {
         continue
       }
@@ -635,8 +635,10 @@ export class DI {
       if (!named) {
         this.bindingNames.set(name, [binding])
       } else {
-        named.push(binding)
-        this.bindingNames.set(name, named)
+        if (!named.some(x => x.id === binding.id)) {
+          named.push(binding)
+          this.bindingNames.set(name, named)
+        }
       }
     }
   }

@@ -11,7 +11,7 @@ import { Injectable } from '../decorators/Injectable.js'
 import { RequestScoped } from '../decorators/RequestScoped.js'
 import { DI } from '../DI.js'
 import { RequestScope } from '../internal/RequestScope.js'
-import { DecoratedInjectables } from '../DecoratedInjectables.js'
+import { DiTypes } from '../DiTypes.js'
 import { PostConstruct } from '../decorators/PostConstruct.js'
 import { PreDestroy } from '../decorators/PreDestroy.js'
 import { Lifecycle } from '../Lifecycle.js'
@@ -70,7 +70,7 @@ describe('Request Scope', function () {
   const server = Http.createServer(requestListener)
 
   afterAll(async () => {
-    DecoratedInjectables.instance().delete(Ctrl)
+    DiTypes.instance().delete(Ctrl)
     server.close()
 
     await di.finalize()

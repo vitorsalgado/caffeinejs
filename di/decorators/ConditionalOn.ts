@@ -1,4 +1,4 @@
-import { DecoratedInjectables } from '../DecoratedInjectables.js'
+import { DiTypes } from '../DiTypes.js'
 import { DI } from '../DI.js'
 import { configureBean, getBeanConfiguration } from '../internal/utils/beanUtils.js'
 
@@ -13,7 +13,7 @@ export function ConditionalOn<T>(...conditionals: Conditional[]) {
     const merged: Conditional[] = [...conditionals]
 
     if (typeof target === 'function') {
-      const injectable = DecoratedInjectables.instance().get(target)
+      const injectable = DiTypes.instance().get(target)
 
       if (injectable && injectable.conditionals) {
         merged.push(...injectable.conditionals)

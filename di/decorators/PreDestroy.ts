@@ -1,7 +1,7 @@
-import { DecoratedInjectables } from '../DecoratedInjectables.js'
+import { DiTypes } from '../DiTypes.js'
 
 export function PreDestroy(): MethodDecorator {
   return function (target, propertyKey) {
-    DecoratedInjectables.instance().configure(target.constructor, { preDestroy: propertyKey })
+    DiTypes.instance().configure(target.constructor, { preDestroy: propertyKey })
   }
 }
