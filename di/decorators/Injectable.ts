@@ -15,8 +15,9 @@ export function Injectable<T>(token?: Token) {
     if (typeof target === 'function') {
       if (token !== undefined && !isNamedToken(token)) {
         throw new InvalidBindingError(
-          '@Injectable or @Bean when used on class level only accepts injection named qualifiers of type string or symbol. ' +
-            `Check class '${target.name}' decorators.`
+          `@Injectable or @Bean when used on class level only accepts injection named qualifiers of type string or symbol. ` +
+            `Received: ${typeof token}. ` +
+            `Check decorator on class '${target.name}'.`
         )
       }
 
@@ -34,8 +35,9 @@ export function Injectable<T>(token?: Token) {
 
     if (isNil(token)) {
       throw new InvalidBindingError(
-        '@Injectable or @Bean when used on @Configuration classes method level, must receive a valid token. Current value is null or undefined. ' +
-          `Check decorators on method '${String(propertyKey)}' from class '${target.constructor.name}'`
+        `@Injectable or @Bean when used on @Configuration classes method level, must receive a valid token. Current value is: ${String(
+          token
+        )}. Check the decorators on method '${String(propertyKey)}' from class '${target.constructor.name}'`
       )
     }
 

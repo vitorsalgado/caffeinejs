@@ -16,7 +16,9 @@ export function Lookup(token?: Token, options?: LookupOptions): MethodDecorator 
     if (typeof descriptor.get !== 'function') {
       notNil(
         token,
-        `@Lookup() on property key '${String(propertyKey)}' at class '${target.constructor.name}' must not be null.`
+        `@Lookup() on property key '${String(propertyKey)}' at class '${
+          target.constructor.name
+        }' must not be null or undefined.`
       )
     }
 
@@ -27,16 +29,16 @@ export function Lookup(token?: Token, options?: LookupOptions): MethodDecorator 
 
     if (lookupProperties[propertyKey]) {
       throw new InvalidBindingError(
-        `@Lookup() already added at property '${String(propertyKey)}' on class '${target.constructor.name}'.`
+        `@Lookup() already added on property '${String(propertyKey)}' at class '${target.constructor.name}'.`
       )
     }
 
     if (!isValidToken(injectionToken)) {
       throw new InvalidInjectionToken(
-        `@Lookup() decorator at property '${String(propertyKey)}' on class '${
+        `@Lookup() decorator on property '${String(propertyKey)}' at class '${
           target.constructor.name
         }' doesn't contain a valid injection token. Value is typeof ${typeof injectionToken}. ` +
-          `It must be a Class, String or Symbol.`
+          `It must be a class ref, string or symbol.`
       )
     }
 

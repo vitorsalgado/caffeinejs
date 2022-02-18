@@ -1,8 +1,6 @@
-'use strict'
+import Base from './jest-base.config.js'
 
-const Base = require('./jest-base.config.js')
-
-module.exports = {
+export default {
   ...Base,
 
   projects: ['<rootDir>'],

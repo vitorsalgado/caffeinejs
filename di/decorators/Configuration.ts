@@ -10,8 +10,15 @@ import { Token } from '../Token.js'
 import { tokenStr } from '../Token.js'
 import { getParamTypes } from '../internal/utils/getParamTypes.js'
 import { isNil } from '../internal/utils/isNil.js'
-import { ConfigurationOptions } from './ConfigurationOptions.js'
-import { ConfigurationProviderOptions } from './ConfigurationProviderOptions.js'
+import { ConfigurationProviderOptions } from '../internal/index.js'
+
+export interface ConfigurationOptions {
+  namespace: Identifier
+  lazy: boolean
+  primary: boolean
+  scopeId: Identifier
+  late: boolean
+}
 
 export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): ClassDecorator {
   return function (target) {
@@ -28,13 +35,13 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
     const dupTokens = new Set<Token>()
     const dupNames = new Set<Identifier>()
 
-    for (const [method, configuration] of beanConfiguration) {
+    for (const [, configuration] of beanConfiguration) {
       if (dupTokens.has(configuration.token)) {
         if (isNamedToken(configuration.token)) {
           throw new RepeatedNamesError(
-            `Found multiple injectables with name '${tokenStr(configuration.token)}' on method '${String(
-              method
-            )}' at the configuration class ${target.name}`
+            `Found multiple injectables with the name '${tokenStr(configuration.token)}' at the configuration class '${
+              target.name
+            }'`
           )
         }
       }
@@ -42,9 +49,9 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
       if (configuration.name) {
         if (dupNames.has(configuration.name)) {
           throw new RepeatedNamesError(
-            `Found multiple injectables with name '${tokenStr(configuration.token)}' on method '${String(
-              method
-            )}' at the configuration class ${target.name}`
+            `Found multiple injectables with the name '${tokenStr(configuration.token)}' at the configuration class '${
+              target.name
+            }'`
           )
         }
 

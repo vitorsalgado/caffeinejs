@@ -60,8 +60,8 @@ jobs:
       - name: Lint
         if: matrix.os == 'ubuntu-latest'
         run: |
-          yarn lint
           yarn format:check
+          yarn lint
 
       - name: Build
         run: |
