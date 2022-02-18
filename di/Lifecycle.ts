@@ -3,5 +3,6 @@ export const Lifecycle = {
   TRANSIENT: 'transient',
   CONTAINER: 'container',
   RESOLUTION_CONTEXT: 'resolution_context',
-  REQUEST: 'request'
+  REQUEST: 'request',
+  REFRESH: 'refresh'
 }

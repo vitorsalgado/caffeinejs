@@ -1,14 +1,13 @@
 import { Binding } from '../Binding.js'
-import { Scope } from '../Scope.js'
 import { tokenStr } from '../Token.js'
 import { Provider } from '../Provider.js'
 import { ProviderContext } from '../Provider.js'
 import { IllegalScopeStateError } from './DiError.js'
 import { OutOfScopeError } from './DiError.js'
+import { DestructionAwareScope } from './DestructionAwareScope.js'
 
-export class RequestScope implements Scope {
+export class RequestScope extends DestructionAwareScope {
   private readonly instances = new Map<number, unknown>()
-  private readonly destructionCallbacks = new Array<() => Promise<void> | void>()
   private entered = false
 
   begin() {
@@ -68,9 +67,5 @@ export class RequestScope implements Scope {
 
   remove(binding: Binding): void {
     this.instances.get(binding.id)
-  }
-
-  registerDestructionCallback(callback: () => Promise<void> | void): void {
-    this.destructionCallbacks.push(callback)
   }
 }

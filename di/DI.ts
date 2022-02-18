@@ -45,6 +45,7 @@ import { loadModule } from './internal/utils/loadModule.js'
 import { notNil } from './internal/utils/notNil.js'
 import { RequestScope } from './internal/RequestScope.js'
 import { ValueProvider } from './internal/index.js'
+import { RefreshScope } from './internal/RefreshScope.js'
 
 export class DI {
   static MetadataReader = new InternalMetadataReader()
@@ -567,6 +568,7 @@ export class DI {
       .set(Lifecycle.RESOLUTION_CONTEXT, new ResolutionContextScope())
       .set(Lifecycle.TRANSIENT, new TransientScope())
       .set(Lifecycle.REQUEST, new RequestScope())
+      .set(Lifecycle.REFRESH, new RefreshScope())
   }
 
   protected setup(): void {
