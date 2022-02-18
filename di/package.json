@@ -8,12 +8,16 @@
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json",
+    "./stereotypes": {
+      "import": "./dist/stereotypes/index.js",
+      "default": "./dist/stereotypes/index.js"
+    },
     "./decorators": {
-      "node": "./dist/decorators/index.js",
+      "import": "./dist/decorators/index.js",
       "default": "./dist/decorators/index.js"
     },
     "./internal": {
-      "node": "./dist/internal/index.js",
+      "import": "./dist/internal/index.js",
       "default": "./dist/internal/index.js"
     }
   },
