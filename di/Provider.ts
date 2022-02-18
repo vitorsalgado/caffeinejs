@@ -1,6 +1,6 @@
 import { Binding } from './Binding.js'
 import { DI } from './DI.js'
-import { ResolutionContext } from './ResolutionContext.js'
+import { ContextResolutions } from './ContextResolutions.js'
 import { Token } from './Token.js'
 import { ClassProvider } from './internal/ClassProvider.js'
 import { TokenProvider } from './internal/TokenProvider.js'
@@ -10,7 +10,7 @@ export interface ProviderContext {
   di: DI
   token: Token
   binding: Binding
-  resolutionContext: ResolutionContext
+  resolutionContext: ContextResolutions
 }
 
 export interface Provider<T = any> {

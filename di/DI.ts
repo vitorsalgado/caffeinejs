@@ -32,7 +32,7 @@ import { Lifecycle } from './Lifecycle.js'
 import { InitialOptions } from './Options.js'
 import { Options } from './Options.js'
 import { PostProcessor } from './PostProcessor.js'
-import { ResolutionContext } from './ResolutionContext.js'
+import { ContextResolutions } from './ContextResolutions.js'
 import { Resolver } from './Resolver.js'
 import { Scope } from './Scope.js'
 import { DefaultServiceLocator } from './ServiceLocator.js'
@@ -176,7 +176,7 @@ export class DI {
     if (rawProvider instanceof TokenProvider) {
       const path = [token]
       let tokenProvider: TokenProvider<any> | null = rawProvider
-      const ctx = { di: this, token, binding, resolutionContext: ResolutionContext.INSTANCE }
+      const ctx = { di: this, token, binding, resolutionContext: ContextResolutions.INSTANCE }
 
       while (tokenProvider !== null) {
         const currentToken: Token = tokenProvider.provide(ctx)
@@ -213,11 +213,11 @@ export class DI {
 
         if (descriptor && typeof descriptor.get === 'function') {
           Object.defineProperty(token.prototype, propertyKey, {
-            get: () => Resolver.resolveParam(this, token, spec, propertyKey, ResolutionContext.INSTANCE)
+            get: () => Resolver.resolveParam(this, token, spec, propertyKey, ContextResolutions.INSTANCE)
           })
         } else {
           token.prototype[propertyKey] = () =>
-            Resolver.resolveParam(this, token, spec, propertyKey, ResolutionContext.INSTANCE)
+            Resolver.resolveParam(this, token, spec, propertyKey, ContextResolutions.INSTANCE)
         }
       }
     }
@@ -267,7 +267,7 @@ export class DI {
     this.mapNamed(binding)
   }
 
-  get<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
+  get<T>(token: Token<T>, context: ContextResolutions = ContextResolutions.INSTANCE): T {
     const bindings = this.getBindings<T>(token)
 
     if (bindings.length > 1) {
@@ -283,7 +283,7 @@ export class DI {
     return Resolver.resolve<T>(this, token, bindings[0], context)
   }
 
-  getRequired<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T {
+  getRequired<T>(token: Token<T>, context: ContextResolutions = ContextResolutions.INSTANCE): T {
     const result = this.get(token, context)
 
     if (isNil(result)) {
@@ -293,7 +293,7 @@ export class DI {
     return result
   }
 
-  getMany<T>(token: Token<T>, context: ResolutionContext = ResolutionContext.INSTANCE): T[] {
+  getMany<T>(token: Token<T>, context: ContextResolutions = ContextResolutions.INSTANCE): T[] {
     const bindings = this.getBindings(token)
 
     if (bindings.length === 0) {
@@ -479,7 +479,7 @@ export class DI {
         continue
       }
 
-      Resolver.resolve(this, token, binding, ResolutionContext.INSTANCE)
+      Resolver.resolve(this, token, binding, ContextResolutions.INSTANCE)
     }
   }
 

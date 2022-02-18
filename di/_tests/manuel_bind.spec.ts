@@ -11,7 +11,7 @@ import { MultiplePrimaryError } from '../internal/DiError.js'
 import { InvalidBindingError } from '../internal/DiError.js'
 import { ProviderContext } from '../Provider.js'
 import { Provider } from '../Provider.js'
-import { ResolutionContext } from '../ResolutionContext.js'
+import { ContextResolutions } from '../ContextResolutions.js'
 
 describe('Manual Binding', function () {
   describe('general bindings', function () {
@@ -336,7 +336,7 @@ describe('Manual Binding', function () {
       describe('when calling .resolutionContextScoped()', function () {
         it('should bind component as resolution context scoped', function () {
           const di = DI.setup()
-          const ctx = new ResolutionContext()
+          const ctx = new ContextResolutions()
 
           di.bind(CtxDep).toSelf().resolutionContextScoped()
 

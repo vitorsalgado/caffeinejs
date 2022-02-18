@@ -1,5 +1,5 @@
 import { ConfigurationProviderOptions } from '../decorators/ConfigurationProviderOptions.js'
-import { ResolutionContext } from '../ResolutionContext.js'
+import { ContextResolutions } from '../ContextResolutions.js'
 import { Resolver } from '../Resolver.js'
 import { ProviderContext } from '../Provider.js'
 import { Provider } from '../Provider.js'
@@ -15,7 +15,13 @@ export class BeanFactoryProvider<T> implements Provider<T> {
   provide(ctx: ProviderContext): T {
     const clazz = ctx.di.get<{ [key: symbol | string]: (...args: unknown[]) => T }>(this.target, ctx.resolutionContext)
     const deps = this.options.dependencies.map((dep, index) =>
-      Resolver.resolveParam(ctx.di, this.options.token, dep, index, ctx.resolutionContext || ResolutionContext.INSTANCE)
+      Resolver.resolveParam(
+        ctx.di,
+        this.options.token,
+        dep,
+        index,
+        ctx.resolutionContext || ContextResolutions.INSTANCE
+      )
     )
 
     return clazz[this.method](...deps)

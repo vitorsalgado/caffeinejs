@@ -8,7 +8,7 @@ import { Binding } from './Binding.js'
 import { DeferredCtor } from './internal/DeferredCtor.js'
 import { DI } from './DI.js'
 import { TokenProvider } from './internal/TokenProvider.js'
-import { ResolutionContext } from './ResolutionContext.js'
+import { ContextResolutions } from './ContextResolutions.js'
 import { tokenStr } from './Token.js'
 import { Token } from './Token.js'
 import { TokenSpec } from './Token.js'
@@ -16,7 +16,7 @@ import { fmtTokenError } from './internal/utils/errorFmt.js'
 import { fmtParamError } from './internal/utils/errorFmt.js'
 
 export namespace Resolver {
-  export function resolve<T>(di: DI, token: Token<T>, binding: Binding<T> | undefined, context: ResolutionContext): T {
+  export function resolve<T>(di: DI, token: Token<T>, binding: Binding<T> | undefined, context: ContextResolutions): T {
     if (binding) {
       return binding.scopedProvider.provide({ di, token, binding, resolutionContext: context }) as T
     }
@@ -60,7 +60,7 @@ export namespace Resolver {
     return resolved as T
   }
 
-  export function construct<T>(di: DI, ctor: Ctor<T>, binding: Binding, context: ResolutionContext): T {
+  export function construct<T>(di: DI, ctor: Ctor<T>, binding: Binding, context: ContextResolutions): T {
     return new ctor(...binding.injections.map((dep, index) => resolveParam(di, ctor, dep, index, context)))
   }
 
@@ -69,7 +69,7 @@ export namespace Resolver {
     target: Token<T>,
     dep: TokenSpec<T>,
     indexOrProp: number | string | symbol,
-    context: ResolutionContext
+    context: ContextResolutions
   ): T {
     if (dep.token === undefined || dep.token === null) {
       throw new CircularReferenceError(

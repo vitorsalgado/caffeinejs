@@ -2,7 +2,7 @@ import { v4 } from 'uuid'
 import { DI } from '../DI.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Lifecycle } from '../Lifecycle.js'
-import { ResolutionContext } from '../ResolutionContext.js'
+import { ContextResolutions } from '../ContextResolutions.js'
 import { ScopedAs } from '../decorators/ScopedAs.js'
 
 describe('Context Scoped', function () {
@@ -27,7 +27,7 @@ describe('Context Scoped', function () {
   }
 
   it('should return instance stored in the resolution context when one is provided', function () {
-    const context = new ResolutionContext()
+    const context = new ContextResolutions()
     const di = DI.setup()
     const result1 = di.get(ResScopedRoot, context)
     const result2 = di.get(ResScopedRoot, context)
