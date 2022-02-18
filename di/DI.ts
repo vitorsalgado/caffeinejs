@@ -365,14 +365,16 @@ export class DI {
     }
   }
 
-  unbindAsync<T>(token: Token<T>): Promise<void> {
+  async unbindAsync<T>(token: Token<T>): Promise<void> {
     notNil(token)
 
     if (this.has(token)) {
-      const binding = this.bindingRegistry.get(token)
+      const bindings = this.getBindings(token)
 
-      if (binding?.cachedInstance && binding?.preDestroy) {
-        return DI.preDestroyBinding(binding).finally(() => this.unref(token))
+      for (const binding of bindings) {
+        if (binding?.cachedInstance && binding?.preDestroy) {
+          await DI.preDestroyBinding(binding).finally(() => this.unref(token))
+        }
       }
 
       this.unref(token)
@@ -443,6 +445,7 @@ export class DI {
   resetInstances(): void {
     for (const [, binding] of this.bindingRegistry.entries()) {
       binding.cachedInstance = undefined
+      DI.getScope(binding.scopeId).remove(binding)
     }
   }
 
@@ -452,7 +455,21 @@ export class DI {
     const bindings = this.getBindings(token)
 
     for (const binding of bindings) {
-      binding.cachedInstance = undefined
+      DI.getScope(binding.scopeId).remove(binding)
+    }
+  }
+
+  async resetInstanceAsync(token: Token): Promise<void> {
+    notNil(token)
+
+    const bindings = this.getBindings(token)
+
+    for (const binding of bindings) {
+      if (binding.cachedInstance && binding.preDestroy) {
+        await DI.preDestroyBinding(binding).finally(() => this.unref(token))
+      }
+
+      DI.getScope(binding.scopeId).remove(binding)
     }
   }
 
