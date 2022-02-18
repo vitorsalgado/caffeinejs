@@ -1,7 +1,7 @@
 import { performance } from 'perf_hooks'
 import { expect } from '@jest/globals'
-import { di } from '../_bench/_fixtures/di.js'
 import { Root } from './_fixtures/caf.js'
+import { di } from './_fixtures/caf.js'
 import { inv } from './_fixtures/inversify.js'
 import { InvRoot } from './_fixtures/inversify.js'
 import { tsy } from './_fixtures/tsy.js'
@@ -44,6 +44,10 @@ describe('Performance Compare', function () {
 
   it('should resolve 15k times in less time then the others', () => {
     const times = 15000
+
+    expect(inv.get(InvRoot)).toBeInstanceOf(InvRoot)
+    expect(tsy.resolve(TsyRoot)).toBeInstanceOf(TsyRoot)
+    expect(di.get(Root)).toBeInstanceOf(Root)
 
     const invRes = resolve(times, () => inv.get(InvRoot))
     const tsyRes = resolve(times, () => tsy.resolve(TsyRoot))

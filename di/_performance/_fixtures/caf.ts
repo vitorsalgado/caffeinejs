@@ -1,5 +1,6 @@
 import { Injectable } from '../../decorators/index.js'
 import { TransientScoped } from '../../decorators/index.js'
+import { DI } from '../../DI.js'
 
 @Injectable()
 @TransientScoped()
@@ -16,3 +17,7 @@ class Svc {
 export class Root {
   constructor(readonly svc: Svc) {}
 }
+
+const di = DI.setup()
+
+export { di }
