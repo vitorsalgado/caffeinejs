@@ -50,6 +50,7 @@ import { RefreshScope } from './internal/RefreshScope.js'
 
 export class DI {
   static MetadataReader = new InternalMetadataReader()
+
   protected static readonly Scopes = new Map(DI.builtInScopes().entries())
   protected static readonly PostProcessors = new Set<PostProcessor>()
 
@@ -76,6 +77,14 @@ export class DI {
     this.lateBind = opts.lateBind
     this.overriding = opts.overriding
     this.scopeId = opts.scopeId || Lifecycle.SINGLETON
+  }
+
+  get [Symbol.toStringTag]() {
+    return DI.name
+  }
+
+  get size(): number {
+    return this.bindingRegistry.size()
   }
 
   static setup(options: Partial<Options> | Identifier = '', parent?: DI): DI {
@@ -166,6 +175,37 @@ export class DI {
     check('read' in other && other.read.length === 1, 'Provided instance must be an MetadataReader implementation.')
 
     DI.MetadataReader = other
+  }
+
+  protected static async preDestroyBinding(binding: Binding): Promise<void> {
+    const scope = DI.Scopes.get(binding.scopeId) as Scope
+    const instance: any = scope.cachedInstance(binding)
+
+    const r = instance?.[binding.preDestroy as Identifier]()
+
+    if (r && 'then' in r && typeof r.then === 'function') {
+      return r.finally(() => scope.remove(binding))
+    }
+
+    scope.remove(binding)
+
+    return Promise.resolve()
+  }
+
+  protected static registerInternalComponents(di: DI) {
+    if (!di.has(ServiceLocator)) {
+      di.bind(ServiceLocator).toValue(new DefaultServiceLocator(di)).as(Lifecycle.SINGLETON)
+    }
+  }
+
+  protected static builtInScopes() {
+    return new Map<Identifier, Scope>()
+      .set(Lifecycle.SINGLETON, new SingletonScope())
+      .set(Lifecycle.CONTAINER, new ContainerScope())
+      .set(Lifecycle.LOCAL_RESOLUTION, new LocalResolutionScope())
+      .set(Lifecycle.TRANSIENT, new TransientScope())
+      .set(Lifecycle.REQUEST, new RequestScope())
+      .set(Lifecycle.REFRESH, new RefreshScope())
   }
 
   configureBinding<T>(token: Token<T>, binding: Binding<T>): void {
@@ -534,45 +574,6 @@ export class DI {
 
   [Symbol.iterator](): IterableIterator<[Token, Binding]> {
     return this.bindingRegistry.entries()
-  }
-
-  get [Symbol.toStringTag]() {
-    return DI.name
-  }
-
-  get size(): number {
-    return this.bindingRegistry.size()
-  }
-
-  protected static async preDestroyBinding(binding: Binding): Promise<void> {
-    const scope = DI.Scopes.get(binding.scopeId) as Scope
-    const instance: any = scope.cachedInstance(binding)
-
-    const r = instance?.[binding.preDestroy as Identifier]()
-
-    if (r && 'then' in r && typeof r.then === 'function') {
-      return r.finally(() => scope.remove(binding))
-    }
-
-    scope.remove(binding)
-
-    return Promise.resolve()
-  }
-
-  protected static registerInternalComponents(di: DI) {
-    if (!di.has(ServiceLocator)) {
-      di.bind(ServiceLocator).toValue(new DefaultServiceLocator(di)).as(Lifecycle.SINGLETON)
-    }
-  }
-
-  protected static builtInScopes() {
-    return new Map<Identifier, Scope>()
-      .set(Lifecycle.SINGLETON, new SingletonScope())
-      .set(Lifecycle.CONTAINER, new ContainerScope())
-      .set(Lifecycle.LOCAL_RESOLUTION, new LocalResolutionScope())
-      .set(Lifecycle.TRANSIENT, new TransientScope())
-      .set(Lifecycle.REQUEST, new RequestScope())
-      .set(Lifecycle.REFRESH, new RefreshScope())
   }
 
   protected setup(): void {
