@@ -1,13 +1,12 @@
 import { BinderOptions } from './BinderOptions.js'
+import { BindToOptions } from './BinderOptions.js'
 import { Provider } from './Provider.js'
-import { DI } from './DI.js'
 import { Token } from './Token.js'
 import { isNamedToken } from './Token.js'
 import { tokenStr } from './Token.js'
 import { Binding } from './Binding.js'
 import { check } from './internal/utils/check.js'
 import { notNil } from './internal/utils/notNil.js'
-import { BindToOptions } from './BinderOptions.js'
 import { InvalidBindingError } from './internal/errors.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { ClassProvider } from './internal/providers/ClassProvider.js'
@@ -16,6 +15,7 @@ import { TokenProvider } from './internal/providers/TokenProvider.js'
 import { FactoryProvider } from './internal/providers/FactoryProvider.js'
 import { Ctor } from './internal/types.js'
 import { Identifier } from './internal/types.js'
+import { Container } from './Container.js'
 
 export interface Binder<T> {
   to(ctor: Ctor<T>): BinderOptions<T>
@@ -32,15 +32,19 @@ export interface Binder<T> {
 }
 
 export class BindTo<T> implements Binder<T> {
-  constructor(private readonly di: DI, private readonly token: Token<T>, private readonly binding: Binding<T>) {}
+  constructor(
+    private readonly container: Container,
+    private readonly token: Token<T>,
+    private readonly binding: Binding<T>
+  ) {}
 
   to(ctor: Ctor<T>): BindToOptions<T> {
     check(typeof ctor === 'function', `Binding .to() parameter must be class reference. Received: ${typeof ctor}`)
 
     this.binding.rawProvider = new ClassProvider(ctor)
-    this.di.configureBinding(this.token, this.binding)
+    this.container.configureBinding(this.token, this.binding)
 
-    return new BindToOptions<T>(this.di, this.token, this.binding)
+    return new BindToOptions<T>(this.container, this.token, this.binding)
   }
 
   toSelf(): BindToOptions<T> {
@@ -55,18 +59,18 @@ export class BindTo<T> implements Binder<T> {
 
   toValue(value: T): BinderOptions<T> {
     this.binding.rawProvider = new ValueProvider(value)
-    this.di.configureBinding(this.token, this.binding)
+    this.container.configureBinding(this.token, this.binding)
 
-    return new BindToOptions<T>(this.di, this.token, this.binding)
+    return new BindToOptions<T>(this.container, this.token, this.binding)
   }
 
   toToken(token: Identifier): BinderOptions<T> {
     notNil(token)
 
     this.binding.rawProvider = new TokenProvider(token)
-    this.di.configureBinding(this.token, this.binding)
+    this.container.configureBinding(this.token, this.binding)
 
-    return new BindToOptions<T>(this.di, this.token, this.binding)
+    return new BindToOptions<T>(this.container, this.token, this.binding)
   }
 
   toFactory(factory: (ctx: ResolutionContext) => T): BinderOptions<T> {
@@ -80,9 +84,9 @@ export class BindTo<T> implements Binder<T> {
     )
 
     this.binding.rawProvider = new FactoryProvider(factory)
-    this.di.configureBinding(this.token, this.binding)
+    this.container.configureBinding(this.token, this.binding)
 
-    return new BindToOptions<T>(this.di, this.token, this.binding)
+    return new BindToOptions<T>(this.container, this.token, this.binding)
   }
 
   toProvider(provider: Provider<T>): BinderOptions<T> {
@@ -92,8 +96,8 @@ export class BindTo<T> implements Binder<T> {
     )
 
     this.binding.rawProvider = provider
-    this.di.configureBinding(this.token, this.binding)
+    this.container.configureBinding(this.token, this.binding)
 
-    return new BindToOptions<T>(this.di, this.token, this.binding)
+    return new BindToOptions<T>(this.container, this.token, this.binding)
   }
 }

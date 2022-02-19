@@ -7,6 +7,6 @@ export class ClassProvider<T = any> implements Provider<T> {
   constructor(private readonly clazz: Ctor<T>) {}
 
   provide(ctx: ResolutionContext): T {
-    return Resolver.construct(ctx.di, this.clazz, ctx.binding, ctx.args)
+    return Resolver.construct(ctx.container, this.clazz, ctx.binding, ctx.args)
   }
 }

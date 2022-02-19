@@ -14,15 +14,15 @@ describe('Conditionals', function () {
     class Managed {}
 
     @Injectable()
-    @ConditionalOn(ctx => ctx.di.has(NonManaged))
+    @ConditionalOn(ctx => ctx.container.has(NonManaged))
     class NoPass {}
 
     @Injectable()
-    @ConditionalOn(ctx => ctx.di.has(NonManaged), () => process.env.NODE === 'test')
+    @ConditionalOn(ctx => ctx.container.has(NonManaged), () => process.env.NODE === 'test')
     class NoPassToo {}
 
     @Injectable()
-    @ConditionalOn(ctx => ctx.di.has(Managed))
+    @ConditionalOn(ctx => ctx.container.has(Managed))
     @ConditionalOn(() => true)
     class Pass {}
 

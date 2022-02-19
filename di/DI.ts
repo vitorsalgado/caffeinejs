@@ -1,4 +1,5 @@
 import { Binder } from './Binder.js'
+import { BindTo } from './Binder.js'
 import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
@@ -26,8 +27,6 @@ import { TokenProvider } from './internal/providers/TokenProvider.js'
 import { TransientScope } from './internal/scopes/TransientScope.js'
 import { Vars } from './internal/Vars.js'
 import { Lifecycle } from './Lifecycle.js'
-import { InitialOptions } from './Options.js'
-import { Options } from './Options.js'
 import { PostProcessor } from './PostProcessor.js'
 import { Resolver } from './Resolver.js'
 import { Scope } from './Scope.js'
@@ -41,14 +40,16 @@ import { notNil } from './internal/utils/notNil.js'
 import { RequestScope } from './internal/scopes/RequestScope.js'
 import { RefreshScope } from './internal/scopes/RefreshScope.js'
 import { Filter } from './Filter.js'
-import { ContainerLifecycle } from './ContainerLifecycle.js'
-import { BindTo } from './Binder.js'
 import { MetadataReader } from './MetadataReader.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { ValueProvider } from './internal/providers/ValueProvider.js'
 import { Identifier } from './internal/types.js'
+import { Container } from './Container.js'
+import { InitialOptions } from './Container.js'
+import { ContainerOptions } from './Container.js'
+import { ContainerLifecycle } from './Container.js'
 
-export class DI {
+export class DI implements Container {
   protected static Filters: Filter[] = []
   protected static readonly Scopes = new Map(DI.builtInScopes().entries())
   protected static readonly PostProcessors = new Set<PostProcessor>()
@@ -66,7 +67,7 @@ export class DI {
   readonly namespace: Identifier
   readonly parent?: DI
 
-  constructor(options: Partial<Options> | Identifier, parent?: DI) {
+  constructor(options: Partial<ContainerOptions> | Identifier, parent?: DI) {
     const opts =
       typeof options === 'string' || typeof options === 'symbol'
         ? { ...InitialOptions, namespace: options }
@@ -89,7 +90,7 @@ export class DI {
     return this.bindingRegistry.size()
   }
 
-  static setup(options: Partial<Options> | Identifier = '', parent?: DI): DI {
+  static setup(options: Partial<ContainerOptions> | Identifier = '', parent?: DI): DI {
     const di = new DI(options, parent)
     di.setup()
 
@@ -161,9 +162,9 @@ export class DI {
     return Promise.resolve()
   }
 
-  protected static registerInternalComponents(di: DI) {
-    if (!di.has(ServiceLocator)) {
-      di.bind(ServiceLocator).toValue(new DefaultServiceLocator(di)).as(Lifecycle.SINGLETON)
+  protected static registerInternalComponents(container: DI) {
+    if (!container.has(ServiceLocator)) {
+      container.bind(ServiceLocator).toValue(new DefaultServiceLocator(container)).as(Lifecycle.SINGLETON)
     }
   }
 
@@ -190,7 +191,7 @@ export class DI {
     if (rawProvider instanceof TokenProvider) {
       const path = [token]
       let tokenProvider: TokenProvider<any> | null = rawProvider
-      const ctx: ResolutionContext = { di: this, token, binding }
+      const ctx: ResolutionContext = { container: this, token, binding }
 
       while (tokenProvider !== null) {
         const currentToken: Token = tokenProvider.provide(ctx)
@@ -413,7 +414,7 @@ export class DI {
     return this.unbindAsync(token).then(() => this.bind(token))
   }
 
-  newChild(): DI {
+  newChild(): Container {
     const child = new DI(
       {
         lazy: this.lazy,
@@ -520,7 +521,7 @@ export class DI {
         continue
       }
 
-      const pass = binding.conditionals.every(conditional => conditional({ di: this }))
+      const pass = binding.conditionals.every(conditional => conditional({ container: this }))
 
       if (pass) {
         DI.Inspector?.onBound(token, binding)
@@ -552,7 +553,9 @@ export class DI {
       }
 
       const pass =
-        binding.conditionals === undefined ? true : binding.conditionals.every(conditional => conditional({ di: this }))
+        binding.conditionals === undefined
+          ? true
+          : binding.conditionals.every(conditional => conditional({ container: this }))
 
       if (pass) {
         if (this.has(token) && !this.overriding) {

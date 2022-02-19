@@ -1,5 +1,5 @@
-import { DI } from './DI.js'
 import { Token } from './Token.js'
+import { Container } from './Container.js'
 
 export interface LocatorOptions {
   args?: unknown
@@ -14,19 +14,19 @@ export abstract class ServiceLocator {
 }
 
 export class DefaultServiceLocator extends ServiceLocator {
-  constructor(private readonly di: DI) {
+  constructor(private readonly container: Container) {
     super()
   }
 
   get<T>(key: Token<T>, options?: Partial<LocatorOptions>): T {
-    return this.di.get(key, options?.args)
+    return this.container.get(key, options?.args)
   }
 
   getMany<T>(key: Token<T>, options?: Partial<LocatorOptions>): T[] {
-    return this.di.getMany(key, options?.args)
+    return this.container.getMany(key, options?.args)
   }
 
   has(key: Token): boolean {
-    return this.di.has(key)
+    return this.container.has(key)
   }
 }

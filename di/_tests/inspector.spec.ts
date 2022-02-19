@@ -1,6 +1,5 @@
 import { jest } from '@jest/globals'
 import { expect } from '@jest/globals'
-import { ContainerLifecycle } from '../ContainerLifecycle.js'
 import { Token } from '../Token.js'
 import { Binding } from '../Binding.js'
 import { DI } from '../DI.js'
@@ -9,6 +8,7 @@ import { Configuration } from '../decorators/Configuration.js'
 import { Namespace } from '../decorators/Namespace.js'
 import { Bean } from '../decorators/Bean.js'
 import { Injectable } from '../decorators/Injectable.js'
+import { ContainerLifecycle } from '../Container.js'
 
 describe('Inspections', function () {
   const spy = jest.fn()

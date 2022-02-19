@@ -121,7 +121,7 @@ describe('Manual Binding', function () {
       const di = DI.setup()
 
       di.bind('val').toValue('test')
-      di.bind(sy).toFactory(({ di }) => `factory-${di.get('val')}`)
+      di.bind(sy).toFactory(({ container }) => `factory-${container.get('val')}`)
       di.bind(FromFactory).toSelf()
 
       const r = di.get(FromFactory)

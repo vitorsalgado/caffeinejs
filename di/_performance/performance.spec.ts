@@ -4,6 +4,7 @@ import { Injectable } from '../decorators/Injectable.js'
 import { PostConstruct } from '../decorators/PostConstruct.js'
 import { TransientScoped } from '../decorators/TransientScoped.js'
 import { Inject } from '../decorators/Inject.js'
+import { Container } from '../Container.js'
 
 describe('Performance', () => {
   const kVal = Symbol('perf_val')
@@ -68,7 +69,7 @@ describe('Performance', () => {
     return result
   }
 
-  function resolveTimes(di: DI, times: number) {
+  function resolveTimes(di: Container, times: number) {
     const result = {
       avg: -1,
       max: -1,

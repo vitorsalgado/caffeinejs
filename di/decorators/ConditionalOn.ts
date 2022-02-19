@@ -1,9 +1,9 @@
 import { DiTypes } from '../internal/DiTypes.js'
-import { DI } from '../DI.js'
 import { configureBean, getBeanConfiguration } from '../internal/utils/beanUtils.js'
+import { Container } from '../Container.js'
 
 export interface ConditionContext {
-  di: DI
+  container: Container
 }
 
 export type Conditional = (ctx: ConditionContext) => boolean
