@@ -1,5 +1,7 @@
 import { performance } from 'perf_hooks'
 import { expect } from '@jest/globals'
+import { yellow, blue } from 'colorette'
+import { gray } from 'colorette'
 import { Root } from './_fixtures/caf.js'
 import { di } from './_fixtures/caf.js'
 import { RootSingleton } from './_fixtures/caf.js'
@@ -9,6 +11,10 @@ import { tsy } from './_fixtures/tsy.js'
 import { TsyRoot } from './_fixtures/tsy.js'
 import { bootstrap } from './_fixtures/nest.js'
 import { NestRoot } from './_fixtures/nest.js'
+
+const failIfLess = process.env.TEST_FAIL_PERF === 'true'
+
+const diff = (a: number, b: number) => '~' + String(Math.round(((a - b) / b) * 100)) + '%'
 
 describe('Performance Compare', function () {
   function resolve(times: number, res: () => unknown) {
@@ -59,15 +65,35 @@ describe('Performance Compare', function () {
       const diSingletonRes = resolve(times, () => di.get(RootSingleton))
       const nestRes = resolve(times, () => nestApp.get(NestRoot))
 
-      console.log('DI Avg: ' + String(diRes.avg))
-      console.log('DI Singleton Avg: ' + String(diSingletonRes.avg))
-      console.log('Inversify Avg: ' + String(invRes.avg))
-      console.log('Tsyringe Avg: ' + String(tsyRes.avg))
-      console.log('NestJs Avg: ' + String(nestRes.avg))
+      console.log('DI Avg: ' + gray(String(diRes.avg)))
+      console.log('DI Singleton Avg: ' + gray(String(diSingletonRes.avg)))
 
-      expect(diRes.avg).toBeLessThan(invRes.avg)
-      expect(diRes.avg).toBeLessThan(tsyRes.avg)
-      expect(diSingletonRes.avg).toBeLessThan(nestRes.avg)
+      console.log('Inversify Avg: ' + gray(String(invRes.avg)))
+      if (diRes.avg > invRes.avg) {
+        console.log(yellow(`PERF: Diff Inversify ${diff(diRes.avg, invRes.avg)}`))
+      } else {
+        console.log(blue(`PERF: Diff Inversify ${diff(invRes.avg, diRes.avg)}`))
+      }
+
+      console.log('Tsyringe Avg: ' + gray(String(tsyRes.avg)))
+      if (diRes.avg > tsyRes.avg) {
+        console.log(yellow(`PERF: Diff Tsyringe ${diff(diRes.avg, tsyRes.avg)}`))
+      } else {
+        console.log(blue(`PERF: Diff Tsyringe ${diff(tsyRes.avg, diRes.avg)}`))
+      }
+
+      console.log('NestJs Avg: ' + gray(String(nestRes.avg)))
+      if (diSingletonRes.avg > nestRes.avg) {
+        console.log(yellow(`PERF: Diff NestJs ${diff(diRes.avg, nestRes.avg)}`))
+      } else {
+        console.log(blue(`PERF: Diff NestJs ${diff(nestRes.avg, diRes.avg)}`))
+      }
+
+      if (failIfLess) {
+        expect(diRes.avg).toBeLessThan(invRes.avg)
+        expect(diRes.avg).toBeLessThan(tsyRes.avg)
+        expect(diSingletonRes.avg).toBeLessThan(nestRes.avg)
+      }
     })
   })
 })
