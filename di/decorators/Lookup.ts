@@ -1,10 +1,10 @@
 import { Vars } from '../internal/Vars.js'
-import { InvalidBindingError } from '../internal/index.js'
-import { InvalidInjectionToken } from '../internal/index.js'
 import { Token } from '../Token.js'
 import { TokenSpec } from '../Token.js'
 import { isValidToken } from '../Token.js'
 import { notNil } from '../internal/utils/notNil.js'
+import { InvalidBindingError } from '../internal/DiError.js'
+import { InvalidInjectionToken } from '../internal/DiError.js'
 
 export interface LookupOptions {
   multiple?: boolean

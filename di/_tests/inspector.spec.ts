@@ -4,11 +4,11 @@ import { ContainerLifecycle } from '../ContainerLifecycle.js'
 import { Token } from '../Token.js'
 import { Binding } from '../Binding.js'
 import { DI } from '../DI.js'
-import { Injectable } from '../decorators/index.js'
-import { ConditionalOn } from '../decorators/index.js'
-import { Namespace } from '../decorators/index.js'
-import { Configuration } from '../decorators/index.js'
-import { Bean } from '../decorators/index.js'
+import { ConditionalOn } from '../decorators/ConditionalOn.js'
+import { Configuration } from '../decorators/Configuration.js'
+import { Namespace } from '../decorators/Namespace.js'
+import { Bean } from '../decorators/Bean.js'
+import { Injectable } from '../decorators/Injectable.js'
 
 describe('Inspections', function () {
   const spy = jest.fn()

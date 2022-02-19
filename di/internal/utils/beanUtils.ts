@@ -1,22 +1,7 @@
 import { Vars } from '../Vars.js'
-import { Identifier } from '../types/index.js'
-import { Token } from '../../Token.js'
-import { TokenSpec } from '../../Token.js'
 import { tokenStr } from '../../Token.js'
-import { Conditional } from '../../decorators/index.js'
+import { ConfigurationProviderOptions } from '../../decorators/ConfigurationProviderOptions.js'
 import { RepeatedInjectableConfigurationError } from '../DiError.js'
-
-export interface ConfigurationProviderOptions {
-  scopeId: Identifier
-  token: Token
-  dependencies: TokenSpec[]
-  conditionals: Conditional[]
-  names: Identifier[]
-  type: Function
-  primary: boolean
-  late: boolean
-  lazy: boolean
-}
 
 const Def: Partial<ConfigurationProviderOptions> = {
   dependencies: [],

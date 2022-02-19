@@ -1,6 +1,6 @@
-import { Injectable } from '../../decorators/index.js'
-import { TransientScoped } from '../../decorators/index.js'
 import { DI } from '../../DI.js'
+import { Injectable } from '../../decorators/Injectable.js'
+import { TransientScoped } from '../../decorators/TransientScoped.js'
 
 @Injectable()
 @TransientScoped()

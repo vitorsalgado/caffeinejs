@@ -6,7 +6,7 @@ import { Identifier } from '../internal/types/Identifier.js'
 import { BeanFactoryProvider } from '../internal/BeanFactoryProvider.js'
 import { getParamTypes } from '../internal/utils/getParamTypes.js'
 import { isNil } from '../internal/utils/isNil.js'
-import { ConfigurationProviderOptions } from '../internal/index.js'
+import { ConfigurationProviderOptions } from './ConfigurationProviderOptions.js'
 
 export interface ConfigurationOptions {
   namespace: Identifier

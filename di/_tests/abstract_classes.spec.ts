@@ -8,7 +8,7 @@ import { Named } from '../decorators/Named.js'
 import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
 import { Lifecycle } from '../Lifecycle.js'
-import { TransientScoped } from '../decorators/index.js'
+import { TransientScoped } from '../decorators/TransientScoped.js'
 
 describe('Abstract Classes', function () {
   describe('when referencing the abstract class on constructor without naming', function () {

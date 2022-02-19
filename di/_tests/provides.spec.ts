@@ -2,11 +2,11 @@ import { expect } from '@jest/globals'
 import { v4 } from 'uuid'
 import { Provides } from '../decorators/Provides.js'
 import { Provider } from '../Provider.js'
-import { ResolutionContext } from '../internal/index.js'
 import { DI } from '../DI.js'
-import { TransientScoped } from '../decorators/index.js'
-import { Injectable } from '../decorators/index.js'
-import { Inject } from '../decorators/index.js'
+import { TransientScoped } from '../decorators/TransientScoped.js'
+import { ResolutionContext } from '../internal/ResolutionContext.js'
+import { Injectable } from '../decorators/Injectable.js'
+import { Inject } from '../decorators/Inject.js'
 
 describe('Provides', function () {
   class Repo<T = any> {

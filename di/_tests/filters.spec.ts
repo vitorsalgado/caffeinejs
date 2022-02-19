@@ -2,9 +2,9 @@ import { expect } from '@jest/globals'
 import { Filter } from '../Filter.js'
 import { Token } from '../Token.js'
 import { Binding } from '../Binding.js'
-import { Injectable } from '../decorators/index.js'
 import { DI } from '../DI.js'
-import { Optional } from '../decorators/index.js'
+import { Injectable } from '../decorators/Injectable.js'
+import { Optional } from '../decorators/Optional.js'
 
 describe('Filters', function () {
   const kMeta = '__test_filter'

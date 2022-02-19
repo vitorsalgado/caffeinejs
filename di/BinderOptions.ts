@@ -3,8 +3,8 @@ import { DI } from './DI.js'
 import { Token } from './Token.js'
 import { Binding } from './Binding.js'
 import { notNil } from './internal/utils/notNil.js'
-import { InvalidBindingError } from './internal/index.js'
 import { Lifecycle } from './Lifecycle.js'
+import { InvalidBindingError } from './internal/DiError.js'
 
 export interface BinderOptions<T> {
   as(scopeId: Identifier): BinderOptions<T>

@@ -5,9 +5,9 @@ import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
 import { Optional } from '../decorators/Optional.js'
 import { DI } from '../DI.js'
-import { InternalMetadataReader } from '../internal/MetadataReader.js'
-import { MetadataReader } from '../internal/MetadataReader.js'
+import { InternalMetadataReader } from '../internal/InternalMetadataReader.js'
 import { Token } from '../Token.js'
+import { MetadataReader } from '../MetadataReader.js'
 
 describe('DI', function () {
   const kTestName = Symbol('test-name')

@@ -1,4 +1,4 @@
-import { ResolutionContext } from './internal/index.js'
+import { ResolutionContext } from './internal/ResolutionContext.js'
 
 export interface PostProcessor {
   beforeInit(instance: unknown, ctx: ResolutionContext): unknown

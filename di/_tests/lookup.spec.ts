@@ -1,13 +1,13 @@
 import { v4 } from 'uuid'
 import { expect } from '@jest/globals'
-import { Injectable } from '../decorators/index.js'
-import { ScopedAs } from '../decorators/index.js'
 import { Lifecycle } from '../Lifecycle.js'
 import { Lookup } from '../decorators/Lookup.js'
 import { lookup } from '../lookup.js'
 import { DI } from '../DI.js'
-import { InvalidBindingError } from '../internal/index.js'
-import { InvalidInjectionToken } from '../internal/index.js'
+import { InvalidBindingError } from '../internal/DiError.js'
+import { InvalidInjectionToken } from '../internal/DiError.js'
+import { Injectable } from '../decorators/Injectable.js'
+import { ScopedAs } from '../decorators/ScopedAs.js'
 
 describe('Lookup', function () {
   @Injectable()

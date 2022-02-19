@@ -1,10 +1,6 @@
 import { Binding } from '../Binding.js'
-import { Token } from '../Token.js'
 import { TokenSpec } from '../Token.js'
-
-export interface MetadataReader {
-  read(token: Token): Partial<Binding>
-}
+import { MetadataReader } from '../MetadataReader.js'
 
 export class InternalMetadataReader implements MetadataReader {
   read(token: any): Partial<Binding> {

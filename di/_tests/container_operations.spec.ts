@@ -4,7 +4,7 @@ import { jest } from '@jest/globals'
 import { Inject } from '../decorators/Inject.js'
 import { DI } from '../DI.js'
 import { Injectable } from '../decorators/Injectable.js'
-import { PreDestroy } from '../decorators/index.js'
+import { PreDestroy } from '../decorators/PreDestroy.js'
 
 describe('Basic', function () {
   describe('calling .clear()', function () {

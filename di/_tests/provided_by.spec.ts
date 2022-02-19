@@ -6,7 +6,7 @@ import { DI } from '../DI.js'
 import { ClassProvider } from '../internal/ClassProvider.js'
 import { Provider } from '../Provider.js'
 import { Ctor } from '../internal/types/Ctor.js'
-import { ResolutionContext } from '../internal/index.js'
+import { ResolutionContext } from '../internal/ResolutionContext.js'
 
 describe('Provided By', function () {
   const spy = jest.fn()

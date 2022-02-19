@@ -9,7 +9,7 @@ import { DI } from '../DI.js'
 import { Provider } from '../Provider.js'
 import { PostProcessor } from '../PostProcessor.js'
 import { Scope } from '../Scope.js'
-import { ResolutionContext } from '../internal/index.js'
+import { ResolutionContext } from '../internal/ResolutionContext.js'
 
 describe('Post Processors', function () {
   const ppSpy = jest.fn()

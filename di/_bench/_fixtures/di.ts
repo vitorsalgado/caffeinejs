@@ -1,8 +1,8 @@
-import { Injectable } from '../../decorators/index.js'
-import { TransientScoped } from '../../decorators/index.js'
-import { Inject } from '../../decorators/index.js'
+import { Injectable } from '../../decorators/Injectable.js'
+import { TransientScoped } from '../../decorators/TransientScoped.js'
+import { Named } from '../../decorators/Named.js'
+import { Inject } from '../../decorators/Inject.js'
 import { DI } from '../../DI.js'
-import { Named } from '../../decorators/index.js'
 
 export interface Caf {
   get(): string

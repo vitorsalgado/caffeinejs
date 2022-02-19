@@ -2,7 +2,7 @@ import { Token } from './Token.js'
 import { ClassProvider } from './internal/ClassProvider.js'
 import { TokenProvider } from './internal/TokenProvider.js'
 import { Ctor } from './internal/types/Ctor.js'
-import { ResolutionContext } from './internal/index.js'
+import { ResolutionContext } from './internal/ResolutionContext.js'
 
 export interface Provider<T = any> {
   provide(ctx: ResolutionContext): T

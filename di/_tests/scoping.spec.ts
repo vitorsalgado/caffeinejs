@@ -12,7 +12,7 @@ import { ScopeNotRegisteredError } from '../internal/DiError.js'
 import { Provider } from '../Provider.js'
 import { Lifecycle } from '../Lifecycle.js'
 import { Scope } from '../Scope.js'
-import { ResolutionContext } from '../internal/index.js'
+import { ResolutionContext } from '../internal/ResolutionContext.js'
 
 describe('Scoping', function () {
   const kCustomScopeId = Symbol('custom')
