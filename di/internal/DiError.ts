@@ -102,3 +102,10 @@ export class InvalidInjectionToken extends DiError {
     this.name = 'InvalidInjectionToken'
   }
 }
+
+export class MissingRequiredProviderArgumentError extends DiError {
+  constructor(message: string) {
+    super(message, 'MISS_REQ_PROVIDER_ARG')
+    this.name = 'MissingRequiredProviderArgumentError'
+  }
+}

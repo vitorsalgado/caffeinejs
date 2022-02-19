@@ -30,7 +30,6 @@ import { Lifecycle } from './Lifecycle.js'
 import { InitialOptions } from './Options.js'
 import { Options } from './Options.js'
 import { PostProcessor } from './PostProcessor.js'
-import { LocalResolutions } from './LocalResolutions.js'
 import { Resolver } from './Resolver.js'
 import { Scope } from './Scope.js'
 import { DefaultServiceLocator } from './ServiceLocator.js'
@@ -212,11 +211,11 @@ export class DI {
       .set(Lifecycle.REFRESH, new RefreshScope())
   }
 
-  configureBinding<T>(token: Token<T>, _binding: Binding<T>): void {
+  configureBinding<T>(token: Token<T>, incoming: Binding<T>): void {
     notNil(token)
-    notNil(_binding)
+    notNil(incoming)
 
-    const binding = { ..._binding, ...this.metadataReader.read(token) }
+    const binding = { ...incoming, ...this.metadataReader.read(token) }
     const scopeId = binding.scopeId ? binding.scopeId : this.scopeId
     const rawProvider = providerFromToken(token, binding.rawProvider)
 
@@ -225,7 +224,7 @@ export class DI {
     if (rawProvider instanceof TokenProvider) {
       const path = [token]
       let tokenProvider: TokenProvider<any> | null = rawProvider
-      const ctx: ResolutionContext = { di: this, token, binding, localResolutions: LocalResolutions.INSTANCE }
+      const ctx: ResolutionContext = { di: this, token, binding }
 
       while (tokenProvider !== null) {
         const currentToken: Token = tokenProvider.provide(ctx)
@@ -262,11 +261,10 @@ export class DI {
 
         if (descriptor && typeof descriptor.get === 'function') {
           Object.defineProperty(token.prototype, propertyKey, {
-            get: () => Resolver.resolveParam(this, token, spec, propertyKey, LocalResolutions.INSTANCE)
+            get: () => Resolver.resolveParam(this, token, spec, propertyKey)
           })
         } else {
-          token.prototype[propertyKey] = () =>
-            Resolver.resolveParam(this, token, spec, propertyKey, LocalResolutions.INSTANCE)
+          token.prototype[propertyKey] = () => Resolver.resolveParam(this, token, spec, propertyKey)
         }
       }
     }
@@ -320,24 +318,24 @@ export class DI {
     this.mapNamed(binding)
   }
 
-  get<T>(token: Token<T>, context: LocalResolutions = LocalResolutions.INSTANCE): T {
+  get<T>(token: Token<T>, args?: unknown): T {
     const bindings = this.getBindings<T>(token)
 
     if (bindings.length > 1) {
       const primary = bindings.find(x => x.primary)
 
       if (primary) {
-        return Resolver.resolve<T>(this, token, primary, context)
+        return Resolver.resolve<T>(this, token, primary, args)
       }
 
       throw new NoUniqueInjectionForTokenError(token)
     }
 
-    return Resolver.resolve<T>(this, token, bindings[0], context)
+    return Resolver.resolve<T>(this, token, bindings[0], args)
   }
 
-  getRequired<T>(token: Token<T>, context: LocalResolutions = LocalResolutions.INSTANCE): T {
-    const result = this.get(token, context)
+  getRequired<T>(token: Token<T>, args?: unknown): T {
+    const result = this.get(token, args)
 
     if (isNil(result)) {
       throw new NoResolutionForTokenError({ token })
@@ -346,14 +344,14 @@ export class DI {
     return result
   }
 
-  getMany<T>(token: Token<T>, context: LocalResolutions = LocalResolutions.INSTANCE): T[] {
+  getMany<T>(token: Token<T>, args?: unknown): T[] {
     const bindings = this.getBindings(token)
 
     if (bindings.length === 0) {
       if (this.multipleBeansRefCache.has(token)) {
         const bindings = this.multipleBeansRefCache.get(token) as Binding[]
 
-        return bindings.map(binding => Resolver.resolve(this, token, binding, context))
+        return bindings.map(binding => Resolver.resolve(this, token, binding, args))
       }
 
       let entries = this.search(tk => tk !== token && token.isPrototypeOf(tk))
@@ -371,10 +369,10 @@ export class DI {
         )
       }
 
-      return entries.map(entry => Resolver.resolve(this, entry.token, entry.binding, context))
+      return entries.map(entry => Resolver.resolve(this, entry.token, entry.binding, args))
     }
 
-    return bindings.map(binding => Resolver.resolve(this, token, binding, context))
+    return bindings.map(binding => Resolver.resolve(this, token, binding, args))
   }
 
   has<T>(token: Token<T>, checkParent = false): boolean {
@@ -528,7 +526,7 @@ export class DI {
           binding.scopeId === Lifecycle.CONTAINER ||
           binding.scopeId === Lifecycle.REFRESH)
       ) {
-        Resolver.resolve(this, token, binding, LocalResolutions.INSTANCE)
+        Resolver.resolve(this, token, binding)
       }
     }
   }

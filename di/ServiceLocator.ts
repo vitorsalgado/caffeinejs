@@ -1,9 +1,8 @@
 import { DI } from './DI.js'
-import { LocalResolutions } from './LocalResolutions.js'
 import { Token } from './Token.js'
 
 export interface LocatorOptions {
-  resolutionContext: LocalResolutions
+  args?: unknown
 }
 
 export abstract class ServiceLocator {
@@ -20,11 +19,11 @@ export class DefaultServiceLocator extends ServiceLocator {
   }
 
   get<T>(key: Token<T>, options?: Partial<LocatorOptions>): T {
-    return this.di.get(key, options?.resolutionContext)
+    return this.di.get(key, options?.args)
   }
 
   getMany<T>(key: Token<T>, options?: Partial<LocatorOptions>): T[] {
-    return this.di.getMany(key, options?.resolutionContext)
+    return this.di.getMany(key, options?.args)
   }
 
   has(key: Token): boolean {

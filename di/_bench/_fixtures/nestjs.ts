@@ -59,5 +59,5 @@ export class NestTransientRoot {
 export class App {}
 
 export async function bootstrap() {
-  return await NestFactory.createApplicationContext(App)
+  return await NestFactory.createApplicationContext(App, { logger: false })
 }

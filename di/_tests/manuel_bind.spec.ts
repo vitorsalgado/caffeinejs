@@ -10,9 +10,9 @@ import { DI } from '../DI.js'
 import { MultiplePrimaryError } from '../internal/DiError.js'
 import { InvalidBindingError } from '../internal/DiError.js'
 import { Provider } from '../Provider.js'
-import { LocalResolutions } from '../LocalResolutions.js'
 import { Lifecycle } from '../Lifecycle.js'
 import { ResolutionContext } from '../internal/ResolutionContext.js'
+import { LocalResolutions } from '../LocalResolutions.js'
 
 describe('Manual Binding', function () {
   describe('general bindings', function () {
