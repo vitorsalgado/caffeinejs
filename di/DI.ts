@@ -65,7 +65,7 @@ export class DI {
   readonly namespace: Identifier
   readonly parent?: DI
 
-  protected constructor(options: Partial<Options> | Identifier, parent?: DI) {
+  constructor(options: Partial<Options> | Identifier, parent?: DI) {
     const opts =
       typeof options === 'string' || typeof options === 'symbol'
         ? { ...InitialOptions, namespace: options }
@@ -536,46 +536,7 @@ export class DI {
     ).then(() => this.resetInstances())
   }
 
-  entries(): Iterable<[Token, Binding]> {
-    return this.bindingRegistry.entries()
-  }
-
-  qualifiers(): Iterable<[Identifier, Binding[]]> {
-    return this.bindingNames.entries()
-  }
-
-  toString() {
-    return (
-      `${DI.name}(namespace=${String(this.namespace)}, count=${this.size}) {` +
-      '\n' +
-      this.bindingRegistry
-        .toArray()
-        .map(
-          x =>
-            `${tokenStr(x.token)}: ` +
-            `names=[${x.binding.names?.map(x => tokenStr(x)).join(', ')}], ` +
-            `scope=${x.binding.scopeId.toString()}, ` +
-            `injections=[${x.binding.injections
-              ?.map(
-                x =>
-                  '[' +
-                  (x.token ? tokenStr(x.token) : `${tokenStr(x.tokenType)}`) +
-                  `: optional=${x.optional || false}, multiple=${x.multiple || false}]`
-              )
-              .join(', ')}], ` +
-            `lazy=${x.binding.lazy}, ` +
-            `provider=${x.binding.rawProvider?.constructor?.name}`
-        )
-        .join('\n, ') +
-      '\n}'
-    )
-  }
-
-  [Symbol.iterator](): IterableIterator<[Token, Binding]> {
-    return this.bindingRegistry.entries()
-  }
-
-  protected setup(): void {
+  setup(): void {
     for (const [token, binding] of DiTypes.instance().entries()) {
       if (!this.isRegistrable(binding)) {
         continue
@@ -626,6 +587,45 @@ export class DI {
     }
 
     DI.registerInternalComponents(this)
+  }
+
+  entries(): Iterable<[Token, Binding]> {
+    return this.bindingRegistry.entries()
+  }
+
+  qualifiers(): Iterable<[Identifier, Binding[]]> {
+    return this.bindingNames.entries()
+  }
+
+  toString() {
+    return (
+      `${DI.name}(namespace=${String(this.namespace)}, count=${this.size}) {` +
+      '\n' +
+      this.bindingRegistry
+        .toArray()
+        .map(
+          x =>
+            `${tokenStr(x.token)}: ` +
+            `names=[${x.binding.names?.map(x => tokenStr(x)).join(', ')}], ` +
+            `scope=${x.binding.scopeId.toString()}, ` +
+            `injections=[${x.binding.injections
+              ?.map(
+                x =>
+                  '[' +
+                  (x.token ? tokenStr(x.token) : `${tokenStr(x.tokenType)}`) +
+                  `: optional=${x.optional || false}, multiple=${x.multiple || false}]`
+              )
+              .join(', ')}], ` +
+            `lazy=${x.binding.lazy}, ` +
+            `provider=${x.binding.rawProvider?.constructor?.name}`
+        )
+        .join('\n, ') +
+      '\n}'
+    )
+  }
+
+  [Symbol.iterator](): IterableIterator<[Token, Binding]> {
+    return this.bindingRegistry.entries()
   }
 
   protected isRegistrable(binding: Binding): boolean {
