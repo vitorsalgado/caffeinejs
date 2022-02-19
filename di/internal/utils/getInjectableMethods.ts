@@ -1,6 +1,6 @@
 import { Vars } from '../Vars.js'
-import { Identifier } from '../types/Identifier.js'
 import { TokenSpec } from '../../Token.js'
+import { Identifier } from '../types.js'
 
 export function getInjectableMethods<TFunction extends Function>(
   target: TFunction

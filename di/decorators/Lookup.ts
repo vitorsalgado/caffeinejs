@@ -3,8 +3,8 @@ import { Token } from '../Token.js'
 import { TokenSpec } from '../Token.js'
 import { isValidToken } from '../Token.js'
 import { notNil } from '../internal/utils/notNil.js'
-import { InvalidBindingError } from '../internal/DiError.js'
-import { InvalidInjectionToken } from '../internal/DiError.js'
+import { InvalidBindingError } from '../internal/errors.js'
+import { InvalidInjectionToken } from '../internal/errors.js'
 
 export interface LookupOptions {
   multiple?: boolean

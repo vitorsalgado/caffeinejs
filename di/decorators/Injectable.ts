@@ -1,5 +1,5 @@
 import { Binding } from '../Binding.js'
-import { InvalidBindingError } from '../internal/DiError.js'
+import { InvalidBindingError } from '../internal/errors.js'
 import { isNamedToken } from '../Token.js'
 import { Token } from '../Token.js'
 import { getInjectableMethods } from '../internal/utils/getInjectableMethods.js'

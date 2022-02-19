@@ -1,12 +1,12 @@
 import { v4 } from 'uuid'
 import { expect } from '@jest/globals'
-import { DI } from '../DI.js'
-import { Injectable } from '../decorators/Injectable.js'
-import { Lifecycle } from '../Lifecycle.js'
-import { ScopedAs } from '../decorators/ScopedAs.js'
-import { MissingRequiredProviderArgumentError } from '../internal/DiError.js'
-import { LocalResolutions } from '../LocalResolutions.js'
-import { Binding } from '../Binding.js'
+import { DI } from '../../../DI.js'
+import { Injectable } from '../../../decorators/Injectable.js'
+import { Lifecycle } from '../../../Lifecycle.js'
+import { ScopedAs } from '../../../decorators/ScopedAs.js'
+import { MissingRequiredProviderArgumentError } from '../../errors.js'
+import { LocalResolutions } from '../../../LocalResolutions.js'
+import { Binding } from '../../../Binding.js'
 
 describe('Context Resolution Scoped', function () {
   @Injectable()

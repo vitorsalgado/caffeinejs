@@ -1,6 +1,6 @@
-import { Resolver } from '../Resolver.js'
-import { PostResolutionInterceptor } from '../PostResolutionInterceptor.js'
-import { ResolutionContext } from '../ResolutionContext.js'
+import { Resolver } from '../../Resolver.js'
+import { PostResolutionInterceptor } from '../../PostResolutionInterceptor.js'
+import { ResolutionContext } from '../../ResolutionContext.js'
 
 export class MethodInjectorInterceptor<T> implements PostResolutionInterceptor<T> {
   intercept(instance: any, ctx: ResolutionContext): T {

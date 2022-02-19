@@ -3,7 +3,7 @@ import { Configuration } from '../decorators/Configuration.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Namespace } from '../decorators/Namespace.js'
 import { DI } from '../DI.js'
-import { NoResolutionForTokenError } from '../internal/DiError.js'
+import { NoResolutionForTokenError } from '../internal/errors.js'
 
 describe('Namespace', function () {
   @Injectable()

@@ -1,7 +1,7 @@
 import { Vars } from '../Vars.js'
 import { tokenStr } from '../../Token.js'
 import { ConfigurationProviderOptions } from '../../decorators/ConfigurationProviderOptions.js'
-import { RepeatedInjectableConfigurationError } from '../DiError.js'
+import { RepeatedInjectableConfigurationError } from '../errors.js'
 
 const Def: Partial<ConfigurationProviderOptions> = {
   dependencies: [],

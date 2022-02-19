@@ -7,7 +7,7 @@ import { getLookupProperties } from '../internal/utils/getLookupProperties.js'
 import { Binding } from '../Binding.js'
 import { isNil } from '../internal/utils/isNil.js'
 import { configureBean } from '../internal/utils/beanUtils.js'
-import { InvalidBindingError } from '../internal/DiError.js'
+import { InvalidBindingError } from '../internal/errors.js'
 import { DiTypes } from '../internal/DiTypes.js'
 import { ConfigurationProviderOptions } from './ConfigurationProviderOptions.js'
 

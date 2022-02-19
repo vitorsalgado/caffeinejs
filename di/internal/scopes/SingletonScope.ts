@@ -1,7 +1,7 @@
-import { Binding } from '../Binding.js'
-import { Scope } from '../Scope.js'
-import { Provider } from '../Provider.js'
-import { ResolutionContext } from '../ResolutionContext.js'
+import { Binding } from '../../Binding.js'
+import { Scope } from '../../Scope.js'
+import { Provider } from '../../Provider.js'
+import { ResolutionContext } from '../../ResolutionContext.js'
 
 export class SingletonScope implements Scope {
   protected readonly _cachedInstances = new Map<number, unknown | undefined>()

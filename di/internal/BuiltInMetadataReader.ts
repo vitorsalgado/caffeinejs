@@ -2,7 +2,7 @@ import { Binding } from '../Binding.js'
 import { TokenSpec } from '../Token.js'
 import { MetadataReader } from '../MetadataReader.js'
 
-export class InternalMetadataReader implements MetadataReader {
+export class BuiltInMetadataReader implements MetadataReader {
   read(token: any): Partial<Binding> {
     if (typeof token === 'function') {
       const kDeps = Object.getOwnPropertySymbols(token)

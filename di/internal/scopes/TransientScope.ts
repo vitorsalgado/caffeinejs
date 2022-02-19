@@ -1,7 +1,7 @@
-import { Binding } from '../Binding.js'
-import { Scope } from '../Scope.js'
-import { Provider } from '../Provider.js'
-import { ResolutionContext } from '../ResolutionContext.js'
+import { Binding } from '../../Binding.js'
+import { Scope } from '../../Scope.js'
+import { Provider } from '../../Provider.js'
+import { ResolutionContext } from '../../ResolutionContext.js'
 
 export class TransientScope implements Scope {
   get<T>(ctx: ResolutionContext, provider: Provider<T>): T {

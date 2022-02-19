@@ -1,10 +1,10 @@
-import { Binding } from '../Binding.js'
-import { tokenStr } from '../Token.js'
-import { Provider } from '../Provider.js'
-import { Scope } from '../Scope.js'
-import { ResolutionContext } from '../ResolutionContext.js'
-import { IllegalScopeStateError } from './DiError.js'
-import { OutOfScopeError } from './DiError.js'
+import { Binding } from '../../Binding.js'
+import { tokenStr } from '../../Token.js'
+import { Provider } from '../../Provider.js'
+import { Scope } from '../../Scope.js'
+import { ResolutionContext } from '../../ResolutionContext.js'
+import { IllegalScopeStateError } from '../errors.js'
+import { OutOfScopeError } from '../errors.js'
 
 export class RequestScope implements Scope {
   protected readonly destructionCallbacks = new Array<() => Promise<void> | void>()

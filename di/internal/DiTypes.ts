@@ -3,7 +3,7 @@ import { Binding } from '../Binding.js'
 import { Token } from '../Token.js'
 import { tokenStr } from '../Token.js'
 import { notNil } from './utils/notNil.js'
-import { RepeatedInjectableConfigurationError } from './DiError.js'
+import { RepeatedInjectableConfigurationError } from './errors.js'
 
 export class DiTypes {
   private static INSTANCE = new DiTypes()

@@ -1,10 +1,10 @@
-import { Identifier } from './internal/types/Identifier.js'
 import { DI } from './DI.js'
 import { Token } from './Token.js'
 import { Binding } from './Binding.js'
 import { notNil } from './internal/utils/notNil.js'
 import { Lifecycle } from './Lifecycle.js'
-import { InvalidBindingError } from './internal/DiError.js'
+import { InvalidBindingError } from './internal/errors.js'
+import { Identifier } from './internal/types.js'
 
 export interface BinderOptions<T> {
   as(scopeId: Identifier): BinderOptions<T>

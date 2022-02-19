@@ -3,10 +3,10 @@ import { jest } from '@jest/globals'
 import { Injectable } from '../decorators/Injectable.js'
 import { ProvidedBy } from '../decorators/ProvidedBy.js'
 import { DI } from '../DI.js'
-import { ClassProvider } from '../internal/ClassProvider.js'
+import { ClassProvider } from '../internal/providers/ClassProvider.js'
 import { Provider } from '../Provider.js'
-import { Ctor } from '../internal/types/Ctor.js'
 import { ResolutionContext } from '../ResolutionContext.js'
+import { Ctor } from '../internal/types.js'
 
 describe('Provided By', function () {
   const spy = jest.fn()

@@ -1,9 +1,9 @@
-import { Identifier } from './internal/types/Identifier.js'
 import { newId } from './internal/utils/newId.js'
 import { PostResolutionInterceptor } from './PostResolutionInterceptor.js'
 import { Provider } from './Provider.js'
 import { TokenSpec } from './Token.js'
 import { Conditional } from './decorators/ConditionalOn.js'
+import { Identifier } from './internal/types.js'
 
 export interface Binding<T = any> {
   id: number

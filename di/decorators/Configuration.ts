@@ -1,11 +1,11 @@
 import { newBinding } from '../Binding.js'
-import { Ctor } from '../internal/types/Ctor.js'
 import { Vars } from '../internal/Vars.js'
-import { Identifier } from '../internal/types/Identifier.js'
-import { BeanFactoryProvider } from '../internal/BeanFactoryProvider.js'
+import { BeanFactoryProvider } from '../internal/providers/BeanFactoryProvider.js'
 import { getParamTypes } from '../internal/utils/getParamTypes.js'
 import { isNil } from '../internal/utils/isNil.js'
 import { DiTypes } from '../internal/DiTypes.js'
+import { Ctor } from '../internal/types.js'
+import { Identifier } from '../internal/types.js'
 import { ConfigurationProviderOptions } from './ConfigurationProviderOptions.js'
 
 export interface ConfigurationOptions {

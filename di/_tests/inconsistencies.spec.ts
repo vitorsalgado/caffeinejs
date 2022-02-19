@@ -1,7 +1,7 @@
 import { expect } from '@jest/globals'
 import { Configuration } from '../decorators/Configuration.js'
 import { Injectable } from '../decorators/Injectable.js'
-import { InvalidBindingError } from '../internal/DiError.js'
+import { InvalidBindingError } from '../internal/errors.js'
 
 describe('Inconsistencies', function () {
   it('should fail when passing a non named token to injectable', function () {

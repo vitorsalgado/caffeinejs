@@ -1,10 +1,10 @@
-import { Binding } from '../Binding.js'
-import { Scope } from '../Scope.js'
-import { Provider } from '../Provider.js'
-import { tokenStr } from '../Token.js'
-import { LocalResolutions } from '../LocalResolutions.js'
-import { ResolutionContext } from '../ResolutionContext.js'
-import { MissingRequiredProviderArgumentError } from './DiError.js'
+import { Binding } from '../../Binding.js'
+import { Scope } from '../../Scope.js'
+import { Provider } from '../../Provider.js'
+import { tokenStr } from '../../Token.js'
+import { LocalResolutions } from '../../LocalResolutions.js'
+import { ResolutionContext } from '../../ResolutionContext.js'
+import { MissingRequiredProviderArgumentError } from '../errors.js'
 
 export class LocalResolutionScope implements Scope {
   get<T>(ctx: ResolutionContext, unscoped: Provider<T>): T {

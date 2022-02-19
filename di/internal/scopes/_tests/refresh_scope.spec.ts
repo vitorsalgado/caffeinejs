@@ -1,11 +1,11 @@
 import { v4 } from 'uuid'
 import { expect } from '@jest/globals'
-import { Lifecycle } from '../Lifecycle.js'
-import { Refresh } from '../decorators/Refresh.js'
-import { DI } from '../DI.js'
-import { RefreshScope } from '../internal/RefreshScope.js'
-import { ScopedAs } from '../decorators/ScopedAs.js'
-import { Injectable } from '../decorators/Injectable.js'
+import { Lifecycle } from '../../../Lifecycle.js'
+import { Refresh } from '../../../decorators/Refresh.js'
+import { DI } from '../../../DI.js'
+import { RefreshScope } from '../RefreshScope.js'
+import { ScopedAs } from '../../../decorators/ScopedAs.js'
+import { Injectable } from '../../../decorators/Injectable.js'
 
 describe('Refresh Scope', function () {
   @Injectable()
