@@ -2,6 +2,7 @@ import { MultiplePrimaryError } from './internal/errors.js'
 import { NoUniqueInjectionForTokenError } from './internal/errors.js'
 import { NoResolutionForTokenError } from './internal/errors.js'
 import { CircularReferenceError } from './internal/errors.js'
+import { solutions } from './internal/errors.js'
 import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { DeferredCtor } from './internal/DeferredCtor.js'
@@ -13,6 +14,9 @@ import { fmtTokenError } from './internal/utils/errorFmt.js'
 import { fmtParamError } from './internal/utils/errorFmt.js'
 import { Ctor } from './internal/types.js'
 import { Container } from './Container.js'
+import { Optional } from './decorators/Optional.js'
+import { Defer } from './decorators/Defer.js'
+import { Primary } from './decorators/Primary.js'
 
 export namespace Resolver {
   export function resolve<T>(container: Container, token: Token<T>, binding?: Binding<T>, context?: unknown): T {
@@ -41,8 +45,9 @@ export namespace Resolver {
 
         if (primaries.length > 1) {
           throw new MultiplePrimaryError(
-            `Found multiple primary bindings for token '${tokenStr(token)}'. ` +
-              `Check the following bindings: ${primaries.map(x => tokenStr(x.token)).join(', ')}`
+            `Found multiple 'primary' bindings for token '${tokenStr(token)}'. \n` +
+              `Check the following bindings: ${primaries.map(x => tokenStr(x.token)).join(', ')}. \n` +
+              `Only one component per token can be decorated with @${Primary.name}`
           )
         }
 
@@ -77,9 +82,10 @@ export namespace Resolver {
         `Cannot resolve ${fmtParamError(target, indexOrProp)} from type '${tokenStr(
           target
         )}' because the injection token is undefined.\n` +
-          `This could mean that the component '${tokenStr(target)}' has a circular reference.\n` +
-          'If this was intentional, make sure to decorate your circular constructor/provider parameters with @Defer to correctly resolve ' +
-          'its dependencies.'
+          `This could mean that the component '${tokenStr(target)}' has a circular reference.` +
+          solutions(
+            `- If this was intentional, make sure to decorate your circular dependency with @${Defer.name} and use the type TypeOf<> to avoid TS errors on compilation.`
+          )
       )
     }
 
@@ -100,9 +106,11 @@ export namespace Resolver {
     }
 
     throw new NoResolutionForTokenError(
-      dep,
-      `Cannot resolve ${fmtParamError(target, indexOrProp)} with token ${fmtTokenError(dep)}.\n` +
-        `Check if the type ${tokenStr(target)} has all its dependencies correctly registered.`
+      `Unable to resolve ${fmtParamError(target, indexOrProp)} with token ${fmtTokenError(dep)}.` +
+        solutions(
+          `- Check if the type '${tokenStr(target)}' has all its dependencies correctly registered`,
+          `- If this dependency is optional and can be undefined, decorate it with @${Optional.name}`
+        )
     )
   }
 }

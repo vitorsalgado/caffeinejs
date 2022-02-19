@@ -306,7 +306,7 @@ export class DI implements Container {
     const result = this.get(token, args)
 
     if (isNil(result)) {
-      throw new NoResolutionForTokenError({ token })
+      throw new NoResolutionForTokenError(`Unable to resolve required injection for token '${tokenStr(token)}'`)
     }
 
     return result
