@@ -47,11 +47,13 @@ import { ValueProvider } from './internal/index.js'
 import { ResolutionContext } from './internal/index.js'
 import { RefreshScope } from './internal/RefreshScope.js'
 import { Filter } from './Filter.js'
+import { ContainerLifecycle } from './ContainerLifecycle.js'
 
 export class DI {
   protected static Filters: Filter[] = []
   protected static readonly Scopes = new Map(DI.builtInScopes().entries())
   protected static readonly PostProcessors = new Set<PostProcessor>()
+  protected static Inspector?: ContainerLifecycle
 
   protected readonly bindingRegistry = new BindingRegistry()
   protected readonly bindingNames = new Map<Identifier, Binding[]>()
@@ -173,6 +175,10 @@ export class DI {
 
   static addFilters(...filters: Filter[]) {
     DI.Filters.push(...notNil(filters))
+  }
+
+  static inspector(inspector: ContainerLifecycle) {
+    DI.Inspector = notNil(inspector)
   }
 
   protected static async preDestroyBinding(binding: Binding): Promise<void> {
@@ -538,19 +544,26 @@ export class DI {
 
   setup(): void {
     for (const [token, binding] of DiTypes.instance().entries()) {
+      DI.Inspector?.onBinding(token, binding)
+
       if (!this.isRegistrable(binding)) {
+        DI.Inspector?.onNotBound(token, binding)
         continue
       }
 
       if (!this.filter(token, binding)) {
+        DI.Inspector?.onNotBound(token, binding)
         continue
       }
 
       const pass = binding.conditionals.every(conditional => conditional({ di: this }))
 
       if (pass) {
+        DI.Inspector?.onBound(token, binding)
         this.configureBinding(token, binding)
       } else {
+        DI.Inspector?.onNotBound(token, binding)
+
         if (binding.configuration) {
           const tokens = Reflect.getOwnMetadata(Vars.CONFIGURATION_TOKENS_PROVIDED, token)
 
@@ -562,11 +575,15 @@ export class DI {
     }
 
     for (const [token, binding] of DiTypes.instance().beans()) {
+      DI.Inspector?.onBinding(token, binding)
+
       if (!this.isRegistrable(binding)) {
+        DI.Inspector?.onNotBound(token, binding)
         continue
       }
 
       if (!this.filter(token, binding)) {
+        DI.Inspector?.onNotBound(token, binding)
         continue
       }
 
@@ -582,7 +599,11 @@ export class DI {
           )
         }
 
+        DI.Inspector?.onBound(token, binding)
+
         this.configureBinding(token, binding)
+      } else {
+        DI.Inspector?.onNotBound(token, binding)
       }
     }
 
