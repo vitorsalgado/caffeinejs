@@ -1,3 +1,5 @@
+const isCI = process.env.CI === 'true'
+
 export default {
   verbose: true,
   testTimeout: 15000,
@@ -18,14 +20,37 @@ export default {
       useESM: true
     }
   },
+  coverageProvider: 'v8',
+  coverageReporters: isCI ? ['json'] : ['text'],
   collectCoverageFrom: [
-    '**/**/*.ts',
+    '**/di/*/**/*.ts',
     '!**/**/*.config.ts',
     '!**/__fixtures__/**',
     '!**/__mocks__/**',
     '!**/__tests__/**',
-    '!**/_tests/**'
+    '!**/_fixtures/**',
+    '!**/_tests/**',
+    '!**/_performance/**',
+    '!**/_bench/**'
   ],
-  coveragePathIgnorePatterns: ['/dist/', '<rootDit>/dist', '/node_modules/', '<rootDir>/examples'],
-  testPathIgnorePatterns: ['/dist/', '<rootDit>/dist', '/node_modules/', '<rootDir>/examples']
+  coveragePathIgnorePatterns: [
+    '/dist/',
+    '/node_modules/',
+    '<rootDit>/dist',
+    '<rootDir>/examples',
+    '<rootDir>/internal',
+    '<rootDir>/test'
+  ],
+  modulePathIgnorePatterns: ['dist', 'coverage', 'examples/*', 'benchmarks/*', 'scripts/*', 'internal/*'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/benchmarks/',
+    '/examples/',
+    '/dist/',
+    '/out/',
+    '/coverage/',
+    '<rootDir>/scripts/*',
+    '<rootDir>/internal/*',
+    '<rootDir>/test/*'
+  ]
 }

@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals'
 import { Optional } from '../Optional.js'
 
 describe('Optional', function () {
