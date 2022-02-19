@@ -1,5 +1,6 @@
 import { Identifier } from './internal/types/Identifier.js'
 import { Lifecycle } from './Lifecycle.js'
+import { MetadataReader } from './internal/index.js'
 
 export interface Options {
   namespace: Identifier
@@ -7,6 +8,7 @@ export interface Options {
   lazy?: boolean
   lateBind?: boolean
   overriding?: boolean
+  metadataReader?: MetadataReader
 }
 
 export const InitialOptions: Options = {

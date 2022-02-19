@@ -39,7 +39,6 @@ import { DefaultServiceLocator } from './ServiceLocator.js'
 import { ServiceLocator } from './ServiceLocator.js'
 import { tokenStr } from './Token.js'
 import { isNamedToken, Token } from './Token.js'
-import { check } from './internal/utils/check.js'
 import { isNil } from './internal/utils/isNil.js'
 import { loadModule } from './internal/utils/loadModule.js'
 import { notNil } from './internal/utils/notNil.js'
@@ -50,8 +49,6 @@ import { RefreshScope } from './internal/RefreshScope.js'
 import { Filter } from './Filter.js'
 
 export class DI {
-  static MetadataReader = new InternalMetadataReader()
-
   protected static Filters: Filter[] = []
   protected static readonly Scopes = new Map(DI.builtInScopes().entries())
   protected static readonly PostProcessors = new Set<PostProcessor>()
@@ -60,6 +57,7 @@ export class DI {
   protected readonly bindingNames = new Map<Identifier, Binding[]>()
   protected readonly multipleBeansRefCache = new Map<Token, Binding[]>()
   protected readonly scopeId: Identifier
+  protected readonly metadataReader: MetadataReader
   protected readonly lazy?: boolean
   protected readonly lateBind?: boolean
   protected readonly overriding?: boolean
@@ -79,6 +77,7 @@ export class DI {
     this.lateBind = opts.lateBind
     this.overriding = opts.overriding
     this.scopeId = opts.scopeId || Lifecycle.SINGLETON
+    this.metadataReader = opts.metadataReader || new InternalMetadataReader()
   }
 
   get [Symbol.toStringTag]() {
@@ -99,7 +98,7 @@ export class DI {
   static configureType<T>(token: Token<T>, additional?: Partial<Binding>): void {
     notNil(token)
 
-    const opts = { ...DI.MetadataReader.read(token), ...additional }
+    const opts = { ...additional }
     const tk = typeof token === 'object' ? token.constructor : token
     const existing = DiTypes.instance().get(tk)
 
@@ -172,13 +171,6 @@ export class DI {
     await Promise.all(paths.map(path => loadModule(path)))
   }
 
-  static changeMetadataReader(other: MetadataReader) {
-    notNil(other)
-    check('read' in other && other.read.length === 1, 'Provided instance must be an MetadataReader implementation.')
-
-    DI.MetadataReader = other
-  }
-
   static addFilters(...filters: Filter[]) {
     DI.Filters.push(...notNil(filters))
   }
@@ -214,10 +206,11 @@ export class DI {
       .set(Lifecycle.REFRESH, new RefreshScope())
   }
 
-  configureBinding<T>(token: Token<T>, binding: Binding<T>): void {
+  configureBinding<T>(token: Token<T>, _binding: Binding<T>): void {
     notNil(token)
-    notNil(binding)
+    notNil(_binding)
 
+    const binding = { ..._binding, ...this.metadataReader.read(token) }
     const scopeId = binding.scopeId ? binding.scopeId : this.scopeId
     const rawProvider = providerFromToken(token, binding.rawProvider)
 

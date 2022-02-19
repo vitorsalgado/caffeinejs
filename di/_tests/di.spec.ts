@@ -1,4 +1,5 @@
 import { expect } from '@jest/globals'
+import { jest } from '@jest/globals'
 import { Binding } from '../Binding.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
@@ -93,26 +94,20 @@ describe('DI', function () {
   })
 
   describe('when using a custom metadata reader', function () {
-    it('should not allow invalid metadata reader instances', function () {
-      expect(() => DI.changeMetadataReader('wrong' as any)).toThrow()
-    })
-
     it('should allow set an alternative metadata reader', function () {
-      const original = DI.MetadataReader
+      const spy = jest.fn()
 
       class Custom implements MetadataReader {
+        constructor(private readonly original: MetadataReader) {}
         read(token: Token): Partial<Binding> {
-          return original.read(token)
+          spy()
+          return this.original.read(token)
         }
       }
 
-      try {
-        DI.changeMetadataReader(new Custom())
-      } finally {
-        expect(DI.MetadataReader).toBeInstanceOf(Custom)
-        DI.MetadataReader = original
-        expect(DI.MetadataReader).toBeInstanceOf(InternalMetadataReader)
-      }
+      DI.setup({ metadataReader: new Custom(new InternalMetadataReader()) })
+
+      expect(spy).toHaveBeenCalled()
     })
   })
 })
