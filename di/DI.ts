@@ -48,6 +48,7 @@ import { Container } from './Container.js'
 import { InitialOptions } from './Container.js'
 import { ContainerOptions } from './Container.js'
 import { ContainerLifecycle } from './Container.js'
+import { containerToString } from './internal/utils/containerToString.js'
 
 export class DI implements Container {
   protected static Filters: Filter[] = []
@@ -585,31 +586,8 @@ export class DI implements Container {
     return this.bindingNames.entries()
   }
 
-  toString() {
-    return (
-      `${DI.name}(namespace=${String(this.namespace)}, count=${this.size}) {` +
-      '\n' +
-      this.bindingRegistry
-        .toArray()
-        .map(
-          x =>
-            `${tokenStr(x.token)}: ` +
-            `names=[${x.binding.names?.map(x => tokenStr(x)).join(', ')}], ` +
-            `scope=${x.binding.scopeId.toString()}, ` +
-            `injections=[${x.binding.injections
-              ?.map(
-                x =>
-                  '[' +
-                  (x.token ? tokenStr(x.token) : `${tokenStr(x.tokenType)}`) +
-                  `: optional=${x.optional || false}, multiple=${x.multiple || false}]`
-              )
-              .join(', ')}], ` +
-            `lazy=${x.binding.lazy}, ` +
-            `provider=${x.binding.rawProvider?.constructor?.name}`
-        )
-        .join('\n, ') +
-      '\n}'
-    )
+  toString(): string {
+    return containerToString(this)
   }
 
   [Symbol.iterator](): IterableIterator<[Token, Binding]> {
