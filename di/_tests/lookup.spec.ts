@@ -7,7 +7,7 @@ import { DI } from '../DI.js'
 import { InvalidBindingError } from '../internal/errors.js'
 import { InvalidInjectionToken } from '../internal/errors.js'
 import { Injectable } from '../decorators/Injectable.js'
-import { ScopedAs } from '../decorators/ScopedAs.js'
+import { Scoped } from '../decorators/Scoped.js'
 
 describe('Lookup', function () {
   @Injectable()
@@ -16,7 +16,7 @@ describe('Lookup', function () {
   }
 
   @Injectable()
-  @ScopedAs(Lifecycle.TRANSIENT)
+  @Scoped(Lifecycle.TRANSIENT)
   class TransientDep {
     readonly id: string = v4()
   }

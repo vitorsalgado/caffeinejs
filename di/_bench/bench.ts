@@ -8,7 +8,7 @@ import { Injectable } from '../decorators/Injectable.js'
 import { RequestScope } from '../internal/scopes/RequestScope.js'
 import { RequestScoped } from '../decorators/RequestScoped.js'
 import { Lifecycle } from '../Lifecycle.js'
-import { TransientScoped } from '../decorators/TransientScoped.js'
+import { Transient } from '../decorators/Transient.js'
 import { parallelRequests } from './vars.js'
 import { errorThreshold } from './vars.js'
 import { connections } from './vars.js'
@@ -54,7 +54,7 @@ class SingletonController {
 }
 
 @Injectable()
-@TransientScoped()
+@Transient()
 class TrRepo {
   find() {
     return 'repository'
@@ -62,7 +62,7 @@ class TrRepo {
 }
 
 @Injectable()
-@TransientScoped()
+@Transient()
 class TrService {
   constructor(readonly repo: TrRepo) {}
 
@@ -72,7 +72,7 @@ class TrService {
 }
 
 @Injectable()
-@TransientScoped()
+@Transient()
 class TrController {
   constructor(readonly service: TrService) {}
 

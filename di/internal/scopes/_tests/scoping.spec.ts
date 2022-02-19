@@ -5,7 +5,7 @@ import { v4 } from 'uuid'
 import { Binding } from '../../../Binding.js'
 import { DiTypes } from '../../DiTypes.js'
 import { Injectable } from '../../../decorators/Injectable.js'
-import { ScopedAs } from '../../../decorators/ScopedAs.js'
+import { Scoped } from '../../../decorators/Scoped.js'
 import { DI } from '../../../DI.js'
 import { ScopeAlreadyRegisteredError } from '../../errors.js'
 import { ScopeNotRegisteredError } from '../../errors.js'
@@ -34,7 +34,7 @@ describe('Scoping', function () {
   }
 
   @Injectable()
-  @ScopedAs(kCustomScopeId)
+  @Scoped(kCustomScopeId)
   class Dep {
     readonly id: string = v4()
   }
@@ -46,7 +46,7 @@ describe('Scoping', function () {
 
   it('should fail when using an non-registered scope', function () {
     @Injectable()
-    @ScopedAs('none')
+    @Scoped('none')
     class NonexistentScope {}
 
     try {

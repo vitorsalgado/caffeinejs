@@ -1,5 +1,5 @@
 import { Injectable } from '../../decorators/Injectable.js'
-import { TransientScoped } from '../../decorators/TransientScoped.js'
+import { Transient } from '../../decorators/Transient.js'
 import { Named } from '../../decorators/Named.js'
 import { Inject } from '../../decorators/Inject.js'
 import { DI } from '../../DI.js'
@@ -26,7 +26,7 @@ export class CafRoot {
 }
 
 @Injectable()
-@TransientScoped()
+@Transient()
 @Named('caf')
 export class CafDep implements Caf {
   get(): string {
@@ -35,7 +35,7 @@ export class CafDep implements Caf {
 }
 
 @Injectable()
-@TransientScoped()
+@Transient()
 export class CafTransientRoot {
   constructor(@Inject('caf') readonly dep: Caf) {}
 }

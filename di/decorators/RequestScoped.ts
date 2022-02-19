@@ -1,4 +1,4 @@
 import { Lifecycle } from '../Lifecycle.js'
-import { ScopedAs } from './ScopedAs.js'
+import { Scoped } from './Scoped.js'
 
-export const RequestScoped = () => ScopedAs(Lifecycle.REQUEST)
+export const RequestScoped = () => Scoped(Lifecycle.REQUEST)

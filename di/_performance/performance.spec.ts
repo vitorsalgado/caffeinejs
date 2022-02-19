@@ -2,7 +2,7 @@ import { performance } from 'perf_hooks'
 import { DI } from '../DI.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { PostConstruct } from '../decorators/PostConstruct.js'
-import { TransientScoped } from '../decorators/TransientScoped.js'
+import { Transient } from '../decorators/Transient.js'
 import { Inject } from '../decorators/Inject.js'
 import { Container } from '../Container.js'
 
@@ -12,15 +12,15 @@ describe('Performance', () => {
   abstract class Repo {}
 
   @Injectable()
-  @TransientScoped()
+  @Transient()
   class Dep {}
 
   @Injectable()
-  @TransientScoped()
+  @Transient()
   class SomeRepo extends Repo {}
 
   @Injectable()
-  @TransientScoped()
+  @Transient()
   class Svc {
     @Inject(kVal)
     val!: string
@@ -39,7 +39,7 @@ describe('Performance', () => {
   }
 
   @Injectable()
-  @TransientScoped()
+  @Transient()
   class Root {
     constructor(readonly dep: Dep) {}
   }

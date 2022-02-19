@@ -3,7 +3,7 @@ import { v4 } from 'uuid'
 import { Provides } from '../decorators/Provides.js'
 import { Provider } from '../Provider.js'
 import { DI } from '../DI.js'
-import { TransientScoped } from '../decorators/TransientScoped.js'
+import { Transient } from '../decorators/Transient.js'
 import { ResolutionContext } from '../ResolutionContext.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Inject } from '../decorators/Inject.js'
@@ -29,7 +29,7 @@ describe('Provides', function () {
   class User {}
 
   @Provides(new RepoProvider())
-  @TransientScoped()
+  @Transient()
   class TrUser {}
 
   @Injectable()

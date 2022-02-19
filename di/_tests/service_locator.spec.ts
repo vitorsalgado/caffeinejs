@@ -1,14 +1,14 @@
 import { expect } from '@jest/globals'
 import { v4 } from 'uuid'
 import { Injectable } from '../decorators/Injectable.js'
-import { ScopedAs } from '../decorators/ScopedAs.js'
+import { Scoped } from '../decorators/Scoped.js'
 import { DI } from '../DI.js'
 import { Lifecycle } from '../Lifecycle.js'
 import { ServiceLocator } from '../ServiceLocator.js'
 
 describe('Service Locator', function () {
   @Injectable()
-  @ScopedAs(Lifecycle.CONTAINER)
+  @Scoped(Lifecycle.CONTAINER)
   class Svc {
     readonly id: string = v4()
 

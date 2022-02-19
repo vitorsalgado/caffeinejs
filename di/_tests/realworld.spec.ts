@@ -6,7 +6,7 @@ import { Configuration } from '../decorators/Configuration.js'
 import { DI } from '../DI.js'
 import { InjectAll } from '../decorators/InjectAll.js'
 import { Provides } from '../decorators/Provides.js'
-import { ScopedAs } from '../decorators/ScopedAs.js'
+import { Scoped } from '../decorators/Scoped.js'
 import { Bean } from '../decorators/Bean.js'
 import { ConditionalOn } from '../decorators/ConditionalOn.js'
 import { Primary } from '../decorators/Primary.js'
@@ -201,7 +201,7 @@ describe('Real World', function () {
     }
   }
 
-  @ScopedAs(Lifecycle.TRANSIENT)
+  @Scoped(Lifecycle.TRANSIENT)
   @Injectable()
   class IdGenerator {
     readonly id: string = v4()

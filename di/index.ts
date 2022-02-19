@@ -23,8 +23,8 @@ export * from './decorators/ProvidedBy.js'
 export * from './decorators/Provides.js'
 export * from './decorators/Refresh.js'
 export * from './decorators/RequestScoped.js'
-export * from './decorators/ScopedAs.js'
-export * from './decorators/TransientScoped.js'
+export * from './decorators/Scoped.js'
+export * from './decorators/Transient.js'
 
 // Internals
 export * from './internal/providers/ClassProvider.js'

@@ -1,13 +1,13 @@
 import { v4 } from 'uuid'
 import { Defer } from '../../../decorators/Defer.js'
 import { Injectable } from '../../../decorators/Injectable.js'
-import { ScopedAs } from '../../../decorators/ScopedAs.js'
+import { Scoped } from '../../../decorators/Scoped.js'
 import { TypeOf } from '../../../TypeOf.js'
 import { Lifecycle } from '../../../Lifecycle.js'
 import { Foo } from './Foo.js'
 
 @Injectable()
-@ScopedAs(Lifecycle.TRANSIENT)
+@Scoped(Lifecycle.TRANSIENT)
 export class Bar {
   uuid: string = v4()
 

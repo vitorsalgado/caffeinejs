@@ -11,7 +11,7 @@ import { DI } from '../DI'
 import { TypeOf } from '../TypeOf.js'
 import { Lifecycle } from '../Lifecycle.js'
 import { DiTypes } from '../internal/DiTypes.js'
-import { ScopedAs } from '../decorators/ScopedAs.js'
+import { Scoped } from '../decorators/Scoped.js'
 import { Defer } from '../decorators/Defer.js'
 import { Foo } from './_fixtures/circular_beans/Foo.js'
 import { Bar } from './_fixtures/circular_beans/Bar.js'
@@ -234,7 +234,7 @@ describe('Configuration', function () {
       }
 
       @Bean(Bar)
-      @ScopedAs(Lifecycle.TRANSIENT)
+      @Scoped(Lifecycle.TRANSIENT)
       bar(@Defer(() => Foo) foo: TypeOf<Foo>) {
         return new Bar(foo)
       }

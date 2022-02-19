@@ -4,12 +4,12 @@ import { Lifecycle } from '../../../Lifecycle.js'
 import { Refresh } from '../../../decorators/Refresh.js'
 import { DI } from '../../../DI.js'
 import { RefreshScope } from '../RefreshScope.js'
-import { ScopedAs } from '../../../decorators/ScopedAs.js'
+import { Scoped } from '../../../decorators/Scoped.js'
 import { Injectable } from '../../../decorators/Injectable.js'
 
 describe('Refresh Scope', function () {
   @Injectable()
-  @ScopedAs(Lifecycle.REFRESH)
+  @Scoped(Lifecycle.REFRESH)
   class Dep {
     readonly id: string = v4()
   }

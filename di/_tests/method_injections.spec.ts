@@ -4,7 +4,7 @@ import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { InjectAll } from '../decorators/InjectAll.js'
 import { Named } from '../decorators/Named.js'
-import { ScopedAs } from '../decorators/ScopedAs.js'
+import { Scoped } from '../decorators/Scoped.js'
 import { DI } from '../DI.js'
 import { Lifecycle } from '../Lifecycle.js'
 
@@ -13,7 +13,7 @@ describe('Method Injections', function () {
   const kBase = Symbol('base')
 
   @Injectable()
-  @ScopedAs(Lifecycle.TRANSIENT)
+  @Scoped(Lifecycle.TRANSIENT)
   class TransientDep {
     readonly id: string = v4()
   }
@@ -73,7 +73,7 @@ describe('Method Injections', function () {
 
   describe('when setting a singleton dependency in a transient component', function () {
     @Injectable()
-    @ScopedAs(Lifecycle.TRANSIENT)
+    @Scoped(Lifecycle.TRANSIENT)
     class Tr {
       id: string = v4()
       dep!: SingletonDep

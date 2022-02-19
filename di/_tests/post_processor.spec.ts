@@ -4,7 +4,7 @@ import { expect } from '@jest/globals'
 import { jest } from '@jest/globals'
 import { Binding } from '../Binding.js'
 import { Injectable } from '../decorators/Injectable.js'
-import { ScopedAs } from '../decorators/ScopedAs.js'
+import { Scoped } from '../decorators/Scoped.js'
 import { DI } from '../DI.js'
 import { Provider } from '../Provider.js'
 import { PostProcessor } from '../PostProcessor.js'
@@ -30,7 +30,7 @@ describe('Post Processors', function () {
   }
 
   @Injectable()
-  @ScopedAs(kScope)
+  @Scoped(kScope)
   class Dep {
     message() {
       return 'hello world'

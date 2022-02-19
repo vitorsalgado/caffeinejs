@@ -5,7 +5,7 @@ import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { PostConstruct } from '../decorators/PostConstruct.js'
 import { PreDestroy } from '../decorators/PreDestroy.js'
-import { ScopedAs } from '../decorators/ScopedAs.js'
+import { Scoped } from '../decorators/Scoped.js'
 import { DI } from '../DI.js'
 import { Lifecycle } from '../Lifecycle.js'
 
@@ -24,7 +24,7 @@ describe('Hooks', function () {
     }
 
     @Injectable()
-    @ScopedAs(Lifecycle.CONTAINER)
+    @Scoped(Lifecycle.CONTAINER)
     class ContainerDep {
       @PreDestroy()
       destroy() {

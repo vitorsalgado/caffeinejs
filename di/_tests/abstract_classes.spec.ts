@@ -5,10 +5,10 @@ import { Extends } from '../decorators/Extends.js'
 import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
-import { ScopedAs } from '../decorators/ScopedAs.js'
+import { Scoped } from '../decorators/Scoped.js'
 import { DI } from '../DI.js'
 import { Lifecycle } from '../Lifecycle.js'
-import { TransientScoped } from '../decorators/TransientScoped.js'
+import { Transient } from '../decorators/Transient.js'
 
 describe('Abstract Classes', function () {
   describe('when referencing the abstract class on constructor without naming', function () {
@@ -35,7 +35,7 @@ describe('Abstract Classes', function () {
     }
 
     @Injectable()
-    @ScopedAs(Lifecycle.TRANSIENT)
+    @Scoped(Lifecycle.TRANSIENT)
     class Service {
       constructor(readonly dep: Base) {}
 
@@ -136,7 +136,7 @@ describe('Abstract Classes', function () {
 
     @Injectable()
     @Extends(Base)
-    @TransientScoped()
+    @Transient()
     class Impl extends Base {}
 
     it('should resolve using the correct scope', function () {

@@ -3,14 +3,14 @@ import { expect } from '@jest/globals'
 import { DI } from '../../../DI.js'
 import { Injectable } from '../../../decorators/Injectable.js'
 import { Lifecycle } from '../../../Lifecycle.js'
-import { ScopedAs } from '../../../decorators/ScopedAs.js'
+import { Scoped } from '../../../decorators/Scoped.js'
 import { MissingRequiredProviderArgumentError } from '../../errors.js'
 import { LocalResolutions } from '../../../LocalResolutions.js'
 import { Binding } from '../../../Binding.js'
 
 describe('Context Resolution Scoped', function () {
   @Injectable()
-  @ScopedAs(Lifecycle.LOCAL_RESOLUTION)
+  @Scoped(Lifecycle.LOCAL_RESOLUTION)
   class ResScopedDep {
     readonly id: string
 
@@ -24,7 +24,7 @@ describe('Context Resolution Scoped', function () {
   }
 
   @Injectable()
-  @ScopedAs(Lifecycle.TRANSIENT)
+  @Scoped(Lifecycle.TRANSIENT)
   class ResScopedRoot {
     constructor(readonly dep: ResScopedDep) {}
   }

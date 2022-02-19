@@ -1,19 +1,19 @@
 import { DI } from '../../DI.js'
 import { Injectable } from '../../decorators/Injectable.js'
-import { TransientScoped } from '../../decorators/TransientScoped.js'
+import { Transient } from '../../decorators/Transient.js'
 
 @Injectable()
-@TransientScoped()
+@Transient()
 class Rep {}
 
 @Injectable()
-@TransientScoped()
+@Transient()
 class Svc {
   constructor(readonly repo: Rep) {}
 }
 
 @Injectable()
-@TransientScoped()
+@Transient()
 export class Root {
   constructor(readonly svc: Svc) {}
 }
