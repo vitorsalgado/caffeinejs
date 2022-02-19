@@ -1,6 +1,6 @@
-import { Configuration } from '@caffeinejs/di/decorators'
-import { Bean } from '@caffeinejs/di/decorators'
 import { getCustomRepository } from 'typeorm'
+import { Configuration } from '@caffeinejs/di'
+import { Bean } from '@caffeinejs/di'
 import { UserRepository } from './UserRepository.js'
 
 @Configuration()
