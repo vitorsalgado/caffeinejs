@@ -17,7 +17,7 @@ import { Injectable } from '../decorators/Injectable.js'
 import { Lifecycle } from '../Lifecycle.js'
 import { Inject } from '../decorators/Inject.js'
 import { Lookup } from '../decorators/Lookup.js'
-import { lookup } from '../lookup.js'
+import { noop } from '../noop.js'
 
 describe('Real World', function () {
   const initSpy = jest.fn()
@@ -237,7 +237,7 @@ describe('Real World', function () {
 
     @Lookup(IdGenerator)
     get idGen(): IdGenerator {
-      return lookup()
+      return noop()
     }
   }
 

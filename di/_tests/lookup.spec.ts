@@ -2,7 +2,7 @@ import { v4 } from 'uuid'
 import { expect } from '@jest/globals'
 import { Lifecycle } from '../Lifecycle.js'
 import { Lookup } from '../decorators/Lookup.js'
-import { lookup } from '../lookup.js'
+import { noop } from '../noop.js'
 import { DI } from '../DI.js'
 import { InvalidBindingError } from '../internal/errors.js'
 import { InvalidInjectionToken } from '../internal/errors.js'
@@ -36,17 +36,17 @@ describe('Lookup', function () {
 
       @Lookup()
       get dep(): Dep {
-        return lookup()
+        return noop()
       }
 
       @Lookup()
       private get transient(): TransientDep {
-        return lookup<TransientDep>()
+        return noop<TransientDep>()
       }
 
       @Lookup(Base, { multiple: true })
       get many(): Array<Base> {
-        return lookup()
+        return noop()
       }
 
       getTransient() {
@@ -105,12 +105,12 @@ describe('Lookup', function () {
     class Lk {
       @Lookup(Dep)
       getDep(): Dep {
-        return lookup()
+        return noop()
       }
 
       @Lookup(Base, { multiple: true })
       getMany() {
-        return lookup<Array<Base>>()
+        return noop<Array<Base>>()
       }
     }
 
@@ -132,7 +132,7 @@ describe('Lookup', function () {
           class Fail {
             @Lookup()
             getTest() {
-              return lookup()
+              return noop()
             }
           }
         }).toThrow()
