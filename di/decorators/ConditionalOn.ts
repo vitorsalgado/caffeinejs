@@ -13,13 +13,13 @@ export function ConditionalOn<T>(...conditionals: Conditional[]) {
     const merged: Conditional[] = [...conditionals]
 
     if (typeof target === 'function') {
-      const injectable = DiTypes.instance().get(target)
+      const injectable = DiTypes.get(target)
 
       if (injectable && injectable.conditionals) {
         merged.push(...injectable.conditionals)
       }
 
-      DiTypes.instance().configure<T>(target, { conditionals: merged })
+      DiTypes.configure<T>(target, { conditionals: merged })
 
       return
     }

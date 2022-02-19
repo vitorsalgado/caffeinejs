@@ -17,7 +17,7 @@ export function Bind<T>(
 
   return function <TFunction extends Function>(target: TFunction | object, propertyKey?: string | symbol) {
     if (typeof target === 'function') {
-      DiTypes.instance().configure<T>(target, {
+      DiTypes.configure<T>(target, {
         injections: getParamTypes(target),
         injectableProperties: getInjectableProperties(target),
         injectableMethods: getInjectableMethods(target),

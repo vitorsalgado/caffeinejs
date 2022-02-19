@@ -285,8 +285,8 @@ describe('Configuration', function () {
 
         expect(replaced.id).toEqual('replaced')
 
-        DiTypes.instance().delete(ToBeReplaced)
-        DiTypes.instance().delete(Conf)
+        DiTypes.remove(ToBeReplaced)
+        DiTypes.remove(Conf)
       }).not.toThrow()
     })
 
@@ -310,8 +310,8 @@ describe('Configuration', function () {
         try {
           DI.setup()
         } finally {
-          DiTypes.instance().delete(ToBeReplaced)
-          DiTypes.instance().delete(Conf)
+          DiTypes.remove(ToBeReplaced)
+          DiTypes.remove(Conf)
         }
       }).toThrow()
     })

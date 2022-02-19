@@ -363,7 +363,7 @@ export class DI implements Container {
   bind<T>(token: Token<T>): Binder<T> {
     notNil(token)
 
-    const type = DiTypes.instance().get(token)
+    const type = DiTypes.get(token)
     const binding = newBinding(type)
 
     this.configureBinding(token, binding)
@@ -508,7 +508,7 @@ export class DI implements Container {
   }
 
   setup(): void {
-    for (const [token, binding] of DiTypes.instance().entries()) {
+    for (const [token, binding] of DiTypes.entries()) {
       DI.Inspector?.onBinding(token, binding)
 
       if (!this.isRegistrable(binding)) {
@@ -533,13 +533,13 @@ export class DI implements Container {
           const tokens = Reflect.getOwnMetadata(Vars.CONFIGURATION_TOKENS_PROVIDED, token)
 
           for (const tk of tokens) {
-            DiTypes.instance().deleteBean(tk)
+            DiTypes.deleteBean(tk)
           }
         }
       }
     }
 
-    for (const [token, binding] of DiTypes.instance().beans()) {
+    for (const [token, binding] of DiTypes.beans()) {
       DI.Inspector?.onBinding(token, binding)
 
       if (!this.isRegistrable(binding)) {

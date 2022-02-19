@@ -18,7 +18,7 @@ export interface ConfigurationOptions {
 
 export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): ClassDecorator {
   return function (target) {
-    DiTypes.instance().configure<T>(target, {
+    DiTypes.configure<T>(target, {
       injections: getParamTypes(target),
       namespace: config.namespace,
       configuration: true
@@ -47,7 +47,7 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
         configuredBy: `${target.name}${String(method)}`
       })
 
-      DiTypes.instance().addBean(factory.token, { ...binding })
+      DiTypes.addBean(factory.token, { ...binding })
     }
   }
 }

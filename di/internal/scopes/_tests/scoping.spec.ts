@@ -41,7 +41,7 @@ describe('Scoping', function () {
 
   afterAll(() => {
     DI.unbindScope(kCustomScopeId)
-    DiTypes.instance().delete(Dep)
+    DiTypes.remove(Dep)
   })
 
   it('should fail when using an non-registered scope', function () {
@@ -58,7 +58,7 @@ describe('Scoping', function () {
       return
     } finally {
       DI.unbindScope('none')
-      DiTypes.instance().delete(NonexistentScope)
+      DiTypes.remove(NonexistentScope)
     }
 
     fail('should not reach here!')

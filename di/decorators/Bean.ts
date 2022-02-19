@@ -22,7 +22,7 @@ export function Bean<T>(bean: Token<T>, token?: Token) {
         )
       }
 
-      DiTypes.instance().configure<T>(target, {
+      DiTypes.configure<T>(target, {
         injections: getParamTypes(target),
         injectableProperties: getInjectableProperties(target),
         injectableMethods: getInjectableMethods(target),

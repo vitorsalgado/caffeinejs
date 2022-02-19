@@ -5,25 +5,16 @@ import { tokenStr } from '../Token.js'
 import { notNil } from './utils/notNil.js'
 import { RepeatedInjectableConfigurationError } from './errors.js'
 
-export class DiTypes {
-  private static INSTANCE = new DiTypes()
-  private readonly _entries = new Map<Token, Binding>()
-  private readonly _beans: Array<[Token, Binding]> = []
+export namespace DiTypes {
+  const _entries = new Map<Token, Binding>()
+  const _beans: Array<[Token, Binding]> = []
 
-  private constructor() {
-    // internal
-  }
-
-  static instance(): DiTypes {
-    return DiTypes.INSTANCE
-  }
-
-  configure<T>(token: Token<T>, additional: Partial<Binding>): DiTypes {
+  export function configure<T>(token: Token<T>, additional: Partial<Binding>) {
     notNil(token)
 
     const opts = { ...additional }
     const tk = typeof token === 'object' ? token.constructor : token
-    const existing = DiTypes.instance().get(tk)
+    const existing = DiTypes.get(tk)
 
     if (existing) {
       const names = existing.names
@@ -46,48 +37,45 @@ export class DiTypes {
     }
 
     const info = newBinding({ ...existing, ...opts })
-    const entry = this._entries.get(tk)
+    const entry = _entries.get(tk)
 
     if (entry) {
-      this._entries.set(tk, { ...entry, ...info })
+      _entries.set(tk, { ...entry, ...info })
     } else {
-      this._entries.set(tk, newBinding(info))
+      _entries.set(tk, newBinding(info))
     }
-
-    return this
   }
 
-  addBean<T>(token: Token<T>, binding: Binding<T>): DiTypes {
+  export function addBean<T>(token: Token<T>, binding: Binding<T>) {
     notNil(token)
     notNil(binding)
 
-    this._beans.push([token, binding])
-
-    return this
+    _beans.push([token, binding])
   }
 
-  deleteBean(token: Token): void {
-    const idx = this._beans.findIndex(([k]) => k === token)
+  export function deleteBean(token: Token) {
+    notNil(token)
+
+    const idx = _beans.findIndex(([k]) => k === token)
 
     if (idx > -1) {
-      this._beans.splice(idx, 1)
+      _beans.splice(idx, 1)
     }
   }
 
-  get<T>(ctor: Token<T>): Binding<T> | undefined {
-    return this._entries.get(ctor)
+  export function get<T>(ctor: Token<T>) {
+    return _entries.get(notNil(ctor))
   }
 
-  entries(): IterableIterator<[Token, Binding]> {
-    return this._entries.entries()
+  export function entries(): IterableIterator<[Token, Binding]> {
+    return _entries.entries()
   }
 
-  beans(): Array<[Token, Binding]> {
-    return this._beans
+  export function beans(): Array<[Token, Binding]> {
+    return _beans
   }
 
-  delete(token: Token): boolean {
-    notNil(token)
-    return this._entries.delete(token)
+  export function remove(token: Token): boolean {
+    return _entries.delete(notNil(token))
   }
 }

@@ -8,6 +8,6 @@ export function Extends<T>(base: Ctor<T> | AbstractCtor<T>) {
   check(typeof base === 'function', `@Extends parameter must be a class reference (typeof 'function')`)
 
   return function <TFunction extends Function>(target: TFunction) {
-    DiTypes.instance().configure<T>(base, { rawProvider: new TokenProvider(target) })
+    DiTypes.configure<T>(base, { rawProvider: new TokenProvider(target) })
   }
 }

@@ -3,6 +3,6 @@ import { DiTypes } from '../internal/DiTypes.js'
 
 export function ProvidedBy<T>(provider: Provider<T>): ClassDecorator {
   return function (target) {
-    DiTypes.instance().configure<T>(target, { rawProvider: provider })
+    DiTypes.configure<T>(target, { rawProvider: provider })
   }
 }

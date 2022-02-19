@@ -70,7 +70,7 @@ describe('Request Scope', function () {
   const server = Http.createServer(requestListener)
 
   afterAll(async () => {
-    DiTypes.instance().delete(Ctrl)
+    DiTypes.remove(Ctrl)
     server.close()
 
     await di.dispose()

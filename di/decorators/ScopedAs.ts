@@ -6,7 +6,7 @@ import { Identifier } from '../internal/types.js'
 export function ScopedAs(scopeId: Identifier) {
   return function (target: Function | object, propertyKey?: string | symbol) {
     if (typeof target === 'function') {
-      DiTypes.instance().configure(target as Token, { scopeId })
+      DiTypes.configure(target as Token, { scopeId })
       return
     }
 
