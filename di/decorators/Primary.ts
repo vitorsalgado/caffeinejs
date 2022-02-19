@@ -1,10 +1,10 @@
-import { DI } from '../DI.js'
 import { configureBean } from '../internal/utils/beanUtils.js'
+import { DiTypes } from '../internal/DiTypes.js'
 
 export function Primary() {
   return function (target: Function | object, propertyKey?: string | symbol) {
     if (typeof target === 'function') {
-      DI.configureType(target, { primary: true })
+      DiTypes.instance().configure(target, { primary: true })
       return
     }
 

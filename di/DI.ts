@@ -96,40 +96,6 @@ export class DI {
     return di
   }
 
-  static configureType<T>(token: Token<T>, additional?: Partial<Binding>): void {
-    notNil(token)
-
-    const opts = { ...additional }
-    const tk = typeof token === 'object' ? token.constructor : token
-    const existing = DiTypes.instance().get(tk)
-
-    if (existing) {
-      const names = existing.names
-
-      if (opts?.names) {
-        if (names.some(value => opts.names!.includes(value))) {
-          throw new RepeatedInjectableConfigurationError(
-            `Found repeated qualifiers for the class '${tokenStr(token)}'. Qualifiers found: ${opts.names
-              .map(x => tokenStr(x))
-              .join(', ')}`
-          )
-        }
-
-        names.push(...opts.names)
-
-        opts.names = names
-      } else {
-        opts.names = existing.names
-      }
-    }
-
-    DiTypes.instance().configure(tk, newBinding({ ...existing, ...opts }))
-  }
-
-  static addBean<T>(token: Token<T>, binding: Binding<T>): void {
-    DiTypes.instance().addBean(token, binding)
-  }
-
   static bindScope(scopeId: Identifier, scope: Scope): void {
     notNil(scopeId)
     notNil(scope)

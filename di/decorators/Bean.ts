@@ -1,6 +1,5 @@
 import { Token } from '../Token.js'
 import { isNamedToken } from '../Token.js'
-import { DI } from '../DI.js'
 import { getParamTypes } from '../internal/utils/getParamTypes.js'
 import { getInjectableProperties } from '../internal/utils/getInjectableProperties.js'
 import { getInjectableMethods } from '../internal/utils/getInjectableMethods.js'
@@ -9,6 +8,7 @@ import { Binding } from '../Binding.js'
 import { isNil } from '../internal/utils/isNil.js'
 import { configureBean } from '../internal/utils/beanUtils.js'
 import { InvalidBindingError } from '../internal/DiError.js'
+import { DiTypes } from '../internal/DiTypes.js'
 import { ConfigurationProviderOptions } from './ConfigurationProviderOptions.js'
 
 export function Bean<T>(bean: Token<T>, token?: Token) {
@@ -22,7 +22,7 @@ export function Bean<T>(bean: Token<T>, token?: Token) {
         )
       }
 
-      DI.configureType<T>(target, {
+      DiTypes.instance().configure<T>(target, {
         injections: getParamTypes(target),
         injectableProperties: getInjectableProperties(target),
         injectableMethods: getInjectableMethods(target),

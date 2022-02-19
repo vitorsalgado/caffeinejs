@@ -1,7 +1,9 @@
 import { newBinding } from '../Binding.js'
 import { Binding } from '../Binding.js'
 import { Token } from '../Token.js'
+import { tokenStr } from '../Token.js'
 import { notNil } from './utils/notNil.js'
+import { RepeatedInjectableConfigurationError } from './DiError.js'
 
 export class DiTypes {
   private static INSTANCE = new DiTypes()
@@ -16,15 +18,40 @@ export class DiTypes {
     return DiTypes.INSTANCE
   }
 
-  configure<T>(ctor: Token<T>, info: Partial<Binding>): DiTypes {
-    notNil(ctor)
+  configure<T>(token: Token<T>, additional: Partial<Binding>): DiTypes {
+    notNil(token)
 
-    const entry = this._entries.get(ctor)
+    const opts = { ...additional }
+    const tk = typeof token === 'object' ? token.constructor : token
+    const existing = DiTypes.instance().get(tk)
+
+    if (existing) {
+      const names = existing.names
+
+      if (opts?.names) {
+        if (names.some(value => opts.names!.includes(value))) {
+          throw new RepeatedInjectableConfigurationError(
+            `Found repeated qualifiers for the class '${tokenStr(token)}'. Qualifiers found: ${opts.names
+              .map(x => tokenStr(x))
+              .join(', ')}`
+          )
+        }
+
+        names.push(...opts.names)
+
+        opts.names = names
+      } else {
+        opts.names = existing.names
+      }
+    }
+
+    const info = newBinding({ ...existing, ...opts })
+    const entry = this._entries.get(tk)
 
     if (entry) {
-      this._entries.set(ctor, { ...entry, ...info })
+      this._entries.set(tk, { ...entry, ...info })
     } else {
-      this._entries.set(ctor, newBinding(info))
+      this._entries.set(tk, newBinding(info))
     }
 
     return this

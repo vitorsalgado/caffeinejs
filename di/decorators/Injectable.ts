@@ -1,5 +1,4 @@
 import { Binding } from '../Binding.js'
-import { DI } from '../DI.js'
 import { InvalidBindingError } from '../internal/DiError.js'
 import { isNamedToken } from '../Token.js'
 import { Token } from '../Token.js'
@@ -9,6 +8,7 @@ import { getParamTypes } from '../internal/utils/getParamTypes.js'
 import { isNil } from '../internal/utils/isNil.js'
 import { configureBean } from '../internal/utils/beanUtils.js'
 import { getLookupProperties } from '../internal/utils/getLookupProperties.js'
+import { DiTypes } from '../internal/DiTypes.js'
 
 export function Injectable<T>(token?: Token) {
   return function <TFunction extends Function>(target: TFunction | object, propertyKey?: string | symbol) {
@@ -21,7 +21,7 @@ export function Injectable<T>(token?: Token) {
         )
       }
 
-      DI.configureType<T>(target, {
+      DiTypes.instance().configure<T>(target, {
         injections: getParamTypes(target),
         injectableProperties: getInjectableProperties(target),
         injectableMethods: getInjectableMethods(target),

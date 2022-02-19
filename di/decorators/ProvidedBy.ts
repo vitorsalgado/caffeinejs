@@ -1,8 +1,8 @@
-import { DI } from '../DI.js'
 import { Provider } from '../Provider.js'
+import { DiTypes } from '../internal/DiTypes.js'
 
 export function ProvidedBy<T>(provider: Provider<T>): ClassDecorator {
   return function (target) {
-    DI.configureType<T>(target, { rawProvider: provider })
+    DiTypes.instance().configure<T>(target, { rawProvider: provider })
   }
 }

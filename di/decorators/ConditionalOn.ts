@@ -19,7 +19,7 @@ export function ConditionalOn<T>(...conditionals: Conditional[]) {
         merged.push(...injectable.conditionals)
       }
 
-      DI.configureType<T>(target, { conditionals: merged })
+      DiTypes.instance().configure<T>(target, { conditionals: merged })
 
       return
     }

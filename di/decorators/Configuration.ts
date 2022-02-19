@@ -1,11 +1,11 @@
 import { newBinding } from '../Binding.js'
-import { DI } from '../DI.js'
 import { Ctor } from '../internal/types/Ctor.js'
 import { Vars } from '../internal/Vars.js'
 import { Identifier } from '../internal/types/Identifier.js'
 import { BeanFactoryProvider } from '../internal/BeanFactoryProvider.js'
 import { getParamTypes } from '../internal/utils/getParamTypes.js'
 import { isNil } from '../internal/utils/isNil.js'
+import { DiTypes } from '../internal/DiTypes.js'
 import { ConfigurationProviderOptions } from './ConfigurationProviderOptions.js'
 
 export interface ConfigurationOptions {
@@ -18,7 +18,7 @@ export interface ConfigurationOptions {
 
 export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): ClassDecorator {
   return function (target) {
-    DI.configureType<T>(target, {
+    DiTypes.instance().configure<T>(target, {
       injections: getParamTypes(target),
       namespace: config.namespace,
       configuration: true
@@ -47,7 +47,7 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
         configuredBy: `${target.name}${String(method)}`
       })
 
-      DI.addBean(factory.token, { ...binding })
+      DiTypes.instance().addBean(factory.token, { ...binding })
     }
   }
 }
