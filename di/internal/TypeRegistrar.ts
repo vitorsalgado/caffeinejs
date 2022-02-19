@@ -5,7 +5,7 @@ import { tokenStr } from '../Token.js'
 import { notNil } from './utils/notNil.js'
 import { RepeatedInjectableConfigurationError } from './errors.js'
 
-export namespace DiTypes {
+export namespace TypeRegistrar {
   const _entries = new Map<Token, Binding>()
   const _beans: Array<[Token, Binding]> = []
 
@@ -14,7 +14,7 @@ export namespace DiTypes {
 
     const opts = { ...additional }
     const tk = typeof token === 'object' ? token.constructor : token
-    const existing = DiTypes.get(tk)
+    const existing = TypeRegistrar.get(tk)
 
     if (existing) {
       const names = existing.names

@@ -3,7 +3,7 @@ import { afterAll } from '@jest/globals'
 import { jest } from '@jest/globals'
 import { v4 } from 'uuid'
 import { Binding } from '../../../Binding.js'
-import { DiTypes } from '../../DiTypes.js'
+import { TypeRegistrar } from '../../TypeRegistrar.js'
 import { Injectable } from '../../../decorators/Injectable.js'
 import { Scoped } from '../../../decorators/Scoped.js'
 import { DI } from '../../../DI.js'
@@ -41,7 +41,7 @@ describe('Scoping', function () {
 
   afterAll(() => {
     DI.unbindScope(kCustomScopeId)
-    DiTypes.remove(Dep)
+    TypeRegistrar.remove(Dep)
   })
 
   it('should fail when using an non-registered scope', function () {
@@ -58,7 +58,7 @@ describe('Scoping', function () {
       return
     } finally {
       DI.unbindScope('none')
-      DiTypes.remove(NonexistentScope)
+      TypeRegistrar.remove(NonexistentScope)
     }
 
     fail('should not reach here!')

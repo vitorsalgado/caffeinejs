@@ -1,10 +1,10 @@
 import { configureBean } from '../internal/utils/beanUtils.js'
-import { DiTypes } from '../internal/DiTypes.js'
+import { TypeRegistrar } from '../internal/TypeRegistrar.js'
 
 export function Options<T>(options: unknown) {
   return function <TFunction extends Function>(target: TFunction | object, propertyKey?: string | symbol) {
     if (typeof target === 'function') {
-      DiTypes.configure<T>(target, { options })
+      TypeRegistrar.configure<T>(target, { options })
       return
     }
 

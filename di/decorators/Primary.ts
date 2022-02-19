@@ -1,10 +1,10 @@
 import { configureBean } from '../internal/utils/beanUtils.js'
-import { DiTypes } from '../internal/DiTypes.js'
+import { TypeRegistrar } from '../internal/TypeRegistrar.js'
 
 export function Primary() {
   return function (target: Function | object, propertyKey?: string | symbol) {
     if (typeof target === 'function') {
-      DiTypes.configure(target, { primary: true })
+      TypeRegistrar.configure(target, { primary: true })
       return
     }
 

@@ -2,8 +2,8 @@ import { Binder } from './Binder.js'
 import { BindTo } from './Binder.js'
 import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
-import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
-import { DiTypes } from './internal/DiTypes.js'
+import { BindingEntry, BindingRegistry } from './internal/BindingRegistry.js'
+import { TypeRegistrar } from './internal/TypeRegistrar.js'
 import { RepeatedInjectableConfigurationError } from './internal/errors.js'
 import { ScopeAlreadyRegisteredError } from './internal/errors.js'
 import { ScopeNotRegisteredError } from './internal/errors.js'
@@ -364,7 +364,7 @@ export class DI implements Container {
   bind<T>(token: Token<T>): Binder<T> {
     notNil(token)
 
-    const type = DiTypes.get(token)
+    const type = TypeRegistrar.get(token)
     const binding = newBinding(type)
 
     this.configureBinding(token, binding)
@@ -509,7 +509,7 @@ export class DI implements Container {
   }
 
   setup(): void {
-    for (const [token, binding] of DiTypes.entries()) {
+    for (const [token, binding] of TypeRegistrar.entries()) {
       DI.Inspector?.onBinding(token, binding)
 
       if (!this.isRegistrable(binding)) {
@@ -534,13 +534,13 @@ export class DI implements Container {
           const tokens = Reflect.getOwnMetadata(Vars.CONFIGURATION_TOKENS_PROVIDED, token)
 
           for (const tk of tokens) {
-            DiTypes.deleteBean(tk)
+            TypeRegistrar.deleteBean(tk)
           }
         }
       }
     }
 
-    for (const [token, binding] of DiTypes.beans()) {
+    for (const [token, binding] of TypeRegistrar.beans()) {
       DI.Inspector?.onBinding(token, binding)
 
       if (!this.isRegistrable(binding)) {

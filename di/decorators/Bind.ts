@@ -5,7 +5,7 @@ import { getInjectableProperties } from '../internal/utils/getInjectableProperti
 import { getParamTypes } from '../internal/utils/getParamTypes.js'
 import { notNil } from '../internal/utils/notNil.js'
 import { configureBean } from '../internal/utils/beanUtils.js'
-import { DiTypes } from '../internal/DiTypes.js'
+import { TypeRegistrar } from '../internal/TypeRegistrar.js'
 
 export function Bind<T>(
   options: Partial<Exclude<Binding<T>, 'id' | 'scopedProvider' | 'configuration' | 'cachedInstance'>>
@@ -17,7 +17,7 @@ export function Bind<T>(
 
   return function <TFunction extends Function>(target: TFunction | object, propertyKey?: string | symbol) {
     if (typeof target === 'function') {
-      DiTypes.configure<T>(target, {
+      TypeRegistrar.configure<T>(target, {
         injections: getParamTypes(target),
         injectableProperties: getInjectableProperties(target),
         injectableMethods: getInjectableMethods(target),

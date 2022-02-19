@@ -1,7 +1,7 @@
 import { Identifier } from './internal/types.js'
 import { Token } from './Token.js'
 import { Binding } from './Binding.js'
-import { BindingEntry } from './BindingRegistry.js'
+import { BindingEntry } from './internal/BindingRegistry.js'
 import { Binder } from './Binder.js'
 import { DI } from './DI.js'
 import { Lifecycle } from './Lifecycle.js'

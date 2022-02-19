@@ -1,4 +1,4 @@
-import { DiTypes } from '../internal/DiTypes.js'
+import { TypeRegistrar } from '../internal/TypeRegistrar.js'
 import { configureBean, getBeanConfiguration } from '../internal/utils/beanUtils.js'
 import { Container } from '../Container.js'
 
@@ -13,13 +13,13 @@ export function ConditionalOn<T>(...conditionals: Conditional[]) {
     const merged: Conditional[] = [...conditionals]
 
     if (typeof target === 'function') {
-      const injectable = DiTypes.get(target)
+      const injectable = TypeRegistrar.get(target)
 
       if (injectable && injectable.conditionals) {
         merged.push(...injectable.conditionals)
       }
 
-      DiTypes.configure<T>(target, { conditionals: merged })
+      TypeRegistrar.configure<T>(target, { conditionals: merged })
 
       return
     }

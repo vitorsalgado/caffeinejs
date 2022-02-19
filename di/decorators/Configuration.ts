@@ -3,7 +3,7 @@ import { Vars } from '../internal/Vars.js'
 import { BeanFactoryProvider } from '../internal/providers/BeanFactoryProvider.js'
 import { getParamTypes } from '../internal/utils/getParamTypes.js'
 import { isNil } from '../internal/utils/isNil.js'
-import { DiTypes } from '../internal/DiTypes.js'
+import { TypeRegistrar } from '../internal/TypeRegistrar.js'
 import { Ctor } from '../internal/types.js'
 import { Identifier } from '../internal/types.js'
 import { ConfigurationProviderOptions } from './ConfigurationProviderOptions.js'
@@ -18,7 +18,7 @@ export interface ConfigurationOptions {
 
 export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): ClassDecorator {
   return function (target) {
-    DiTypes.configure<T>(target, {
+    TypeRegistrar.configure<T>(target, {
       injections: getParamTypes(target),
       namespace: config.namespace,
       configuration: true
@@ -47,7 +47,7 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
         configuredBy: `${target.name}${String(method)}`
       })
 
-      DiTypes.addBean(factory.token, { ...binding })
+      TypeRegistrar.addBean(factory.token, { ...binding })
     }
   }
 }

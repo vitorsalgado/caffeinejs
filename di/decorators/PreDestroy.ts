@@ -1,7 +1,7 @@
-import { DiTypes } from '../internal/DiTypes.js'
+import { TypeRegistrar } from '../internal/TypeRegistrar.js'
 
 export function PreDestroy(): MethodDecorator {
   return function (target, propertyKey) {
-    DiTypes.configure(target.constructor, { preDestroy: propertyKey })
+    TypeRegistrar.configure(target.constructor, { preDestroy: propertyKey })
   }
 }

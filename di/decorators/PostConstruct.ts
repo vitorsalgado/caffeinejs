@@ -1,7 +1,7 @@
-import { DiTypes } from '../internal/DiTypes.js'
+import { TypeRegistrar } from '../internal/TypeRegistrar.js'
 
 export function PostConstruct(): MethodDecorator {
   return function (target, propertyKey) {
-    DiTypes.configure(target.constructor, { postConstruct: propertyKey })
+    TypeRegistrar.configure(target.constructor, { postConstruct: propertyKey })
   }
 }

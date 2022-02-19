@@ -1,6 +1,6 @@
-import { Binding } from './Binding.js'
-import { Token } from './Token.js'
-import { notNil } from './internal/utils/notNil.js'
+import { Binding } from '../Binding.js'
+import { Token } from '../Token.js'
+import { notNil } from './utils/notNil.js'
 
 export interface BindingEntry {
   token: Token

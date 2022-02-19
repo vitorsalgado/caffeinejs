@@ -10,7 +10,7 @@ import { Primary } from '../decorators/Primary.js'
 import { DI } from '../DI'
 import { TypeOf } from '../TypeOf.js'
 import { Lifecycle } from '../Lifecycle.js'
-import { DiTypes } from '../internal/DiTypes.js'
+import { TypeRegistrar } from '../internal/TypeRegistrar.js'
 import { Scoped } from '../decorators/Scoped.js'
 import { Defer } from '../decorators/Defer.js'
 import { Foo } from './_fixtures/circular_beans/Foo.js'
@@ -285,8 +285,8 @@ describe('Configuration', function () {
 
         expect(replaced.id).toEqual('replaced')
 
-        DiTypes.remove(ToBeReplaced)
-        DiTypes.remove(Conf)
+        TypeRegistrar.remove(ToBeReplaced)
+        TypeRegistrar.remove(Conf)
       }).not.toThrow()
     })
 
@@ -310,8 +310,8 @@ describe('Configuration', function () {
         try {
           DI.setup()
         } finally {
-          DiTypes.remove(ToBeReplaced)
-          DiTypes.remove(Conf)
+          TypeRegistrar.remove(ToBeReplaced)
+          TypeRegistrar.remove(Conf)
         }
       }).toThrow()
     })

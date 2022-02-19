@@ -8,7 +8,7 @@ import { Binding } from '../Binding.js'
 import { isNil } from '../internal/utils/isNil.js'
 import { configureBean } from '../internal/utils/beanUtils.js'
 import { InvalidBindingError } from '../internal/errors.js'
-import { DiTypes } from '../internal/DiTypes.js'
+import { TypeRegistrar } from '../internal/TypeRegistrar.js'
 import { ConfigurationProviderOptions } from './ConfigurationProviderOptions.js'
 
 export function Bean<T>(bean: Token<T>, token?: Token) {
@@ -22,7 +22,7 @@ export function Bean<T>(bean: Token<T>, token?: Token) {
         )
       }
 
-      DiTypes.configure<T>(target, {
+      TypeRegistrar.configure<T>(target, {
         injections: getParamTypes(target),
         injectableProperties: getInjectableProperties(target),
         injectableMethods: getInjectableMethods(target),
