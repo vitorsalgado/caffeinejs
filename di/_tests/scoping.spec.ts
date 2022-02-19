@@ -3,7 +3,7 @@ import { afterAll } from '@jest/globals'
 import { jest } from '@jest/globals'
 import { v4 } from 'uuid'
 import { Binding } from '../Binding.js'
-import { DiTypes } from '../DiTypes.js'
+import { DiTypes } from '../internal/DiTypes.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { ScopedAs } from '../decorators/ScopedAs.js'
 import { DI } from '../DI.js'
@@ -12,7 +12,7 @@ import { ScopeNotRegisteredError } from '../internal/DiError.js'
 import { Provider } from '../Provider.js'
 import { Lifecycle } from '../Lifecycle.js'
 import { Scope } from '../Scope.js'
-import { ResolutionContext } from '../internal/ResolutionContext.js'
+import { ResolutionContext } from '../ResolutionContext.js'
 
 describe('Scoping', function () {
   const kCustomScopeId = Symbol('custom')

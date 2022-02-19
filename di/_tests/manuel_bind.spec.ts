@@ -11,7 +11,7 @@ import { MultiplePrimaryError } from '../internal/DiError.js'
 import { InvalidBindingError } from '../internal/DiError.js'
 import { Provider } from '../Provider.js'
 import { Lifecycle } from '../Lifecycle.js'
-import { ResolutionContext } from '../internal/ResolutionContext.js'
+import { ResolutionContext } from '../ResolutionContext.js'
 import { LocalResolutions } from '../LocalResolutions.js'
 
 describe('Manual Binding', function () {

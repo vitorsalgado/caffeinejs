@@ -2,7 +2,7 @@ import { Binder } from './Binder.js'
 import { newBinding } from './Binding.js'
 import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
-import { DiTypes } from './DiTypes.js'
+import { DiTypes } from './internal/DiTypes.js'
 import { RepeatedInjectableConfigurationError } from './internal/DiError.js'
 import { ScopeAlreadyRegisteredError } from './internal/DiError.js'
 import { ScopeNotRegisteredError } from './internal/DiError.js'
@@ -45,7 +45,7 @@ import { Filter } from './Filter.js'
 import { ContainerLifecycle } from './ContainerLifecycle.js'
 import { BindTo } from './Binder.js'
 import { MetadataReader } from './MetadataReader.js'
-import { ResolutionContext } from './internal/ResolutionContext.js'
+import { ResolutionContext } from './ResolutionContext.js'
 import { ValueProvider } from './internal/ValueProvider.js'
 
 export class DI {
@@ -159,11 +159,11 @@ export class DI {
     return scope as T
   }
 
-  static bindPostProcessor(postProcessor: PostProcessor) {
+  static addPostProcessor(postProcessor: PostProcessor) {
     DI.PostProcessors.add(notNil(postProcessor))
   }
 
-  static unbindPostProcessor(posProcessor: PostProcessor) {
+  static removePostProcessor(posProcessor: PostProcessor) {
     DI.PostProcessors.delete(posProcessor)
   }
 

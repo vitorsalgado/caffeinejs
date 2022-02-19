@@ -9,7 +9,7 @@ import { DI } from '../DI.js'
 import { Provider } from '../Provider.js'
 import { PostProcessor } from '../PostProcessor.js'
 import { Scope } from '../Scope.js'
-import { ResolutionContext } from '../internal/ResolutionContext.js'
+import { ResolutionContext } from '../ResolutionContext.js'
 
 describe('Post Processors', function () {
   const ppSpy = jest.fn()
@@ -84,14 +84,14 @@ describe('Post Processors', function () {
 
   beforeAll(() => {
     DI.bindScope(kScope, new CustomTransient())
-    DI.bindPostProcessor(new PpOne())
-    DI.bindPostProcessor(new PpTwo())
+    DI.addPostProcessor(new PpOne())
+    DI.addPostProcessor(new PpTwo())
   })
 
   afterAll(() => {
     DI.unbindScope(kScope)
-    DI.unbindPostProcessor(ppOne)
-    DI.unbindPostProcessor(ppTwo)
+    DI.removePostProcessor(ppOne)
+    DI.removePostProcessor(ppTwo)
   })
 
   it('should execute post processors calling the provider just one time per execution', async function () {

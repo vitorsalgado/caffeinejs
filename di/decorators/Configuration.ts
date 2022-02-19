@@ -43,6 +43,7 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
         names: factory.names,
         type: factory.type || (typeof factory.token === 'function' ? factory.token : undefined),
         rawProvider: new BeanFactoryProvider(target as unknown as Ctor<T>, method, factory),
+        options: factory.options,
         configuredBy: `${target.name}${String(method)}`
       })
 

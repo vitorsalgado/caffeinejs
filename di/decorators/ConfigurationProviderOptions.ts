@@ -13,4 +13,5 @@ export interface ConfigurationProviderOptions {
   primary: boolean
   late: boolean
   lazy: boolean
+  options: unknown
 }

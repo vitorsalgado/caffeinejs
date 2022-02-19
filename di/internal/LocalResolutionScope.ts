@@ -3,7 +3,7 @@ import { Scope } from '../Scope.js'
 import { Provider } from '../Provider.js'
 import { tokenStr } from '../Token.js'
 import { LocalResolutions } from '../LocalResolutions.js'
-import { ResolutionContext } from './ResolutionContext.js'
+import { ResolutionContext } from '../ResolutionContext.js'
 import { MissingRequiredProviderArgumentError } from './DiError.js'
 
 export class LocalResolutionScope implements Scope {

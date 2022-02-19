@@ -1,6 +1,6 @@
 import { PostResolutionInterceptor } from '../PostResolutionInterceptor.js'
 import { Provider } from '../Provider.js'
-import { ResolutionContext } from './ResolutionContext.js'
+import { ResolutionContext } from '../ResolutionContext.js'
 
 export class EntrypointProvider<T> implements Provider<T> {
   constructor(private readonly rawProvider: Provider<T>, private readonly interceptors: PostResolutionInterceptor[]) {}

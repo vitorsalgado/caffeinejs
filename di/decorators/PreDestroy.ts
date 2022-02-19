@@ -1,4 +1,4 @@
-import { DiTypes } from '../DiTypes.js'
+import { DiTypes } from '../internal/DiTypes.js'
 
 export function PreDestroy(): MethodDecorator {
   return function (target, propertyKey) {

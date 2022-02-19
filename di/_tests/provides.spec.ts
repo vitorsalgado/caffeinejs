@@ -4,7 +4,7 @@ import { Provides } from '../decorators/Provides.js'
 import { Provider } from '../Provider.js'
 import { DI } from '../DI.js'
 import { TransientScoped } from '../decorators/TransientScoped.js'
-import { ResolutionContext } from '../internal/ResolutionContext.js'
+import { ResolutionContext } from '../ResolutionContext.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Inject } from '../decorators/Inject.js'
 

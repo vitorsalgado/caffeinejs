@@ -1,7 +1,7 @@
-import { notNil } from './internal/utils/notNil.js'
-import { newBinding } from './Binding.js'
-import { Binding } from './Binding.js'
-import { Token } from './Token.js'
+import { newBinding } from '../Binding.js'
+import { Binding } from '../Binding.js'
+import { Token } from '../Token.js'
+import { notNil } from './utils/notNil.js'
 
 export class DiTypes {
   private static INSTANCE = new DiTypes()

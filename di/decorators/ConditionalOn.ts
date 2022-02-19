@@ -1,4 +1,4 @@
-import { DiTypes } from '../DiTypes.js'
+import { DiTypes } from '../internal/DiTypes.js'
 import { DI } from '../DI.js'
 import { configureBean, getBeanConfiguration } from '../internal/utils/beanUtils.js'
 
