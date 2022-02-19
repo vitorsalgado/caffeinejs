@@ -95,7 +95,7 @@ export namespace Resolver {
     }
 
     if (dep.optional) {
-      return null as unknown as T
+      return undefined as unknown as T
     }
 
     throw new NoResolutionForTokenError(

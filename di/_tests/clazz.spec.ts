@@ -276,9 +276,9 @@ describe('Class', function () {
       const svc = di.get(OptSvc)
       const ctrl = di.get(Ctrl)
 
-      expect(svc.repo).toBeNull()
+      expect(svc.repo).toBeUndefined()
       expect(() => di.get(NonSvc)).toThrow()
-      expect(ctrl.service).toBeNull()
+      expect(ctrl.service).toBeUndefined()
     })
   })
 

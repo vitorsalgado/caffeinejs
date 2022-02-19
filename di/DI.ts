@@ -47,10 +47,12 @@ import { RequestScope } from './internal/RequestScope.js'
 import { ValueProvider } from './internal/index.js'
 import { ResolutionContext } from './internal/index.js'
 import { RefreshScope } from './internal/RefreshScope.js'
+import { Filter } from './Filter.js'
 
 export class DI {
   static MetadataReader = new InternalMetadataReader()
 
+  protected static Filters: Filter[] = []
   protected static readonly Scopes = new Map(DI.builtInScopes().entries())
   protected static readonly PostProcessors = new Set<PostProcessor>()
 
@@ -175,6 +177,10 @@ export class DI {
     check('read' in other && other.read.length === 1, 'Provided instance must be an MetadataReader implementation.')
 
     DI.MetadataReader = other
+  }
+
+  static addFilters(...filters: Filter[]) {
+    DI.Filters.push(...notNil(filters))
   }
 
   protected static async preDestroyBinding(binding: Binding): Promise<void> {
@@ -577,33 +583,25 @@ export class DI {
   }
 
   protected setup(): void {
-    const conditionals = new Map<Token, Binding>()
-
-    for (const [key, binding] of DiTypes.instance().entries()) {
+    for (const [token, binding] of DiTypes.instance().entries()) {
       if (!this.isRegistrable(binding)) {
         continue
       }
 
-      this.configureBinding(key, binding)
-
-      if (binding.conditionals) {
-        conditionals.set(key, binding)
+      if (!this.filter(token, binding)) {
+        continue
       }
-    }
 
-    for (const [token, binding] of conditionals) {
-      if (binding.conditionals.length > 0) {
-        const pass = binding.conditionals.every(conditional => conditional({ di: this }))
+      const pass = binding.conditionals.every(conditional => conditional({ di: this }))
 
-        if (!pass) {
-          this.bindingRegistry.delete(token)
+      if (pass) {
+        this.configureBinding(token, binding)
+      } else {
+        if (binding.configuration) {
+          const tokens = Reflect.getOwnMetadata(Vars.CONFIGURATION_TOKENS_PROVIDED, token)
 
-          if (binding.configuration) {
-            const tokens = Reflect.getOwnMetadata(Vars.CONFIGURATION_TOKENS_PROVIDED, token)
-
-            for (const tk of tokens) {
-              DiTypes.instance().deleteBean(tk)
-            }
+          for (const tk of tokens) {
+            DiTypes.instance().deleteBean(tk)
           }
         }
       }
@@ -611,6 +609,10 @@ export class DI {
 
     for (const [token, binding] of DiTypes.instance().beans()) {
       if (!this.isRegistrable(binding)) {
+        continue
+      }
+
+      if (!this.filter(token, binding)) {
         continue
       }
 
@@ -665,5 +667,9 @@ export class DI {
     for (const binding of bindings) {
       DI.getScope(binding.scopeId).remove(binding)
     }
+  }
+
+  protected filter(token: Token, binding: Binding): boolean {
+    return DI.Filters.every(filter => !filter.match(token, binding))
   }
 }

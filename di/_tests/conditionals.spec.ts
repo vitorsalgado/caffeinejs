@@ -49,7 +49,7 @@ describe('Conditionals', function () {
       expect(refPassed).toBeInstanceOf(RefPassed)
       expect(refPassed.pass).toBeInstanceOf(Pass)
       expect(opt).toBeInstanceOf(RefNotPassedOptional)
-      expect(opt.noPass).toBeNull()
+      expect(opt.noPass).toBeUndefined()
       expect(di.has(Pass)).toBeTruthy()
       expect(di.has(NoPass)).toBeFalsy()
       expect(di.has(NoPassToo)).toBeFalsy()
