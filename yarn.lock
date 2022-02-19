@@ -455,7 +455,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@caffeinejs/di@workspace:^, @caffeinejs/di@workspace:di":
+"@caffeinejs/di@^0.0.0, @caffeinejs/di@workspace:di":
   version: 0.0.0-use.local
   resolution: "@caffeinejs/di@workspace:di"
   dependencies:
@@ -523,7 +523,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@caffeinejs/test-realapp@workspace:test/realapp"
   dependencies:
-    "@caffeinejs/di": "workspace:^"
+    "@caffeinejs/di": ^0.0.0
     mongodb: ^4.4.0
     reflect-metadata: ^0.1.13
     typeorm: ^0.2.43

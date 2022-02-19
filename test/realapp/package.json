@@ -13,7 +13,7 @@
     "test": "jest --detectOpenHandles"
   },
   "dependencies": {
-    "@caffeinejs/di": "workspace:^",
+    "@caffeinejs/di": "^0.0.0",
     "mongodb": "^4.4.0",
     "reflect-metadata": "^0.1.13",
     "typeorm": "^0.2.43"
