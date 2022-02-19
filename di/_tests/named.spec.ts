@@ -7,7 +7,7 @@ import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
 import { Primary } from '../decorators/Primary.js'
 import { DI } from '../DI.js'
-import { RepeatedNamesError } from '../internal/DiError.js'
+import { RepeatedInjectableConfigurationError } from '../internal/DiError.js'
 
 describe('Named Dependencies', function () {
   const kAck = Symbol('ok')
@@ -78,27 +78,29 @@ describe('Named Dependencies', function () {
             return 'two'
           }
         }
-      }).toThrow(RepeatedNamesError)
+
+        DI.setup()
+      }).toThrow()
     })
 
-    it('should fail when trying to repeat a name for the same type', function () {
+    it('should fail when repeating the same bean token', function () {
       const kOne = Symbol('one')
 
       expect(() => {
         @Configuration()
         class Rep {
           @Bean(Msg)
-          @Named(kOne)
           msg1() {
             return new Msg('one_1')
           }
 
           @Bean(Msg)
-          @Named(kOne)
           msg1_1() {
             return new Msg('one_1_1')
           }
         }
+
+        DI.setup()
       }).toThrow()
     })
   })
@@ -110,20 +112,17 @@ describe('Named Dependencies', function () {
 
     @Configuration()
     class Conf {
-      @Bean(Msg)
-      @Named(kTwo)
+      @Bean(Msg, kTwo)
       msg2() {
         return new Msg('two_2')
       }
 
-      @Bean(Msg)
-      @Named(kAm)
+      @Bean(Msg, kAm)
       msg3() {
         return new Msg('am')
       }
 
-      @Bean(Msg)
-      @Named(kEu)
+      @Bean(Msg, kEu)
       @Primary()
       msg3_1() {
         return new Msg('eu')
@@ -173,7 +172,7 @@ describe('Named Dependencies', function () {
         @Named(kTest)
         @Named(kTest)
         class Dep {}
-      }).toThrow(RepeatedNamesError)
+      }).toThrow(RepeatedInjectableConfigurationError)
     })
   })
 })

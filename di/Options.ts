@@ -6,6 +6,7 @@ export interface Options {
   scopeId: Identifier
   lazy?: boolean
   lateBind?: boolean
+  overriding?: boolean
 }
 
 export const InitialOptions: Options = {

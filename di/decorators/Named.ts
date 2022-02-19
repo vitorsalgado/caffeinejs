@@ -10,6 +10,6 @@ export function Named<T>(name: Identifier) {
       return
     }
 
-    configureBean(target.constructor, propertyKey!, { name })
+    configureBean(target.constructor, propertyKey!, { names: [name] })
   }
 }

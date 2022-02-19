@@ -18,9 +18,9 @@ export interface Binding<T = any> {
   rawProvider: Provider<T>
   scopedProvider: Provider<T>
   conditionals: Conditional[]
+  configuredBy?: string
   type?: Function
   configuration?: boolean
-  cachedInstance?: T
   primary?: boolean
   late?: boolean
   lazy?: boolean
@@ -39,7 +39,7 @@ export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
     namespace: initial.namespace || '',
     names: initial.names || [],
     conditionals: initial.conditionals || [],
-    cachedInstance: initial.cachedInstance,
+    configuredBy: initial.configuredBy,
     primary: initial.primary,
     lazy: initial.lazy,
     late: initial.late,

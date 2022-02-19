@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals'
 import { expect } from '@jest/globals'
+import { afterAll } from '@jest/globals'
 import { v4 } from 'uuid'
 import { Bean } from '../decorators/Bean.js'
 import { Configuration } from '../decorators/Configuration.js'
@@ -12,6 +13,7 @@ import { TypeOf } from '../TypeOf.js'
 import { Defer } from '../decorators/index.js'
 import { ScopedAs } from '../decorators/index.js'
 import { Lifecycle } from '../Lifecycle.js'
+import { DiTypes } from '../DiTypes.js'
 import { Foo } from './_fixtures/circular_beans/Foo.js'
 import { Bar } from './_fixtures/circular_beans/Bar.js'
 
@@ -258,6 +260,39 @@ describe('Configuration', function () {
 
       expect(foo.uuid).toEqual(foo2.uuid)
       expect(bar.uuid).not.toEqual(bar2.uuid)
+    })
+  })
+
+  describe('when container option "overriding" is enabled', function () {
+    @Injectable()
+    class ToBeReplaced {
+      id = 'injectable'
+    }
+
+    @Configuration()
+    class Conf {
+      @Bean(ToBeReplaced)
+      override() {
+        const bean = new ToBeReplaced()
+        bean.id = 'replaced'
+        return bean
+      }
+    }
+
+    afterAll(() => {
+      DiTypes.instance().delete(ToBeReplaced)
+      DiTypes.instance().delete(Conf)
+    })
+
+    it('should replace registered classes with beans defined in configuration classes', function () {
+      const di = DI.setup({ overriding: true })
+      const replaced = di.get(ToBeReplaced)
+
+      expect(replaced.id).toEqual('replaced')
+    })
+
+    it('should fail when overriding is false', function () {
+      expect(() => DI.setup()).toThrow()
     })
   })
 })

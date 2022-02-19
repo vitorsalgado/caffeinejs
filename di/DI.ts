@@ -4,7 +4,7 @@ import { Binding } from './Binding.js'
 import { BindingEntry, BindingRegistry } from './BindingRegistry.js'
 import { BindTo } from './BindTo.js'
 import { DiTypes } from './DiTypes.js'
-import { RepeatedNamesError } from './internal/DiError.js'
+import { RepeatedInjectableConfigurationError } from './internal/DiError.js'
 import { ScopeAlreadyRegisteredError } from './internal/DiError.js'
 import { ScopeNotRegisteredError } from './internal/DiError.js'
 import { CircularReferenceError } from './internal/DiError.js'
@@ -59,6 +59,7 @@ export class DI {
   protected readonly scopeId: Identifier
   protected readonly lazy?: boolean
   protected readonly lateBind?: boolean
+  protected readonly overriding?: boolean
 
   readonly namespace: Identifier
   readonly parent?: DI
@@ -67,12 +68,13 @@ export class DI {
     const opts =
       typeof options === 'string' || typeof options === 'symbol'
         ? { ...InitialOptions, namespace: options }
-        : { ...InitialOptions, options }
+        : { ...InitialOptions, ...options }
 
     this.parent = parent
     this.namespace = opts.namespace || ''
     this.lazy = opts.lazy
     this.lateBind = opts.lateBind
+    this.overriding = opts.overriding
     this.scopeId = opts.scopeId || Lifecycle.SINGLETON
   }
 
@@ -95,8 +97,8 @@ export class DI {
 
       if (opts?.names) {
         if (names.some(value => opts.names!.includes(value))) {
-          throw new RepeatedNamesError(
-            `Found repeated qualifiers for the class ${tokenStr(token)}. Qualifiers found: ${opts.names
+          throw new RepeatedInjectableConfigurationError(
+            `Found repeated qualifiers for the class '${tokenStr(token)}'. Qualifiers found: ${opts.names
               .map(x => tokenStr(x))
               .join(', ')}`
           )
@@ -374,7 +376,7 @@ export class DI {
       const bindings = this.getBindings(token)
 
       for (const binding of bindings) {
-        if (binding?.cachedInstance && binding?.preDestroy) {
+        if (binding.preDestroy) {
           await DI.preDestroyBinding(binding).finally(() => this.unref(token))
         }
       }
@@ -412,12 +414,7 @@ export class DI {
     this.bindingRegistry
       .toArray()
       .filter(x => x.binding.scopeId === Lifecycle.CONTAINER)
-      .forEach(({ token, binding }) =>
-        child.bindingRegistry.register(token, {
-          ...binding,
-          cachedInstance: undefined
-        })
-      )
+      .forEach(({ token, binding }) => child.bindingRegistry.register(token, newBinding({ ...binding, id: undefined })))
 
     DI.registerInternalComponents(child)
 
@@ -446,7 +443,6 @@ export class DI {
 
   resetInstances(): void {
     for (const [, binding] of this.bindingRegistry.entries()) {
-      binding.cachedInstance = undefined
       DI.getScope(binding.scopeId).remove(binding)
     }
   }
@@ -467,7 +463,7 @@ export class DI {
     const bindings = this.getBindings(token)
 
     for (const binding of bindings) {
-      if (binding.cachedInstance && binding.preDestroy) {
+      if (binding.preDestroy) {
         await DI.preDestroyBinding(binding).finally(() => this.unref(token))
       }
 
@@ -477,15 +473,18 @@ export class DI {
 
   bootstrap(): void {
     for (const [token, binding] of this.bindingRegistry.entries()) {
-      if (binding.lazy) {
-        continue
+      if (
+        !binding.lazy &&
+        (binding.scopeId === Lifecycle.SINGLETON ||
+          binding.scopeId === Lifecycle.CONTAINER ||
+          binding.scopeId === Lifecycle.REFRESH)
+      ) {
+        Resolver.resolve(this, token, binding, LocalResolutions.INSTANCE)
       }
-
-      Resolver.resolve(this, token, binding, LocalResolutions.INSTANCE)
     }
   }
 
-  finalize(): Promise<void> {
+  dispose(): Promise<void> {
     return Promise.all(
       this.bindingRegistry
         .toArray()
@@ -610,13 +609,18 @@ export class DI {
         continue
       }
 
-      if (binding.conditionals?.length > 0) {
-        const pass = binding.conditionals.every(conditional => conditional({ di: this }))
+      const pass =
+        binding.conditionals === undefined ? true : binding.conditionals.every(conditional => conditional({ di: this }))
 
-        if (pass) {
-          this.configureBinding(token, binding)
+      if (pass) {
+        if (this.has(token) && !this.overriding) {
+          throw new RepeatedInjectableConfigurationError(
+            `Found multiple beans with the same injection token '${tokenStr(token)}' configured at '${
+              binding.configuredBy
+            }'`
+          )
         }
-      } else {
+
         this.configureBinding(token, binding)
       }
     }
@@ -644,11 +648,17 @@ export class DI {
   }
 
   protected unref(token: Token) {
+    const bindings = this.getBindings(token)
+
     this.bindingRegistry.delete(token)
     this.multipleBeansRefCache.delete(token)
 
     if (isNamedToken(token)) {
       this.bindingNames.delete(token)
+    }
+
+    for (const binding of bindings) {
+      DI.getScope(binding.scopeId).remove(binding)
     }
   }
 }

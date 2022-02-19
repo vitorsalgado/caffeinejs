@@ -49,7 +49,7 @@ describe('Hooks', function () {
       const di = DI.setup()
       di.get(Dep)
 
-      await di.finalize()
+      await di.dispose()
 
       expect(destroySpy).toHaveBeenCalledTimes(1)
     })
@@ -58,7 +58,7 @@ describe('Hooks', function () {
       const di = DI.setup()
       di.get(ContainerDep)
 
-      await di.finalize()
+      await di.dispose()
 
       expect(destroyContainerScopedSpy).toHaveBeenCalledTimes(1)
     })
@@ -67,7 +67,7 @@ describe('Hooks', function () {
       const di = DI.setup()
       di.get(AsyncDep)
 
-      await di.finalize()
+      await di.dispose()
 
       expect(destroyAsyncSpy).toHaveBeenCalledTimes(1)
     })

@@ -64,7 +64,7 @@ describe('Init Singleton and Container Scoped', function () {
     expect(spy2).toHaveBeenCalledTimes(1)
     expect(spy3).not.toHaveBeenCalled()
     expect(spy4).not.toHaveBeenCalled()
-    expect(spy5).toHaveBeenCalledTimes(1)
+    expect(spy5).toHaveBeenCalledTimes(0)
     expect(dep1).toBeInstanceOf(Dep1)
     expect(dep2).toBeInstanceOf(Dep2)
   })

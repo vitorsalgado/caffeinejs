@@ -4,21 +4,27 @@ import { Provider } from '../Provider.js'
 import { ResolutionContext } from './ResolutionContext.js'
 
 export class SingletonScope implements Scope {
+  protected readonly _cachedInstances = new Map<number, unknown | undefined>()
+
   get<T>(ctx: ResolutionContext, unscoped: Provider<T>): T {
-    if (ctx.binding.cachedInstance) {
-      return ctx.binding.cachedInstance
+    const id = ctx.binding.id
+    const cached = this._cachedInstances.get(id)
+
+    if (cached) {
+      return cached as T
     }
 
-    ctx.binding.cachedInstance = unscoped.provide(ctx)
+    const resolved = unscoped.provide(ctx)
+    this._cachedInstances.set(id, resolved)
 
-    return ctx.binding.cachedInstance
+    return resolved
   }
 
   cachedInstance<T>(binding: Binding): T | undefined {
-    return binding.cachedInstance
+    return this._cachedInstances.get(binding.id) as T | undefined
   }
 
   remove(binding: Binding): void {
-    binding.cachedInstance = null
+    this._cachedInstances.set(binding.id, undefined)
   }
 }

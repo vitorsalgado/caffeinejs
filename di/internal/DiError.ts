@@ -61,10 +61,10 @@ export class ScopeAlreadyRegisteredError extends DiError {
   }
 }
 
-export class RepeatedNamesError extends DiError {
+export class RepeatedInjectableConfigurationError extends DiError {
   constructor(message: string) {
-    super(message, 'REPEATED_NAMES')
-    this.name = 'RepeatedNamesError'
+    super(message, 'REPEATED_INJECTABLE')
+    this.name = 'RepeatedInjectableConfigurationError'
   }
 }
 

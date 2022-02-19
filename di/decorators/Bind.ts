@@ -25,8 +25,7 @@ export function Bind<T>(
 
         ...options,
 
-        configuration: false,
-        cachedInstance: undefined
+        configuration: false
       } as Partial<Binding<T>>)
 
       return
@@ -34,9 +33,7 @@ export function Bind<T>(
 
     configureBean(target.constructor, propertyKey!, {
       ...options,
-
-      configuration: false,
-      cachedInstance: undefined
+      configuration: false
     } as Partial<Binding<T>>)
   }
 }

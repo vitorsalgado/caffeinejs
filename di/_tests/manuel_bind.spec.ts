@@ -220,8 +220,7 @@ describe('Manual Binding', function () {
 
         const dep1 = di.get(Late)
 
-        const bindTo = di.rebind(Late)
-        bindTo.toFactory(() => new Late())
+        di.rebind(Late).toFactory(() => new Late())
 
         const dep2 = di.get(Late)
 

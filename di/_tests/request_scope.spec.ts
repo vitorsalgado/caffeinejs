@@ -73,7 +73,7 @@ describe('Request Scope', function () {
     DiTypes.instance().delete(Ctrl)
     server.close()
 
-    await di.finalize()
+    await di.dispose()
   })
 
   beforeEach(() => {

@@ -99,7 +99,7 @@ describe('Post Processors', function () {
     const dep = di.get(Dep)
     const nonDep = di.get(NonDep)
 
-    await di.finalize()
+    await di.dispose()
 
     expect(ppSpy).toHaveBeenCalledTimes(8)
     expect(sSpy).toHaveBeenCalledTimes(1)
