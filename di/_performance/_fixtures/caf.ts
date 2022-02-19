@@ -18,6 +18,19 @@ export class Root {
   constructor(readonly svc: Svc) {}
 }
 
+@Injectable()
+class RepSingleton {}
+
+@Injectable()
+class SvcSingleton {
+  constructor(readonly repo: RepSingleton) {}
+}
+
+@Injectable()
+export class RootSingleton {
+  constructor(readonly svc: SvcSingleton) {}
+}
+
 const di = DI.setup()
 
 export { di }

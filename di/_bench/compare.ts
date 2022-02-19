@@ -12,6 +12,11 @@ import { InvTransientRoot } from './_fixtures/inversify.js'
 import { di } from './_fixtures/di.js'
 import { CafRoot } from './_fixtures/di.js'
 import { CafTransientRoot } from './_fixtures/di.js'
+import { bootstrap } from './_fixtures/nestjs.js'
+import { NestRoot } from './_fixtures/nestjs.js'
+import { NestTransientRoot } from './_fixtures/nestjs.js'
+
+const nestApp = await bootstrap()
 
 cronometro(
   {
@@ -28,17 +33,24 @@ cronometro(
     di() {
       di.get(CafRoot)
       di.get(CafTransientRoot)
+    },
+
+    async nestjs() {
+      nestApp.get(NestRoot)
+      await nestApp.resolve(NestTransientRoot)
     }
   },
   {
     iterations: 5000,
     errorThreshold
   },
-  (err, results) => {
+  async (err, results) => {
     if (err) {
       throw err
     }
 
     console.log(printResults(connections, results))
+
+    await nestApp.close()
   }
 )

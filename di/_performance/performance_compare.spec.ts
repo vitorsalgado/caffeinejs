@@ -2,10 +2,13 @@ import { performance } from 'perf_hooks'
 import { expect } from '@jest/globals'
 import { Root } from './_fixtures/caf.js'
 import { di } from './_fixtures/caf.js'
+import { RootSingleton } from './_fixtures/caf.js'
 import { inv } from './_fixtures/inversify.js'
 import { InvRoot } from './_fixtures/inversify.js'
 import { tsy } from './_fixtures/tsy.js'
 import { TsyRoot } from './_fixtures/tsy.js'
+import { bootstrap } from './_fixtures/nest.js'
+import { NestRoot } from './_fixtures/nest.js'
 
 describe('Performance Compare', function () {
   function resolve(times: number, res: () => unknown) {
@@ -42,22 +45,29 @@ describe('Performance Compare', function () {
     return result
   }
 
-  it('should resolve 15k times in less time then the others', () => {
+  it('should resolve 15k times in less time then the others', async () => {
     const times = 15000
 
-    expect(inv.get(InvRoot)).toBeInstanceOf(InvRoot)
-    expect(tsy.resolve(TsyRoot)).toBeInstanceOf(TsyRoot)
-    expect(di.get(Root)).toBeInstanceOf(Root)
+    return bootstrap().then(nestApp => {
+      expect(inv.get(InvRoot)).toBeInstanceOf(InvRoot)
+      expect(tsy.resolve(TsyRoot)).toBeInstanceOf(TsyRoot)
+      expect(di.get(Root)).toBeInstanceOf(Root)
 
-    const invRes = resolve(times, () => inv.get(InvRoot))
-    const tsyRes = resolve(times, () => tsy.resolve(TsyRoot))
-    const diRes = resolve(times, () => di.get(Root))
+      const invRes = resolve(times, () => inv.get(InvRoot))
+      const tsyRes = resolve(times, () => tsy.resolve(TsyRoot))
+      const diRes = resolve(times, () => di.get(Root))
+      const diSingletonRes = resolve(times, () => di.get(RootSingleton))
+      const nestRes = resolve(times, () => nestApp.get(NestRoot))
 
-    console.log('DI Avg: ' + String(diRes.avg))
-    console.log('Inversify Avg: ' + String(invRes.avg))
-    console.log('Tsyringe Avg: ' + String(tsyRes.avg))
+      console.log('DI Avg: ' + String(diRes.avg))
+      console.log('DI Singleton Avg: ' + String(diSingletonRes.avg))
+      console.log('Inversify Avg: ' + String(invRes.avg))
+      console.log('Tsyringe Avg: ' + String(tsyRes.avg))
+      console.log('NestJs Avg: ' + String(nestRes.avg))
 
-    expect(diRes.avg).toBeLessThan(invRes.avg)
-    expect(diRes.avg).toBeLessThan(tsyRes.avg)
+      expect(diRes.avg).toBeLessThan(invRes.avg)
+      expect(diRes.avg).toBeLessThan(tsyRes.avg)
+      expect(diSingletonRes.avg).toBeLessThan(nestRes.avg)
+    })
   })
 })
