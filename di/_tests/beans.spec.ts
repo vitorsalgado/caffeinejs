@@ -1,6 +1,5 @@
 import { jest } from '@jest/globals'
 import { expect } from '@jest/globals'
-import { afterAll } from '@jest/globals'
 import { v4 } from 'uuid'
 import { Bean } from '../decorators/Bean.js'
 import { Configuration } from '../decorators/Configuration.js'
@@ -264,35 +263,57 @@ describe('Configuration', function () {
   })
 
   describe('when container option "overriding" is enabled', function () {
-    @Injectable()
-    class ToBeReplaced {
-      id = 'injectable'
-    }
-
-    @Configuration()
-    class Conf {
-      @Bean(ToBeReplaced)
-      override() {
-        const bean = new ToBeReplaced()
-        bean.id = 'replaced'
-        return bean
-      }
-    }
-
-    afterAll(() => {
-      DiTypes.instance().delete(ToBeReplaced)
-      DiTypes.instance().delete(Conf)
-    })
-
     it('should replace registered classes with beans defined in configuration classes', function () {
-      const di = DI.setup({ overriding: true })
-      const replaced = di.get(ToBeReplaced)
+      expect(() => {
+        @Injectable()
+        class ToBeReplaced {
+          id = 'injectable'
+        }
 
-      expect(replaced.id).toEqual('replaced')
+        @Configuration()
+        class Conf {
+          @Bean(ToBeReplaced)
+          override() {
+            const bean = new ToBeReplaced()
+            bean.id = 'replaced'
+            return bean
+          }
+        }
+
+        const di = DI.setup({ overriding: true })
+        const replaced = di.get(ToBeReplaced)
+
+        expect(replaced.id).toEqual('replaced')
+
+        DiTypes.instance().delete(ToBeReplaced)
+        DiTypes.instance().delete(Conf)
+      }).not.toThrow()
     })
 
     it('should fail when overriding is false', function () {
-      expect(() => DI.setup()).toThrow()
+      expect(() => {
+        @Injectable()
+        class ToBeReplaced {
+          id = 'injectable'
+        }
+
+        @Configuration()
+        class Conf {
+          @Bean(ToBeReplaced)
+          override() {
+            const bean = new ToBeReplaced()
+            bean.id = 'replaced'
+            return bean
+          }
+        }
+
+        try {
+          DI.setup()
+        } finally {
+          DiTypes.instance().delete(ToBeReplaced)
+          DiTypes.instance().delete(Conf)
+        }
+      }).toThrow()
     })
   })
 })

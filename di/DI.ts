@@ -262,7 +262,11 @@ export class DI {
     binding.late = binding.late === undefined ? this.lateBind : binding.late
     binding.lazy = binding.lazy =
       binding.lazy === undefined && this.lazy === undefined
-        ? !(binding.scopeId === Lifecycle.SINGLETON || binding.scopeId === Lifecycle.CONTAINER)
+        ? !(
+            binding.scopeId === Lifecycle.SINGLETON ||
+            binding.scopeId === Lifecycle.CONTAINER ||
+            binding.scopeId === Lifecycle.REFRESH
+          )
         : binding.lazy === undefined
         ? this.lazy
         : binding.lazy
@@ -493,21 +497,17 @@ export class DI {
     ).then(() => this.resetInstances())
   }
 
-  size(): number {
-    return this.bindingRegistry.size()
-  }
-
   entries(): Iterable<[Token, Binding]> {
     return this.bindingRegistry.entries()
   }
 
-  aliases(): Iterable<[Identifier, Binding[]]> {
+  qualifiers(): Iterable<[Identifier, Binding[]]> {
     return this.bindingNames.entries()
   }
 
   toString() {
     return (
-      `${DI.name}(namespace=${String(this.namespace)}, count=${this.size()}) {` +
+      `${DI.name}(namespace=${String(this.namespace)}, count=${this.size}) {` +
       '\n' +
       this.bindingRegistry
         .toArray()
@@ -538,6 +538,10 @@ export class DI {
 
   get [Symbol.toStringTag]() {
     return DI.name
+  }
+
+  get size(): number {
+    return this.bindingRegistry.size()
   }
 
   protected static async preDestroyBinding(binding: Binding): Promise<void> {

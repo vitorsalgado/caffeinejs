@@ -44,7 +44,7 @@ describe('DI', function () {
   it('should return the number of registered components when calling size()', function () {
     const di = DI.setup()
 
-    expect(di.size()).toEqual(3 + 1) // <User Registered> + <Internal Components>
+    expect(di.size).toEqual(3 + 1) // <User Registered> + <Internal Components>
   })
 
   it('should allow to iterate all binding entries', function () {
@@ -59,16 +59,16 @@ describe('DI', function () {
     expect(entries.has(NamedTest)).toBeTruthy()
     expect(entries.get(NamedTest)?.names).toContain(kTestName)
     expect(entries.has(Test)).toBeTruthy()
-    expect(entries.size).toEqual(di.size())
+    expect(entries.size).toEqual(di.size)
   })
 
   it('should allow iterate all binding aliases', function () {
     const di = DI.setup()
-    const aliases = new Map(di.aliases())
+    const aliases = new Map(di.qualifiers())
     const entries = new Map(di.entries())
     const named = entries.get(NamedTest)
 
-    for (const [token, bindings] of di.aliases()) {
+    for (const [token, bindings] of di.qualifiers()) {
       expect(token).toBeDefined()
       expect(bindings).toBeInstanceOf(Array)
     }
@@ -89,7 +89,7 @@ describe('DI', function () {
     expect(entries.has(NamedTest)).toBeTruthy()
     expect(entries.get(NamedTest)?.names).toContain(kTestName)
     expect(entries.has(Test)).toBeTruthy()
-    expect(entries.size).toEqual(di.size())
+    expect(entries.size).toEqual(di.size)
   })
 
   describe('when using a custom metadata reader', function () {
