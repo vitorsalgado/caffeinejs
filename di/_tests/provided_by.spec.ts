@@ -1,5 +1,6 @@
 import { expect } from '@jest/globals'
 import { jest } from '@jest/globals'
+import { beforeEach } from '@jest/globals'
 import { Injectable } from '../decorators/Injectable.js'
 import { ProvidedBy } from '../decorators/ProvidedBy.js'
 import { DI } from '../DI.js'
@@ -10,6 +11,10 @@ import { Ctor } from '../internal/types.js'
 
 describe('Provided By', function () {
   const spy = jest.fn()
+
+  beforeEach(() => {
+    spy.mockReset()
+  })
 
   class LogSetterProvider<T> implements Provider<T> {
     private readonly clazzProvider: ClassProvider
@@ -35,7 +40,16 @@ describe('Provided By', function () {
     static Log: () => void
   }
 
-  it('should use custom provider provided by the decorator', function () {
+  @Injectable()
+  @ProvidedBy(ctx => {
+    spy()
+    return new Dep('created')
+  })
+  class Dep {
+    constructor(readonly status: string) {}
+  }
+
+  it('should use custom provider provided in the decorator', function () {
     const di = DI.setup()
     const loggable = di.get(Loggable)
 
@@ -43,5 +57,13 @@ describe('Provided By', function () {
 
     expect(loggable).toBeInstanceOf(Loggable)
     expect(spy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should use a factory provider using the function provided in the decorator', function () {
+    const di = DI.setup()
+    const dep = di.get(Dep)
+
+    expect(spy).toHaveBeenCalledTimes(1)
+    expect(dep).toBeInstanceOf(Dep)
   })
 })
