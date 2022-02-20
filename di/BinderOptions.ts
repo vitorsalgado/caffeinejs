@@ -44,9 +44,7 @@ export class BindToOptions<T> implements BinderOptions<T> {
   ) {}
 
   as(scopeId: Identifier): BinderOptions<T> {
-    notNil(scopeId)
-
-    if (!DI.hasScope(scopeId)) {
+    if (!DI.hasScope(notNil(scopeId))) {
       throw new InvalidBindingError(
         `Scope '${String(
           scopeId,
@@ -61,9 +59,7 @@ export class BindToOptions<T> implements BinderOptions<T> {
   }
 
   qualifiers(...names: Identifier[]): BinderOptions<T> {
-    notNil(names)
-
-    this.binding.names = names
+    this.binding.names = notNil(names)
     this.container.configureBinding(this.token, this.binding)
 
     return this
