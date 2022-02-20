@@ -7,8 +7,8 @@ import { Identifier } from './internal/types.js'
 import { Container } from './Container.js'
 import { DI } from './DI.js'
 import { PostResolutionInterceptor } from './PostResolutionInterceptor.js'
-import { FunctionPostResolutionInterceptor } from './PostResolutionInterceptor.js'
 import { ResolutionContext } from './ResolutionContext.js'
+import { FunctionPostResolutionInterceptor } from './internal/interceptors/FunctionPostResolutionInterceptor.js'
 
 export interface BinderOptions<T> {
   as(scopeId: Identifier): BinderOptions<T>
