@@ -19,13 +19,13 @@ import { Defer } from './decorators/Defer.js'
 import { Primary } from './decorators/Primary.js'
 
 export namespace Resolver {
-  export function resolve<T>(container: Container, token: Token<T>, binding?: Binding<T>, context?: unknown): T {
+  export function resolve<T>(container: Container, token: Token<T>, binding?: Binding<T>, args?: unknown): T {
     if (binding) {
-      return binding.scopedProvider.provide({ container, token, binding, args: context }) as T
+      return binding.scopedProvider.provide({ container, token, binding, args }) as T
     }
 
     if (token instanceof DeferredCtor) {
-      return token.createProxy(target => container.get(target, context))
+      return token.createProxy(target => container.get(target, args))
     }
 
     let resolved: T | undefined
@@ -37,7 +37,7 @@ export namespace Resolver {
 
       if (entries.length === 1) {
         const tk = entries[0].token
-        resolved = container.get<T>(tk, context)
+        resolved = container.get<T>(tk, args)
 
         container.configureBinding(token, newBinding({ rawProvider: new TokenProvider(tk) }))
       } else if (entries.length > 1) {
@@ -54,7 +54,7 @@ export namespace Resolver {
         if (primaries.length === 1) {
           const primary = primaries[0]
 
-          resolved = container.get<T>(primary.token, context)
+          resolved = container.get<T>(primary.token, args)
 
           container.configureBinding(token, newBinding({ ...primary, rawProvider: new TokenProvider(primary.token) }))
         } else {
@@ -66,8 +66,8 @@ export namespace Resolver {
     return resolved as T
   }
 
-  export function construct<T>(container: Container, ctor: Ctor<T>, binding: Binding, context: unknown): T {
-    return new ctor(...binding.injections.map((dep, index) => resolveParam(container, ctor, dep, index, context)))
+  export function construct<T>(container: Container, ctor: Ctor<T>, binding: Binding, args?: unknown): T {
+    return new ctor(...binding.injections.map((dep, index) => resolveParam(container, ctor, dep, index, args)))
   }
 
   export function resolveParam<T>(
@@ -75,7 +75,7 @@ export namespace Resolver {
     target: Token<T>,
     dep: TokenSpec<T>,
     indexOrProp: number | string | symbol,
-    context?: unknown,
+    args?: unknown,
   ): T {
     if (dep.token === undefined || dep.token === null) {
       throw new CircularReferenceError(
@@ -92,9 +92,9 @@ export namespace Resolver {
     let resolution: unknown
 
     if (dep.multiple) {
-      resolution = container.getMany(dep.token, context)
+      resolution = container.getMany(dep.token, args)
     } else {
-      resolution = container.get(dep.token, context)
+      resolution = container.get(dep.token, args)
     }
 
     if (resolution !== undefined && resolution !== null) {

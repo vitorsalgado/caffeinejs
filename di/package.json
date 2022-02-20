@@ -24,6 +24,7 @@
   "scripts": {
     "build": "rm -rf dist && tsc --build --force tsconfig.build.json",
     "test": "yarn node --experimental-vm-modules $(yarn bin jest) --detectOpenHandles",
+    "test:npm": "NODE_OPTIONS=--experimental-vm-modules npx jest --detectOpenHandles",
     "test:coverage": "yarn test --coverage",
     "bench": "node --loader ts-node/esm _bench/bench.ts",
     "bench:compare": "node --loader ts-node/esm _bench/compare.ts"

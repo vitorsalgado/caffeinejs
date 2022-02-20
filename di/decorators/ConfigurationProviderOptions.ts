@@ -14,4 +14,5 @@ export interface ConfigurationProviderOptions {
   late: boolean
   lazy: boolean
   options: unknown
+  byPassPostProcessors: boolean
 }

@@ -27,6 +27,8 @@ export interface BinderOptions<T> {
   requestScoped(): BinderOptions<T>
 
   refreshableScoped(): BinderOptions<T>
+
+  byPassPostProcessors(): BinderOptions<T>
 }
 
 export class BindToOptions<T> implements BinderOptions<T> {
@@ -113,6 +115,13 @@ export class BindToOptions<T> implements BinderOptions<T> {
 
   requestScoped(): BinderOptions<T> {
     this.binding.scopeId = Lifecycle.REQUEST
+    this.container.configureBinding(this.token, this.binding)
+
+    return this
+  }
+
+  byPassPostProcessors(): BinderOptions<T> {
+    this.binding.byPassPostProcessors = true
     this.container.configureBinding(this.token, this.binding)
 
     return this

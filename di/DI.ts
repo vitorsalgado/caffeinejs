@@ -42,7 +42,6 @@ import { RefreshScope } from './internal/scopes/RefreshScope.js'
 import { Filter } from './Filter.js'
 import { MetadataReader } from './MetadataReader.js'
 import { ResolutionContext } from './ResolutionContext.js'
-import { ValueProvider } from './internal/providers/ValueProvider.js'
 import { Identifier } from './internal/types.js'
 import { Container } from './Container.js'
 import { InitialOptions } from './Container.js'
@@ -171,7 +170,7 @@ export class DI implements Container {
     for (const [identifier, scope] of DI.Scopes.entries()) {
       const scopeType = scope.constructor
 
-      container.bind(scopeType).toValue(scope)
+      container.bind(scopeType).toValue(scope).singletonScoped().byPassPostProcessors()
 
       if (typeof identifier === 'symbol') {
         container.bind(identifier).toToken(scopeType)
@@ -223,11 +222,7 @@ export class DI implements Container {
       }
     }
 
-    const scope =
-      rawProvider instanceof TokenProvider || rawProvider instanceof ValueProvider
-        ? DI.getScope(Lifecycle.TRANSIENT)
-        : DI.getScope(scopeId)
-
+    const scope = rawProvider instanceof TokenProvider ? DI.getScope(Lifecycle.TRANSIENT) : DI.getScope(scopeId)
     const hasPropertyInjections = binding.injectableProperties.length > 0
     const hasMethodInjections = binding.injectableMethods.length > 0
     const hasLookups = binding.lookupProperties.length > 0
@@ -259,16 +254,20 @@ export class DI implements Container {
       chain.push(interceptor)
     }
 
-    for (const postProcessor of DI.PostProcessors) {
-      chain.push(new BeforeInitInterceptor(postProcessor))
+    if (!binding.byPassPostProcessors) {
+      for (const postProcessor of DI.PostProcessors) {
+        chain.push(new BeforeInitInterceptor(postProcessor))
+      }
     }
 
     if (binding.postConstruct) {
       chain.push(new PostConstructInterceptor())
     }
 
-    for (const postProcessor of DI.PostProcessors) {
-      chain.push(new AfterInitInterceptor(postProcessor))
+    if (!binding.byPassPostProcessors) {
+      for (const postProcessor of DI.PostProcessors) {
+        chain.push(new AfterInitInterceptor(postProcessor))
+      }
     }
 
     if (scope.registerDestructionCallback) {

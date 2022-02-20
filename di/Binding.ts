@@ -27,6 +27,7 @@ export interface Binding<T = any> {
   preDestroy?: Identifier
   postConstruct?: Identifier
   options?: unknown
+  byPassPostProcessors?: boolean
 }
 
 export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
@@ -49,6 +50,7 @@ export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
     postConstruct: initial.postConstruct,
     configuration: initial.configuration,
     type: initial.type,
+    byPassPostProcessors: initial.byPassPostProcessors,
     scopeId: initial.scopeId!,
     scopedProvider: initial.scopedProvider!,
     rawProvider: initial.rawProvider!,

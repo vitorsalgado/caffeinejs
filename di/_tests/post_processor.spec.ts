@@ -10,6 +10,8 @@ import { Provider } from '../Provider.js'
 import { PostProcessor } from '../PostProcessor.js'
 import { Scope } from '../Scope.js'
 import { ResolutionContext } from '../ResolutionContext.js'
+import { SingletonScope } from '../internal/scopes/SingletonScope.js'
+import { ByPassPostProcessors } from '../decorators/ByPassPostProcessors.js'
 
 describe('Post Processors', function () {
   const ppSpy = jest.fn()
@@ -36,6 +38,10 @@ describe('Post Processors', function () {
       return 'hello world'
     }
   }
+
+  @Injectable()
+  @ByPassPostProcessors()
+  class ByPass {}
 
   @Injectable()
   class NonDep {}
@@ -98,6 +104,10 @@ describe('Post Processors', function () {
     const di = DI.setup()
     const dep = di.get(Dep)
     const nonDep = di.get(NonDep)
+
+    // Ensure it does not impact on the count since they should bypass post processors
+    di.get(SingletonScope)
+    di.get(ByPass)
 
     await di.dispose()
 

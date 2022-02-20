@@ -45,6 +45,7 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
         rawProvider: new BeanFactoryProvider(target as unknown as Ctor<T>, method, factory),
         options: factory.options,
         configuredBy: `${target.name}${String(method)}`,
+        byPassPostProcessors: factory.byPassPostProcessors,
       })
 
       TypeRegistrar.addBean(factory.token, { ...binding })

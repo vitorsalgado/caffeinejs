@@ -44,7 +44,7 @@ describe('DI', function () {
 
   it('should return the number of registered components when calling size()', function () {
     const di = DI.setup()
-    const expected = 3 + 1 // user registered + internals
+    const expected = 3 + 7 // user registered + internals
 
     di.setup()
     di.setup()
