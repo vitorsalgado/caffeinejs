@@ -7,7 +7,7 @@ export namespace Reflections {
   export function get<R = unknown, K = unknown, T = unknown>(
     key: K,
     target: Ctor<T> | Function,
-    propertyKey?: PropertyKey
+    propertyKey?: PropertyKey,
   ): R {
     return Reflect.getMetadata(key, target, propertyKey as PropertyKey) as R
   }
@@ -15,7 +15,7 @@ export namespace Reflections {
   export function getOwn<R = unknown, K = unknown, T = unknown>(
     key: K,
     target: Ctor<T> | Function,
-    propertyKey?: PropertyKey
+    propertyKey?: PropertyKey,
   ): R {
     return Reflect.getOwnMetadata(key, target, propertyKey as PropertyKey) as R
   }
@@ -23,7 +23,7 @@ export namespace Reflections {
   export function has<K = unknown, T = unknown>(
     key: K,
     target: Ctor<T> | Function,
-    propertyKey?: PropertyKey
+    propertyKey?: PropertyKey,
   ): boolean {
     return Reflect.hasMetadata(key, target, propertyKey as PropertyKey)
   }
@@ -31,7 +31,7 @@ export namespace Reflections {
   export function hasOwn<K = unknown, T = unknown>(
     key: K,
     target: Ctor<T> | Function,
-    propertyKey?: PropertyKey
+    propertyKey?: PropertyKey,
   ): boolean {
     return Reflect.hasOwnMetadata(key, target, propertyKey as PropertyKey)
   }
@@ -40,7 +40,7 @@ export namespace Reflections {
     key: K,
     value: V,
     target: Ctor<T> | Function,
-    propertyKey?: PropertyKey
+    propertyKey?: PropertyKey,
   ): void {
     return Reflect.defineMetadata(key, value, target, propertyKey as PropertyKey)
   }
@@ -49,7 +49,7 @@ export namespace Reflections {
     key: K,
     value: V,
     target: Ctor<T> | Function,
-    propertyKey?: PropertyKey
+    propertyKey?: PropertyKey,
   ): V {
     const entry = Reflect.getMetadata(key, target, propertyKey as PropertyKey) as V
 
@@ -83,7 +83,7 @@ export namespace Reflections {
   export function remove<K = unknown, T = unknown>(
     key: K,
     target: Ctor<T> | Function,
-    propertyKey?: PropertyKey
+    propertyKey?: PropertyKey,
   ): boolean {
     return Reflect.deleteMetadata(key, target, propertyKey as PropertyKey)
   }

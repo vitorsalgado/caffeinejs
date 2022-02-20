@@ -4,5 +4,5 @@ export const Lifecycle = {
   CONTAINER: 'container',
   LOCAL_RESOLUTION: 'local_resolution',
   REQUEST: 'request',
-  REFRESH: 'refresh'
+  REFRESH: 'refresh',
 }

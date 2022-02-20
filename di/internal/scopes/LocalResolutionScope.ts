@@ -15,11 +15,11 @@ export class LocalResolutionScope implements Scope {
     if (!(ctx.args instanceof LocalResolutions)) {
       throw new MissingRequiredProviderArgumentError(
         `Local Resolution Scope: Failed to provide a component for token '${tokenStr(
-          ctx.token
+          ctx.token,
         )}' inside local resolution scope. \n` +
           `Reason: missing argument of type 'LocalResolutions'. \n` +
           `Received: '${typeof ctx.args}'. \n` +
-          `Possible Solutions: container.get(token, <Pass an instance of LocalResolutions>)`
+          `Possible Solutions: container.get(token, <Pass an instance of LocalResolutions>)`,
       )
     }
 

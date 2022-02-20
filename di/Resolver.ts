@@ -32,7 +32,7 @@ export namespace Resolver {
 
     if (typeof token === 'function') {
       const entries = container.search(
-        tk => typeof tk === 'function' && tk.name !== token.name && token.isPrototypeOf(tk)
+        tk => typeof tk === 'function' && tk.name !== token.name && token.isPrototypeOf(tk),
       )
 
       if (entries.length === 1) {
@@ -47,7 +47,7 @@ export namespace Resolver {
           throw new MultiplePrimaryError(
             `Found multiple 'primary' bindings for token '${tokenStr(token)}'. \n` +
               `Check the following bindings: ${primaries.map(x => tokenStr(x.token)).join(', ')}. \n` +
-              `Only one component per token can be decorated with @${Primary.name}`
+              `Only one component per token can be decorated with @${Primary.name}`,
           )
         }
 
@@ -75,17 +75,17 @@ export namespace Resolver {
     target: Token<T>,
     dep: TokenSpec<T>,
     indexOrProp: number | string | symbol,
-    context?: unknown
+    context?: unknown,
   ): T {
     if (dep.token === undefined || dep.token === null) {
       throw new CircularReferenceError(
         `Cannot resolve ${fmtParamError(target, indexOrProp)} from type '${tokenStr(
-          target
+          target,
         )}' because the injection token is undefined.\n` +
           `This could mean that the component '${tokenStr(target)}' has a circular reference.` +
           solutions(
-            `- If this was intentional, make sure to decorate your circular dependency with @${Defer.name} and use the type TypeOf<> to avoid TS errors on compilation.`
-          )
+            `- If this was intentional, make sure to decorate your circular dependency with @${Defer.name} and use the type TypeOf<> to avoid TS errors on compilation.`,
+          ),
       )
     }
 
@@ -109,8 +109,8 @@ export namespace Resolver {
       `Unable to resolve ${fmtParamError(target, indexOrProp)} with token ${fmtTokenError(dep)}.` +
         solutions(
           `- Check if the type '${tokenStr(target)}' has all its dependencies correctly registered`,
-          `- If this dependency is optional and can be undefined, decorate it with @${Optional.name}`
-        )
+          `- If this dependency is optional and can be undefined, decorate it with @${Optional.name}`,
+        ),
     )
   }
 }

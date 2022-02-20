@@ -9,7 +9,7 @@ export function Primary() {
     }
 
     configureBean(target.constructor, propertyKey!, {
-      primary: true
+      primary: true,
     })
   }
 }

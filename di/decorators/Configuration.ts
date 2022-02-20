@@ -21,7 +21,7 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
     TypeRegistrar.configure<T>(target, {
       injections: getParamTypes(target),
       namespace: config.namespace,
-      configuration: true
+      configuration: true,
     })
 
     const beanConfiguration: Map<string | symbol, ConfigurationProviderOptions> =
@@ -44,7 +44,7 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
         type: factory.type || (typeof factory.token === 'function' ? factory.token : undefined),
         rawProvider: new BeanFactoryProvider(target as unknown as Ctor<T>, method, factory),
         options: factory.options,
-        configuredBy: `${target.name}${String(method)}`
+        configuredBy: `${target.name}${String(method)}`,
       })
 
       TypeRegistrar.addBean(factory.token, { ...binding })

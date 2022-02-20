@@ -23,7 +23,7 @@ export function printResults(c: number, results: Results): unknown {
         size,
         `${((c * 1e9) / mean).toFixed(2)} req/sec`,
         `± ${((standardError / mean) * 100).toFixed(2)} %`,
-        relative > 0 ? `+ ${relative.toFixed(2)} %` : '-'
+        relative > 0 ? `+ ${relative.toFixed(2)} %` : '-',
       ]
     })
 
@@ -32,20 +32,20 @@ export function printResults(c: number, results: Results): unknown {
   return table(rows, {
     columns: {
       0: {
-        alignment: 'left'
+        alignment: 'left',
       },
       1: {
-        alignment: 'right'
+        alignment: 'right',
       },
       2: {
-        alignment: 'right'
+        alignment: 'right',
       },
       3: {
-        alignment: 'right'
+        alignment: 'right',
       },
       4: {
-        alignment: 'right'
-      }
+        alignment: 'right',
+      },
     },
     drawHorizontalLine: (index, rowCount) => rowCount === 0,
     border: {
@@ -57,7 +57,7 @@ export function printResults(c: number, results: Results): unknown {
       joinJoin: '|',
       joinBody: '-',
       bottomBody: '-',
-      topBody: '-'
-    }
+      topBody: '-',
+    },
   })
 }

@@ -11,7 +11,7 @@ export function Scoped(scopeId: Identifier) {
     }
 
     configureBean(target.constructor, propertyKey!, {
-      scopeId
+      scopeId,
     })
   }
 }

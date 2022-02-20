@@ -38,11 +38,11 @@ cronometro(
     async nestjs() {
       nestApp.get(NestRoot)
       await nestApp.resolve(NestTransientRoot)
-    }
+    },
   },
   {
     iterations: 5000,
-    errorThreshold
+    errorThreshold,
   },
   async (err, results) => {
     if (err) {
@@ -52,5 +52,5 @@ cronometro(
     console.log(printResults(connections, results))
 
     await nestApp.close()
-  }
+  },
 )

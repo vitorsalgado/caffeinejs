@@ -8,7 +8,7 @@ export function Named<T>(name: Identifier) {
   return function (
     target: Ctor<T> | object,
     propertyKey?: string | symbol,
-    parameterIndex?: number | PropertyDescriptor
+    parameterIndex?: number | PropertyDescriptor,
   ) {
     // Parameter
     if (typeof parameterIndex === 'number') {

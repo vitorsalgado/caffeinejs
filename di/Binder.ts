@@ -35,7 +35,7 @@ export class BindTo<T> implements Binder<T> {
   constructor(
     private readonly container: Container,
     private readonly token: Token<T>,
-    private readonly binding: Binding<T>
+    private readonly binding: Binding<T>,
   ) {}
 
   to(ctor: Ctor<T>): BindToOptions<T> {
@@ -50,7 +50,7 @@ export class BindTo<T> implements Binder<T> {
   toSelf(): BindToOptions<T> {
     if (isNamedToken(this.token)) {
       throw new InvalidBindingError(
-        '.toSelf() cannot be used when binding key is not a class type. ' + `Current token is: ${tokenStr(this.token)}`
+        '.toSelf() cannot be used when binding key is not a class type. ' + `Current token is: ${tokenStr(this.token)}`,
       )
     }
 
@@ -76,11 +76,11 @@ export class BindTo<T> implements Binder<T> {
   toFactory(factory: (ctx: ResolutionContext) => T): BinderOptions<T> {
     check(
       typeof factory === 'function',
-      `Binding .toFactory() parameter must be function type. Received: ${typeof factory}`
+      `Binding .toFactory() parameter must be function type. Received: ${typeof factory}`,
     )
     check(
       factory.length <= 1,
-      `Binding .toFactory() must receive a function with at most one argument, which is the provider context. Received a function with '${factory.length}' argument(s).`
+      `Binding .toFactory() must receive a function with at most one argument, which is the provider context. Received a function with '${factory.length}' argument(s).`,
     )
 
     this.binding.rawProvider = new FactoryProvider(factory)
@@ -92,7 +92,7 @@ export class BindTo<T> implements Binder<T> {
   toProvider(provider: Provider<T>): BinderOptions<T> {
     check(
       typeof provider === 'object' && 'provide' in provider,
-      `Binding .toProvider() parameter must be a Provider<T> instance.`
+      `Binding .toProvider() parameter must be a Provider<T> instance.`,
     )
 
     this.binding.rawProvider = provider

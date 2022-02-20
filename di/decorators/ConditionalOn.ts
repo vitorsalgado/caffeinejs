@@ -31,7 +31,7 @@ export function ConditionalOn<T>(...conditionals: Conditional[]) {
     }
 
     configureBean(target.constructor, propertyKey!, {
-      conditionals: merged
+      conditionals: merged,
     })
   }
 }

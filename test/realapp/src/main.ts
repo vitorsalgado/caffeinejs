@@ -19,7 +19,7 @@ await createConnection({
   type: 'mongodb',
   authSource: 'admin',
   url: 'mongodb://root:root@192.168.64.2:27017/local',
-  entities: [User]
+  entities: [User],
 })
 
 getConnection('test')

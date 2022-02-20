@@ -18,7 +18,7 @@ export interface ContainerOptions {
 
 export const InitialOptions: ContainerOptions = {
   namespace: '',
-  scopeId: Lifecycle.SINGLETON
+  scopeId: Lifecycle.SINGLETON,
 }
 
 export interface ContainerLifecycle {

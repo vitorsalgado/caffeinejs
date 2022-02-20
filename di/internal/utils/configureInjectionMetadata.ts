@@ -3,7 +3,7 @@ import { TokenSpec } from '../../Token.js'
 import { getParamTypes } from './getParamTypes.js'
 
 export function configureInjectionMetadata(
-  tokenSpec: Partial<TokenSpec<unknown>>
+  tokenSpec: Partial<TokenSpec<unknown>>,
 ): <TFunction>(target: TFunction, propertyKey: string | symbol, parameterIndex?: number | PropertyDescriptor) => void {
   return function (target: any, propertyKey: string | symbol, parameterIndex?: number | PropertyDescriptor): void {
     // Parameter decorator
@@ -49,7 +49,7 @@ export function configureInjectionMetadata(
     const token = tokenSpec.token ? tokenSpec.token : tokenType
     const descriptors: Record<string | symbol, TokenSpec<unknown>> = Reflect.getOwnMetadata(
       Vars.CLASS_PROPERTIES_INJECTION_TOKENS,
-      target.constructor
+      target.constructor,
     ) || {}
 
     descriptors[propertyKey] = { ...descriptors[propertyKey], ...tokenSpec, token, tokenType }

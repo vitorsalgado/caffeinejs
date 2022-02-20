@@ -47,14 +47,14 @@ export class NestTransientRoot {
   providers: [
     {
       useClass: NestDep,
-      provide: 'nest'
+      provide: 'nest',
     },
     NestTransientRoot,
     NestRoot,
     NestDep,
     NestService,
-    NestRepository
-  ]
+    NestRepository,
+  ],
 })
 export class App {}
 

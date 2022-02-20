@@ -96,8 +96,8 @@ describe('Scoping', function () {
           }
 
           remove(binding: Binding): void {}
-        })()
-      )
+        })(),
+      ),
     ).toThrow(ScopeAlreadyRegisteredError)
   })
 })

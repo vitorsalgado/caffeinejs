@@ -22,7 +22,7 @@ describe('Performance Compare', function () {
       avg: -1,
       max: -1,
       min: Number.MAX_SAFE_INTEGER,
-      items: [] as { pos: number; total: number }[]
+      items: [] as { pos: number; total: number }[],
     }
 
     let i: number

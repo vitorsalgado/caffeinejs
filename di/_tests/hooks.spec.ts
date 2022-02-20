@@ -40,7 +40,7 @@ describe('Hooks', function () {
           setTimeout(() => {
             destroyAsyncSpy()
             return resolve()
-          }, 100)
+          }, 100),
         )
       }
     }

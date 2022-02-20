@@ -6,17 +6,17 @@ import { RepeatedInjectableConfigurationError } from '../errors.js'
 const Def: Partial<ConfigurationProviderOptions> = {
   dependencies: [],
   conditionals: [],
-  names: []
+  names: [],
 }
 
 export function configureBean(
   target: Function,
   method: string | symbol,
-  configurations: Partial<ConfigurationProviderOptions>
+  configurations: Partial<ConfigurationProviderOptions>,
 ): void {
   const factories: Map<string | symbol, Partial<ConfigurationProviderOptions>> = Reflect.getOwnMetadata(
     Vars.CONFIGURATION_PROVIDER,
-    target
+    target,
   ) || new Map()
   const actual = factories.get(method) || Def
   const newNames = configurations.names || []
@@ -25,15 +25,15 @@ export function configureBean(
   if (existingNames.some(value => newNames.includes(value))) {
     throw new RepeatedInjectableConfigurationError(
       `Found repeated qualifiers for bean '${actual.token ? tokenStr(actual.token) : ''}' on method '${String(
-        method
-      )}' at configuration class '${target.name}'. Qualifiers found: ${newNames.map(x => tokenStr(x)).join(', ')}`
+        method,
+      )}' at configuration class '${target.name}'. Qualifiers found: ${newNames.map(x => tokenStr(x)).join(', ')}`,
     )
   }
 
   factories.set(method, {
     ...actual,
     ...configurations,
-    names: [...existingNames, ...newNames]
+    names: [...existingNames, ...newNames],
   })
 
   Reflect.defineMetadata(Vars.CONFIGURATION_PROVIDER, factories, target)

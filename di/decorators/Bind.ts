@@ -8,7 +8,7 @@ import { configureBean } from '../internal/utils/beanUtils.js'
 import { TypeRegistrar } from '../internal/TypeRegistrar.js'
 
 export function Bind<T>(
-  options: Partial<Exclude<Binding<T>, 'id' | 'scopedProvider' | 'configuration' | 'cachedInstance'>>
+  options: Partial<Exclude<Binding<T>, 'id' | 'scopedProvider' | 'configuration' | 'cachedInstance'>>,
 ) {
   notNil(options)
   check(typeof options === 'object', '@Bind parameter must be an object')
@@ -25,7 +25,7 @@ export function Bind<T>(
 
         ...options,
 
-        configuration: false
+        configuration: false,
       } as Partial<Binding<T>>)
 
       return
@@ -33,7 +33,7 @@ export function Bind<T>(
 
     configureBean(target.constructor, propertyKey!, {
       ...options,
-      configuration: false
+      configuration: false,
     } as Partial<Binding<T>>)
   }
 }

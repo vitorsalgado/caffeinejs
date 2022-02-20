@@ -3,7 +3,7 @@ import { TokenSpec } from '../../Token.js'
 import { Identifier } from '../types.js'
 
 export function getInjectableMethods<TFunction extends Function>(
-  target: TFunction
+  target: TFunction,
 ): Array<[Identifier, TokenSpec<unknown>[]]> {
   const setterMethods: string[] = Reflect.getOwnMetadata(Vars.CLASS_SETTER_METHODS, target) || []
 

@@ -14,7 +14,7 @@ export class RequestScope implements Scope {
   begin() {
     if (this.entered) {
       throw new IllegalScopeStateError(
-        'Request scoping block already in progress. ' + 'Make sure to start one request scope block per time.'
+        'Request scoping block already in progress. ' + 'Make sure to start one request scope block per time.',
       )
     }
 
@@ -42,7 +42,7 @@ export class RequestScope implements Scope {
         }
 
         return Promise.resolve()
-      })
+      }),
     ).finally(() => this.instances.clear())
   }
 

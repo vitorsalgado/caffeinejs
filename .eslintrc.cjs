@@ -4,7 +4,7 @@ module.exports = {
   plugins: ['@typescript-eslint/eslint-plugin', 'import', 'eslint-plugin-tsdoc'],
   extends: ['plugin:@typescript-eslint/recommended'],
   env: {
-    node: true
+    node: true,
   },
   rules: {
     'tsdoc/syntax': 'error',
@@ -25,8 +25,8 @@ module.exports = {
     'import/order': [
       'error',
       {
-        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object']
-      }
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object'],
+      },
     ],
     'import/no-named-as-default': ['off'],
     'import/no-duplicates': ['off'],
@@ -34,12 +34,12 @@ module.exports = {
     'import/no-useless-path-segments': [
       'error',
       {
-        noUselessIndex: false
-      }
+        noUselessIndex: false,
+      },
     ],
     'import/no-self-import': ['error'],
     'import/export': ['error'],
-    'import/no-deprecated': ['error']
+    'import/no-deprecated': ['error'],
   },
   overrides: [
     {
@@ -48,14 +48,14 @@ module.exports = {
         'import/extensions': ['off'],
         '@typescript-eslint/no-useless-constructor': ['off'],
         '@typescript-eslint/no-empty-function': ['off'],
-        '@typescript-eslint/no-unused-vars': ['off']
-      }
+        '@typescript-eslint/no-unused-vars': ['off'],
+      },
     },
     {
       files: ['*.js'],
       rules: {
-        '@typescript-eslint/no-var-requires': 'off'
-      }
-    }
-  ]
+        '@typescript-eslint/no-var-requires': 'off',
+      },
+    },
+  ],
 }

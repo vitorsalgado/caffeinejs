@@ -180,7 +180,7 @@ describe('Real World', function () {
   class UserService {
     constructor(
       private readonly userRepository: UserRepository,
-      @Inject(kSms) private readonly notificationService: NotificationService
+      @Inject(kSms) private readonly notificationService: NotificationService,
     ) {}
 
     save() {
@@ -216,7 +216,7 @@ describe('Real World', function () {
     constructor(
       private readonly userService: UserService,
       private readonly productService: ProductService,
-      private readonly viewEngine: ViewEngine
+      private readonly viewEngine: ViewEngine,
     ) {}
 
     saveUser() {

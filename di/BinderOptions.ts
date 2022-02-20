@@ -33,7 +33,7 @@ export class BindToOptions<T> implements BinderOptions<T> {
   constructor(
     private readonly container: Container,
     private readonly token: Token<T>,
-    private readonly binding: Binding<T>
+    private readonly binding: Binding<T>,
   ) {}
 
   as(scopeId: Identifier): BinderOptions<T> {
@@ -42,8 +42,8 @@ export class BindToOptions<T> implements BinderOptions<T> {
     if (!DI.hasScope(scopeId)) {
       throw new InvalidBindingError(
         `Scope '${String(
-          scopeId
-        )}' is not registered! Register the scope using the method 'DI.bindScope()' before using it.`
+          scopeId,
+        )}' is not registered! Register the scope using the method 'DI.bindScope()' before using it.`,
       )
     }
 

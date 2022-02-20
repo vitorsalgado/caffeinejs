@@ -18,7 +18,7 @@ export function Bean<T>(bean: Token<T>, token?: Token) {
         throw new InvalidBindingError(
           `@Bean when used on class level only accepts injection named qualifiers of type string or symbol. ` +
             `Received: ${typeof bean}. ` +
-            `Check decorator on class '${target.name}'.`
+            `Check decorator on class '${target.name}'.`,
         )
       }
 
@@ -28,7 +28,7 @@ export function Bean<T>(bean: Token<T>, token?: Token) {
         injectableMethods: getInjectableMethods(target),
         lookupProperties: getLookupProperties(target),
         type: target,
-        names: bean ? [bean] : undefined
+        names: bean ? [bean] : undefined,
       } as Partial<Binding>)
 
       return
@@ -37,8 +37,8 @@ export function Bean<T>(bean: Token<T>, token?: Token) {
     if (isNil(bean)) {
       throw new InvalidBindingError(
         `@Bean when used on @Configuration classes method level, must receive a valid token. Current value is: ${String(
-          bean
-        )}. Check the decorators on method '${String(propertyKey)}' from class '${target.constructor.name}'`
+          bean,
+        )}. Check the decorators on method '${String(propertyKey)}' from class '${target.constructor.name}'`,
       )
     }
 
@@ -48,7 +48,7 @@ export function Bean<T>(bean: Token<T>, token?: Token) {
     configureBean(target.constructor, propertyKey!, {
       dependencies: getParamTypes(target, propertyKey),
       token: tk,
-      type
+      type,
     } as Partial<ConfigurationProviderOptions>)
   }
 }

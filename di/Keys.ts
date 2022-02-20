@@ -1,3 +1,3 @@
 export const Keys = {
-  kDeps: Symbol('injections')
+  kDeps: Symbol('injections'),
 }

@@ -229,7 +229,7 @@ export class DI implements Container {
 
         if (descriptor && typeof descriptor.get === 'function') {
           Object.defineProperty(token.prototype, propertyKey, {
-            get: () => Resolver.resolveParam(this, token, spec, propertyKey)
+            get: () => Resolver.resolveParam(this, token, spec, propertyKey),
           })
         } else {
           token.prototype[propertyKey] = () => Resolver.resolveParam(this, token, spec, propertyKey)
@@ -333,7 +333,7 @@ export class DI implements Container {
       } else {
         this.multipleBeansRefCache.set(
           token,
-          entries.map(entry => entry.binding)
+          entries.map(entry => entry.binding),
         )
       }
 
@@ -421,9 +421,9 @@ export class DI implements Container {
         lazy: this.lazy,
         scopeId: this.scopeId,
         lateBind: this.lateBind,
-        namespace: this.namespace
+        namespace: this.namespace,
       },
-      this
+      this,
     )
 
     this.bindingRegistry
@@ -504,7 +504,7 @@ export class DI implements Container {
       this.bindingRegistry
         .toArray()
         .filter(({ binding }) => binding.preDestroy)
-        .map(({ binding }) => DI.preDestroyBinding(binding))
+        .map(({ binding }) => DI.preDestroyBinding(binding)),
     ).then(() => this.resetInstances())
   }
 
@@ -563,7 +563,7 @@ export class DI implements Container {
           throw new RepeatedInjectableConfigurationError(
             `Found multiple beans with the same injection token '${tokenStr(token)}' configured at '${
               binding.configuredBy
-            }'`
+            }'`,
           )
         }
 
@@ -629,6 +629,6 @@ export class DI implements Container {
   }
 
   protected filter(token: Token, binding: Binding): boolean {
-    return DI.Filters.every(filter => !filter.match(token, binding))
+    return DI.Filters.every(filter => !filter(token, binding))
   }
 }

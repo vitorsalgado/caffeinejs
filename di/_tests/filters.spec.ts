@@ -1,7 +1,5 @@
 import { expect } from '@jest/globals'
-import { Filter } from '../Filter.js'
 import { Token } from '../Token.js'
-import { Binding } from '../Binding.js'
 import { DI } from '../DI.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Optional } from '../decorators/Optional.js'
@@ -15,11 +13,7 @@ describe('Filters', function () {
     }
   }
 
-  class CustomFilter implements Filter {
-    match(token: Token, binding: Binding): boolean {
-      return Reflect.getOwnMetadata(kMeta, token) === true
-    }
-  }
+  const filter = (token: Token) => Reflect.getOwnMetadata(kMeta, token) === true
 
   @Injectable()
   class Valid {}
@@ -36,7 +30,7 @@ describe('Filters', function () {
   describe('using a custom filter', function () {
     describe('when it doesnt match', function () {
       it('should not register the component in the container', function () {
-        DI.addFilters(new CustomFilter())
+        DI.addFilters(filter)
 
         const di = DI.setup()
 

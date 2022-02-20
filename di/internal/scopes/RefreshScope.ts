@@ -13,7 +13,7 @@ export class RefreshScope extends SingletonScope {
         }
 
         return Promise.resolve()
-      })
+      }),
     )
       .then(() => undefined)
       .finally(() => this._cachedInstances.clear())

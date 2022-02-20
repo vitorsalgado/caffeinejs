@@ -24,7 +24,7 @@ export namespace TypeRegistrar {
           throw new RepeatedInjectableConfigurationError(
             `Found repeated qualifiers for the class '${tokenStr(token)}'. Qualifiers found: ${opts.names
               .map(x => tokenStr(x))
-              .join(', ')}`
+              .join(', ')}`,
           )
         }
 

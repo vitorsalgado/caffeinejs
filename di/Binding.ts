@@ -51,6 +51,6 @@ export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
     type: initial.type,
     scopeId: initial.scopeId!,
     scopedProvider: initial.scopedProvider!,
-    rawProvider: initial.rawProvider!
+    rawProvider: initial.rawProvider!,
   }
 }

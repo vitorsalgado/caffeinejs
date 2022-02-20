@@ -7,8 +7,8 @@ export default {
   globals: {
     'ts-jest': {
       tsconfig: './tsconfig.test.json',
-      useESM: true
-    }
+      useESM: true,
+    },
   },
-  setupFilesAfterEnv: ['<rootDir>/scripts/jest.setup.js']
+  setupFilesAfterEnv: ['<rootDir>/scripts/jest.setup.js'],
 }

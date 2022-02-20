@@ -128,43 +128,43 @@ cronometro(
   {
     transient() {
       return makeParallelRequests(parallelRequests, (callback: any) =>
-        Supertest(fastify.server).get('/transient').expect(200).end(callback)
+        Supertest(fastify.server).get('/transient').expect(200).end(callback),
       )
     },
 
     'singleton-no-container'() {
       return makeParallelRequests(parallelRequests, (callback: any) =>
-        Supertest(fastify.server).get('/singleton-no-container').expect(200).end(callback)
+        Supertest(fastify.server).get('/singleton-no-container').expect(200).end(callback),
       )
     },
 
     singleton() {
       return makeParallelRequests(parallelRequests, (callback: any) =>
-        Supertest(fastify.server).get('/singleton').expect(200).end(callback)
+        Supertest(fastify.server).get('/singleton').expect(200).end(callback),
       )
     },
 
     request() {
       return makeParallelRequests(parallelRequests, (callback: any) =>
-        Supertest(fastify.server).get('/request').expect(200).end(callback)
+        Supertest(fastify.server).get('/request').expect(200).end(callback),
       )
     },
 
     'request-with-singleton'() {
       return makeParallelRequests(parallelRequests, (callback: any) =>
-        Supertest(fastify.server).get('/request-with-singleton').expect(200).end(callback)
+        Supertest(fastify.server).get('/request-with-singleton').expect(200).end(callback),
       )
     },
 
     'no-container'() {
       return makeParallelRequests(parallelRequests, (callback: any) =>
-        Supertest(fastify.server).get('/no-container').expect(200).end(callback)
+        Supertest(fastify.server).get('/no-container').expect(200).end(callback),
       )
-    }
+    },
   },
   {
     iterations,
-    errorThreshold
+    errorThreshold,
   },
   (err, results) => {
     if (err) {
@@ -172,5 +172,5 @@ cronometro(
     }
 
     console.log(printResults(connections, results))
-  }
+  },
 )

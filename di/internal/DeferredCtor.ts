@@ -14,7 +14,7 @@ export class DeferredCtor<T> {
     'ownKeys',
     'preventExtensions',
     'set',
-    'setPrototypeOf'
+    'setPrototypeOf',
   ]
 
   constructor(private readonly callback: () => Token<T>) {}

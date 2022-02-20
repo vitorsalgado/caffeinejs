@@ -25,9 +25,9 @@ export class NoUniqueInjectionForTokenError extends DiError {
         solutions(
           `- Use @${Named.name} to differentiate beans and inject the dependency using @${Inject.name}`,
           `- Use @${Primary.name} to specify a unique bean`,
-          `- Use @${ConditionalOn.name} to conditionally register beans.`
+          `- Use @${ConditionalOn.name} to conditionally register beans.`,
         ),
-      'NO_UNIQUE_INJECTION'
+      'NO_UNIQUE_INJECTION',
     )
     this.name = 'NoUniqueInjectionForTokenError'
   }
@@ -51,7 +51,7 @@ export class ScopeNotRegisteredError extends DiError {
   constructor(scopeId: Identifier) {
     super(
       `Scope ${scopeId.toString()} is not registered! use DI.bindScope() static method to register it.`,
-      'SCOPE_NOT_REGISTERED'
+      'SCOPE_NOT_REGISTERED',
     )
     this.name = 'ScopeNotRegisteredError'
   }

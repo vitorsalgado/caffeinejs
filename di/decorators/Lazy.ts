@@ -9,7 +9,7 @@ export function Lazy<T>(lazy = true) {
     }
 
     configureBean(target.constructor, propertyKey!, {
-      lazy
+      lazy,
     })
   }
 }

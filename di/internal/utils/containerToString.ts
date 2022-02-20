@@ -16,11 +16,11 @@ export function containerToString(container: Container): string {
               spec =>
                 '[' +
                 (spec.token ? tokenStr(spec.token) : `${tokenStr(spec.tokenType)}`) +
-                `: optional=${spec.optional || false}, multiple=${spec.multiple || false}]`
+                `: optional=${spec.optional || false}, multiple=${spec.multiple || false}]`,
             )
             .join(', ')}], ` +
           `lazy=${binding.lazy}, ` +
-          `provider=${binding.rawProvider?.constructor?.name}`
+          `provider=${binding.rawProvider?.constructor?.name}`,
       )
       .join('\n, ') +
     '\n}'

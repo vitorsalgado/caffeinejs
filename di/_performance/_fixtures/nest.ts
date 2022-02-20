@@ -16,7 +16,7 @@ export class NestRoot {
 }
 
 @Module({
-  providers: [NestRep, NestSvc, NestRoot]
+  providers: [NestRep, NestSvc, NestRoot],
 })
 export class App {}
 

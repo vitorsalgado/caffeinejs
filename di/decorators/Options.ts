@@ -9,7 +9,7 @@ export function Options<T>(options: unknown) {
     }
 
     configureBean(target.constructor, propertyKey!, {
-      options
+      options,
     })
   }
 }

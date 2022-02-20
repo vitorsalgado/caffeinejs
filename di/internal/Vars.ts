@@ -6,5 +6,5 @@ export const Vars = {
   CLASS_PROPERTIES_INJECTION_TOKENS: '__caffeine_di:property_injection_tokens',
   CLASS_SETTER_METHODS: '__caffeine_di:class_setter_methods',
   CLASS_SETTER_METHODS_TOKENS: '__caffeine_di:class_setter_methods_injections',
-  CLASS_LOOKUP_PROPERTIES: '__caffeine_di:class_lookup_methods'
+  CLASS_LOOKUP_PROPERTIES: '__caffeine_di:class_lookup_methods',
 }

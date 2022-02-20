@@ -12,13 +12,13 @@ export default {
   setupFilesAfterEnv: ['../scripts/jest.setup.js'],
   testMatch: ['**/?(*.)+(spec|test).[jt]s?(x)'],
   moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1'
+    '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   globals: {
     'ts-jest': {
       tsconfig: '../tsconfig.test.json',
-      useESM: true
-    }
+      useESM: true,
+    },
   },
   coverageProvider: 'v8',
   coverageReporters: isCI ? ['json'] : ['text'],
@@ -31,7 +31,7 @@ export default {
     '!**/_fixtures/**',
     '!**/_tests/**',
     '!**/_performance/**',
-    '!**/_bench/**'
+    '!**/_bench/**',
   ],
   coveragePathIgnorePatterns: [
     '/dist/',
@@ -39,7 +39,7 @@ export default {
     '<rootDit>/dist',
     '<rootDir>/examples',
     '<rootDir>/internal',
-    '<rootDir>/test'
+    '<rootDir>/test',
   ],
   modulePathIgnorePatterns: ['dist', 'coverage', 'examples/*', 'benchmarks/*', 'scripts/*', 'internal/*'],
   testPathIgnorePatterns: [
@@ -51,6 +51,6 @@ export default {
     '/coverage/',
     '<rootDir>/scripts/*',
     '<rootDir>/internal/*',
-    '<rootDir>/test/*'
-  ]
+    '<rootDir>/test/*',
+  ],
 }
