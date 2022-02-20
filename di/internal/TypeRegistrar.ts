@@ -34,6 +34,8 @@ export namespace TypeRegistrar {
       } else {
         opts.names = existing.names
       }
+
+      opts.interceptors = [...existing.interceptors, ...(additional.interceptors || [])]
     }
 
     const info = newBinding({ ...existing, ...opts })

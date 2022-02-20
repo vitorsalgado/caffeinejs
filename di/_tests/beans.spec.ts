@@ -13,6 +13,8 @@ import { Lifecycle } from '../Lifecycle.js'
 import { TypeRegistrar } from '../internal/TypeRegistrar.js'
 import { Scoped } from '../decorators/Scoped.js'
 import { Defer } from '../decorators/Defer.js'
+import { Interceptor } from '../decorators/Interceptor.js'
+import { InvalidBindingError } from '../internal/errors.js'
 import { Foo } from './_fixtures/circular_beans/Foo.js'
 import { Bar } from './_fixtures/circular_beans/Bar.js'
 
@@ -315,5 +317,19 @@ describe('Configuration', function () {
         }
       }).toThrow()
     })
+  })
+
+  it('should fail when no token is specified', function () {
+    expect(() => {
+      class Comp {}
+
+      @Configuration()
+      class Conf {
+        @Interceptor(instance => instance)
+        comp() {
+          return new Comp()
+        }
+      }
+    }).toThrow(InvalidBindingError)
   })
 })

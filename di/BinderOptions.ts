@@ -6,6 +6,9 @@ import { InvalidBindingError } from './internal/errors.js'
 import { Identifier } from './internal/types.js'
 import { Container } from './Container.js'
 import { DI } from './DI.js'
+import { PostResolutionInterceptor } from './PostResolutionInterceptor.js'
+import { FunctionPostResolutionInterceptor } from './PostResolutionInterceptor.js'
+import { ResolutionContext } from './ResolutionContext.js'
 
 export interface BinderOptions<T> {
   as(scopeId: Identifier): BinderOptions<T>
@@ -29,6 +32,8 @@ export interface BinderOptions<T> {
   refreshableScoped(): BinderOptions<T>
 
   byPassPostProcessors(): BinderOptions<T>
+
+  intercept(interceptor: PostResolutionInterceptor<T>): BinderOptions<T>
 }
 
 export class BindToOptions<T> implements BinderOptions<T> {
@@ -122,6 +127,17 @@ export class BindToOptions<T> implements BinderOptions<T> {
 
   byPassPostProcessors(): BinderOptions<T> {
     this.binding.byPassPostProcessors = true
+    this.container.configureBinding(this.token, this.binding)
+
+    return this
+  }
+
+  intercept(
+    interceptor: PostResolutionInterceptor<T> | ((instance: T, ctx: ResolutionContext) => T),
+  ): BinderOptions<T> {
+    this.binding.interceptors.push(
+      notNil(typeof interceptor === 'function' ? new FunctionPostResolutionInterceptor(interceptor) : interceptor),
+    )
     this.container.configureBinding(this.token, this.binding)
 
     return this

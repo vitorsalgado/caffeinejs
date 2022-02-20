@@ -12,6 +12,8 @@ import { Scope } from '../Scope.js'
 import { ResolutionContext } from '../ResolutionContext.js'
 import { SingletonScope } from '../internal/scopes/SingletonScope.js'
 import { ByPassPostProcessors } from '../decorators/ByPassPostProcessors.js'
+import { Configuration } from '../decorators/Configuration.js'
+import { Bean } from '../decorators/Bean.js'
 
 describe('Post Processors', function () {
   const ppSpy = jest.fn()
@@ -42,6 +44,17 @@ describe('Post Processors', function () {
   @Injectable()
   @ByPassPostProcessors()
   class ByPass {}
+
+  class Comp {}
+
+  @Configuration()
+  class Conf {
+    @Bean(Comp)
+    @ByPassPostProcessors()
+    comp() {
+      return new Comp()
+    }
+  }
 
   @Injectable()
   class NonDep {}
@@ -104,17 +117,20 @@ describe('Post Processors', function () {
     const di = DI.setup()
     const dep = di.get(Dep)
     const nonDep = di.get(NonDep)
+    const conf = di.get(Conf)
 
     // Ensure it does not impact on the count since they should bypass post processors
     di.get(SingletonScope)
     di.get(ByPass)
+    di.get(Comp)
 
     await di.dispose()
 
-    expect(ppSpy).toHaveBeenCalledTimes(8)
+    expect(ppSpy).toHaveBeenCalledTimes(12)
     expect(sSpy).toHaveBeenCalledTimes(1)
     expect(nonDep).toBeInstanceOf(NonDep)
     expect(dep).toBeInstanceOf(Decorated)
+    expect(conf).toBeInstanceOf(Conf)
     expect(dep.message()).toEqual('the message is hello world')
   })
 })

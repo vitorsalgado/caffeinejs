@@ -1,6 +1,7 @@
 import { Token } from '../Token.js'
 import { TokenSpec } from '../Token.js'
 import { Identifier } from '../internal/types.js'
+import { PostResolutionInterceptor } from '../PostResolutionInterceptor.js'
 import { Conditional } from './ConditionalOn.js'
 
 export interface ConfigurationProviderOptions {
@@ -15,4 +16,5 @@ export interface ConfigurationProviderOptions {
   lazy: boolean
   options: unknown
   byPassPostProcessors: boolean
+  interceptors: PostResolutionInterceptor[]
 }

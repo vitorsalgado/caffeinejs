@@ -6,6 +6,7 @@ import { RepeatedInjectableConfigurationError } from '../errors.js'
 const Def: Partial<ConfigurationProviderOptions> = {
   dependencies: [],
   conditionals: [],
+  interceptors: [],
   names: [],
 }
 
@@ -19,6 +20,7 @@ export function configureBean(
     target,
   ) || new Map()
   const actual = factories.get(method) || Def
+  const interceptors = [...(actual.interceptors || []), ...(configurations.interceptors || [])]
   const newNames = configurations.names || []
   const existingNames = actual.names || []
 
@@ -33,6 +35,7 @@ export function configureBean(
   factories.set(method, {
     ...actual,
     ...configurations,
+    interceptors,
     names: [...existingNames, ...newNames],
   })
 

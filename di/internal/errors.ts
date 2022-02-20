@@ -6,7 +6,7 @@ import { Primary } from '../decorators/Primary.js'
 import { ConditionalOn } from '../decorators/ConditionalOn.js'
 import { Identifier } from './types.js'
 
-export const solutions = (...solutions: string[]) => '\nPossible Solutions: \n' + solutions.join('\n')
+export const solutions = (...solutions: string[]) => '\nPossible Solutions:\n' + solutions.join('\n')
 
 export class DiError extends Error {
   static CODE_DEFAULT = 'DI_ERR'

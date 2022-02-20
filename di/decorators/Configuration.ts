@@ -6,7 +6,11 @@ import { isNil } from '../internal/utils/isNil.js'
 import { TypeRegistrar } from '../internal/TypeRegistrar.js'
 import { Ctor } from '../internal/types.js'
 import { Identifier } from '../internal/types.js'
+import { InvalidBindingError } from '../internal/errors.js'
+import { solutions } from '../internal/errors.js'
 import { ConfigurationProviderOptions } from './ConfigurationProviderOptions.js'
+import { Bean } from './Bean.js'
+import { Injectable } from './Injectable.js'
 
 export interface ConfigurationOptions {
   namespace: Identifier
@@ -32,6 +36,19 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
     Reflect.defineMetadata(Vars.CONFIGURATION_TOKENS_PROVIDED, tokens, target)
 
     for (const [method, factory] of beanConfiguration) {
+      if (factory.token === undefined) {
+        throw new InvalidBindingError(
+          `No injection token defined for bean configured on method '${String(method)}' at the configuration class '${
+            target.name
+          }'.` +
+            solutions(
+              `- Ensure the method '${String(method)}' is decorated with '@${Bean.name}' or '@${
+                Injectable.name
+              }' and has the injection token passed as a parameter`,
+            ),
+        )
+      }
+
       const binding = newBinding({
         injections: [...factory.dependencies],
         namespace: config.namespace,
@@ -40,12 +57,13 @@ export function Configuration<T>(config: Partial<ConfigurationOptions> = {}): Cl
         scopeId: isNil(config.scopeId) ? factory.scopeId : config.scopeId,
         late: isNil(config.late) ? factory.late : config.late,
         conditionals: [...factory.conditionals],
-        names: factory.names,
+        names: [...factory.names],
         type: factory.type || (typeof factory.token === 'function' ? factory.token : undefined),
         rawProvider: new BeanFactoryProvider(target as unknown as Ctor<T>, method, factory),
         options: factory.options,
         configuredBy: `${target.name}${String(method)}`,
         byPassPostProcessors: factory.byPassPostProcessors,
+        interceptors: [...factory.interceptors],
       })
 
       TypeRegistrar.addBean(factory.token, { ...binding })
