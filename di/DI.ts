@@ -163,9 +163,19 @@ export class DI implements Container {
     return Promise.resolve()
   }
 
-  protected static registerInternalComponents(container: DI) {
+  protected static bindInternalComponents(container: DI) {
     if (!container.has(ServiceLocator)) {
       container.bind(ServiceLocator).toValue(new DefaultServiceLocator(container)).as(Lifecycle.SINGLETON)
+    }
+
+    for (const [identifier, scope] of DI.Scopes.entries()) {
+      const scopeType = scope.constructor
+
+      container.bind(scopeType).toValue(scope)
+
+      if (typeof identifier === 'symbol') {
+        container.bind(identifier).toToken(scopeType)
+      }
     }
   }
 
@@ -431,7 +441,7 @@ export class DI implements Container {
       .filter(x => x.binding.scopeId === Lifecycle.CONTAINER)
       .forEach(({ token, binding }) => child.bindingRegistry.register(token, newBinding({ ...binding, id: undefined })))
 
-    DI.registerInternalComponents(child)
+    DI.bindInternalComponents(child)
 
     return child
   }
@@ -575,7 +585,7 @@ export class DI implements Container {
       }
     }
 
-    DI.registerInternalComponents(this)
+    DI.bindInternalComponents(this)
   }
 
   entries(): Iterable<[Token, Binding]> {

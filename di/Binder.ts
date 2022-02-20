@@ -14,7 +14,6 @@ import { ValueProvider } from './internal/providers/ValueProvider.js'
 import { TokenProvider } from './internal/providers/TokenProvider.js'
 import { FactoryProvider } from './internal/providers/FactoryProvider.js'
 import { Ctor } from './internal/types.js'
-import { Identifier } from './internal/types.js'
 import { Container } from './Container.js'
 
 export interface Binder<T> {
@@ -24,7 +23,7 @@ export interface Binder<T> {
 
   toValue(value: T): BinderOptions<T>
 
-  toToken(token: Identifier): BinderOptions<T>
+  toToken(token: Token): BinderOptions<T>
 
   toFactory(factory: (ctx: ResolutionContext) => T): BinderOptions<T>
 
@@ -64,7 +63,7 @@ export class BindTo<T> implements Binder<T> {
     return new BindToOptions<T>(this.container, this.token, this.binding)
   }
 
-  toToken(token: Identifier): BinderOptions<T> {
+  toToken(token: Token): BinderOptions<T> {
     notNil(token)
 
     this.binding.rawProvider = new TokenProvider(token)
