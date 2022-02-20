@@ -2,19 +2,19 @@ import { expect } from '@jest/globals'
 import { v4 } from 'uuid'
 import { Bean } from '../decorators/Bean.js'
 import { Configuration } from '../decorators/Configuration.js'
-import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
 import { Primary } from '../decorators/Primary.js'
 import { DI } from '../DI.js'
 import { RepeatedInjectableConfigurationError } from '../internal/errors.js'
+import { Qualifier } from '../decorators/Qualifier.js'
 
 describe('Named Dependencies', function () {
   const kAck = Symbol('ok')
   const kBye = 'test-named-dependencies-bye'
 
   @Injectable()
-  @Named(kBye)
+  @Qualifier(kBye)
   class ByeService {
     readonly id: string = v4()
 
@@ -24,7 +24,7 @@ describe('Named Dependencies', function () {
   }
 
   @Injectable()
-  @Named(kAck)
+  @Qualifier(kAck)
   class AckService {
     readonly id: string = v4()
 
@@ -43,7 +43,7 @@ describe('Named Dependencies', function () {
   class Root {
     readonly id: string = v4()
 
-    constructor(@Inject(kBye) readonly byeService: ByeService, @Inject(kAck) readonly ackService: AckService) {}
+    constructor(@Qualifier(kBye) readonly byeService: ByeService, @Qualifier(kAck) readonly ackService: AckService) {}
   }
 
   it('should resolve based on dependency qualifier', function () {
