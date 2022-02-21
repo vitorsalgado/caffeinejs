@@ -7,19 +7,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": "./dist/index.js",
-    "./package.json": "./package.json",
-    "./stereotypes": {
-      "import": "./dist/stereotypes/index.js",
-      "default": "./dist/stereotypes/index.js"
-    },
-    "./decorators": {
-      "import": "./dist/decorators/index.js",
-      "default": "./dist/decorators/index.js"
-    },
-    "./internal": {
-      "import": "./dist/internal/index.js",
-      "default": "./dist/internal/index.js"
-    }
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "rm -rf dist && tsc --build --force tsconfig.build.json",

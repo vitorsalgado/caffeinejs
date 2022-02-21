@@ -245,7 +245,7 @@ describe('Real World', function () {
     const di = DI.setup()
     const controller = di.get(Controller)
 
-    di.bootstrap()
+    di.initInstances()
 
     expect(controller).toBeInstanceOf(Controller)
     expect(controller.idGen).not.toEqual(controller.idGen)

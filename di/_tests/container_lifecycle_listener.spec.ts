@@ -8,12 +8,12 @@ import { Configuration } from '../decorators/Configuration.js'
 import { Namespace } from '../decorators/Namespace.js'
 import { Bean } from '../decorators/Bean.js'
 import { Injectable } from '../decorators/Injectable.js'
-import { ContainerLifecycle } from '../Container.js'
+import { ContainerLifecycleListener } from '../Container.js'
 
-describe('Inspections', function () {
+describe('Container Lifecycle Listener', function () {
   const spy = jest.fn()
 
-  class Inspector implements ContainerLifecycle {
+  class Inspector implements ContainerLifecycleListener {
     onBinding(token: Token, binding: Binding): void {
       spy()
     }
@@ -59,7 +59,7 @@ describe('Inspections', function () {
   }
 
   it('should call inspector methods on container specific registration steps', function () {
-    DI.inspector(new Inspector())
+    DI.setContainerLifecycleListener(new Inspector())
     DI.setup()
 
     expect(spy).toHaveBeenCalledTimes(12)

@@ -46,14 +46,14 @@ import { Identifier } from './internal/types.js'
 import { Container } from './Container.js'
 import { InitialOptions } from './Container.js'
 import { ContainerOptions } from './Container.js'
-import { ContainerLifecycle } from './Container.js'
+import { ContainerLifecycleListener } from './Container.js'
 import { containerToString } from './internal/utils/containerToString.js'
 
 export class DI implements Container {
   protected static Filters: Filter[] = []
   protected static readonly Scopes = new Map(DI.builtInScopes().entries())
   protected static readonly PostProcessors = new Set<PostProcessor>()
-  protected static Inspector?: ContainerLifecycle
+  protected static ContainerLifecycle?: ContainerLifecycleListener
 
   protected readonly bindingRegistry = new BindingRegistry()
   protected readonly bindingNames = new Map<Identifier, Binding[]>()
@@ -67,7 +67,7 @@ export class DI implements Container {
   readonly namespace: Identifier
   readonly parent?: DI
 
-  constructor(options: Partial<ContainerOptions> | Identifier, parent?: DI) {
+  constructor(options: Partial<ContainerOptions> | string | symbol, parent?: DI) {
     const opts =
       typeof options === 'string' || typeof options === 'symbol'
         ? { ...InitialOptions, namespace: options }
@@ -143,8 +143,8 @@ export class DI implements Container {
     DI.Filters.push(...notNil(filters))
   }
 
-  static inspector(inspector: ContainerLifecycle) {
-    DI.Inspector = notNil(inspector)
+  static setContainerLifecycleListener(listener: ContainerLifecycleListener) {
+    DI.ContainerLifecycle = notNil(listener)
   }
 
   protected static async preDestroyBinding(binding: Binding): Promise<void> {
@@ -495,7 +495,7 @@ export class DI implements Container {
     }
   }
 
-  bootstrap(): void {
+  initInstances(): void {
     for (const [token, binding] of this.bindingRegistry.entries()) {
       if (
         !binding.lazy &&
@@ -519,25 +519,20 @@ export class DI implements Container {
 
   setup(): void {
     for (const [token, binding] of TypeRegistrar.entries()) {
-      DI.Inspector?.onBinding(token, binding)
+      DI.ContainerLifecycle?.onBinding(token, binding)
 
-      if (!this.isRegistrable(binding)) {
-        DI.Inspector?.onNotBound(token, binding)
-        continue
-      }
-
-      if (!this.filter(token, binding)) {
-        DI.Inspector?.onNotBound(token, binding)
+      if (!this.isRegistrable(binding) || !this.filter(token, binding)) {
+        DI.ContainerLifecycle?.onNotBound(token, binding)
         continue
       }
 
       const pass = binding.conditionals.every(conditional => conditional({ container: this }))
 
       if (pass) {
-        DI.Inspector?.onBound(token, binding)
+        DI.ContainerLifecycle?.onBound(token, binding)
         this.configureBinding(token, binding)
       } else {
-        DI.Inspector?.onNotBound(token, binding)
+        DI.ContainerLifecycle?.onNotBound(token, binding)
 
         if (binding.configuration) {
           const tokens = Reflect.getOwnMetadata(Vars.CONFIGURATION_TOKENS_PROVIDED, token)
@@ -550,15 +545,10 @@ export class DI implements Container {
     }
 
     for (const [token, binding] of TypeRegistrar.beans()) {
-      DI.Inspector?.onBinding(token, binding)
+      DI.ContainerLifecycle?.onBinding(token, binding)
 
-      if (!this.isRegistrable(binding)) {
-        DI.Inspector?.onNotBound(token, binding)
-        continue
-      }
-
-      if (!this.filter(token, binding)) {
-        DI.Inspector?.onNotBound(token, binding)
+      if (!this.isRegistrable(binding) || !this.filter(token, binding)) {
+        DI.ContainerLifecycle?.onNotBound(token, binding)
         continue
       }
 
@@ -576,11 +566,11 @@ export class DI implements Container {
           )
         }
 
-        DI.Inspector?.onBound(token, binding)
+        DI.ContainerLifecycle?.onBound(token, binding)
 
         this.configureBinding(token, binding)
       } else {
-        DI.Inspector?.onNotBound(token, binding)
+        DI.ContainerLifecycle?.onNotBound(token, binding)
       }
     }
 

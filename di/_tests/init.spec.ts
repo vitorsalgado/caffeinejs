@@ -55,7 +55,7 @@ describe('Init Singleton and Container Scoped', function () {
   it('should init all injectables except ones marked as lazy', function () {
     const di = DI.setup()
 
-    di.bootstrap()
+    di.initInstances()
 
     const dep1 = di.get(Dep1)
     const dep2 = di.get(Dep2)

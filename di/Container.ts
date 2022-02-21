@@ -21,7 +21,7 @@ export const InitialOptions: ContainerOptions = {
   scopeId: Lifecycle.SINGLETON,
 }
 
-export interface ContainerLifecycle {
+export interface ContainerLifecycleListener {
   onBinding(token: Token, binding: Binding): void
 
   onBound(token: Token, binding: Binding): void
@@ -70,7 +70,7 @@ export interface Container {
 
   resetInstanceAsync(token: Token): Promise<void>
 
-  bootstrap(): void
+  initInstances(): void
 
   dispose(): Promise<void>
 

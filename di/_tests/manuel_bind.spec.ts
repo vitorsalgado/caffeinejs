@@ -426,7 +426,7 @@ describe('Manual Binding', function () {
 
       di.bind(Laziest).toSelf().lazy()
       di.bind(NonLazy).toSelf().lazy(false)
-      di.bootstrap()
+      di.initInstances()
 
       expect(lazySpy).not.toHaveBeenCalled()
       expect(nonLazySpy).toHaveBeenCalled()
