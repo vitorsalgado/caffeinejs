@@ -526,7 +526,7 @@ export class DI implements Container {
         continue
       }
 
-      const pass = binding.conditionals.every(conditional => conditional({ container: this }))
+      const pass = binding.conditionals.every(conditional => conditional({ container: this, token, binding }))
 
       if (pass) {
         DI.ContainerLifecycle?.onBound(token, binding)
@@ -555,7 +555,7 @@ export class DI implements Container {
       const pass =
         binding.conditionals === undefined
           ? true
-          : binding.conditionals.every(conditional => conditional({ container: this }))
+          : binding.conditionals.every(conditional => conditional({ container: this, token, binding }))
 
       if (pass) {
         if (this.has(token) && !this.overriding) {

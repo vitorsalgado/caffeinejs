@@ -1,9 +1,13 @@
 import { TypeRegistrar } from '../internal/TypeRegistrar.js'
 import { configureBean, getBeanConfiguration } from '../internal/utils/beanUtils.js'
 import { Container } from '../Container.js'
+import { Token } from '../Token.js'
+import { Binding } from '../Binding.js'
 
 export interface ConditionContext {
   container: Container
+  token: Token
+  binding: Binding
 }
 
 export type Conditional = (ctx: ConditionContext) => boolean
