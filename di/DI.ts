@@ -295,7 +295,7 @@ export class DI implements Container {
     this.mapNamed(binding)
   }
 
-  get<T>(token: Token<T>, args?: unknown): T {
+  get<T, A = unknown>(token: Token<T>, args?: A): T {
     const bindings = this.getBindings<T>(token)
 
     if (bindings.length > 1) {
@@ -311,7 +311,7 @@ export class DI implements Container {
     return Resolver.resolve<T>(this, token, bindings[0], args)
   }
 
-  getRequired<T>(token: Token<T>, args?: unknown): T {
+  getRequired<T, A = unknown>(token: Token<T>, args?: A): T {
     const result = this.get(token, args)
 
     if (isNil(result)) {
@@ -321,7 +321,7 @@ export class DI implements Container {
     return result
   }
 
-  getMany<T>(token: Token<T>, args?: unknown): T[] {
+  getMany<T, A = unknown>(token: Token<T>, args?: A): T[] {
     const bindings = this.getBindings(token)
 
     if (bindings.length === 0) {

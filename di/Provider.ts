@@ -4,8 +4,8 @@ import { TokenProvider } from './internal/providers/TokenProvider.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { Ctor } from './internal/types.js'
 
-export interface Provider<T = any> {
-  provide(ctx: ResolutionContext): T
+export interface Provider<T = any, A = unknown> {
+  provide(ctx: ResolutionContext<A>): T
 }
 
 export function providerFromToken<T>(token: Token<T>, provider?: Provider<T>): Provider<T> {

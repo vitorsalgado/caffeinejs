@@ -19,7 +19,7 @@ import { Defer } from './decorators/Defer.js'
 import { Primary } from './decorators/Primary.js'
 
 export namespace Resolver {
-  export function resolve<T>(container: Container, token: Token<T>, binding?: Binding<T>, args?: unknown): T {
+  export function resolve<T, A = unknown>(container: Container, token: Token<T>, binding?: Binding<T>, args?: A): T {
     if (binding) {
       return binding.scopedProvider.provide({ container, token, binding, args }) as T
     }
@@ -66,16 +66,16 @@ export namespace Resolver {
     return resolved as T
   }
 
-  export function construct<T>(container: Container, ctor: Ctor<T>, binding: Binding, args?: unknown): T {
+  export function construct<T, A = unknown>(container: Container, ctor: Ctor<T>, binding: Binding, args?: A): T {
     return new ctor(...binding.injections.map((dep, index) => resolveParam(container, ctor, dep, index, args)))
   }
 
-  export function resolveParam<T>(
+  export function resolveParam<T, A = unknown>(
     container: Container,
     target: Token<T>,
     dep: TokenSpec<T>,
     indexOrProp: number | string | symbol,
-    args?: unknown,
+    args?: A,
   ): T {
     if (dep.token === undefined || dep.token === null) {
       throw new CircularReferenceError(

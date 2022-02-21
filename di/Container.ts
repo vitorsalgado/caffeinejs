@@ -32,17 +32,16 @@ export interface ContainerLifecycleListener {
 export interface Container {
   readonly namespace: Identifier
   readonly parent?: DI
-
   readonly [Symbol.toStringTag]: string
   readonly size: number
 
   configureBinding<T>(token: Token<T>, incoming: Binding<T>): void
 
-  get<T>(token: Token<T>, args?: unknown): T
+  get<T, A = unknown>(token: Token<T>, args?: A): T
 
-  getRequired<T>(token: Token<T>, args?: unknown): T
+  getRequired<T, A = unknown>(token: Token<T>, args?: A): T
 
-  getMany<T>(token: Token<T>, args?: unknown): T[]
+  getMany<T, A = unknown>(token: Token<T>, args?: A): T[]
 
   has<T>(token: Token<T>, checkParent?: boolean): boolean
 

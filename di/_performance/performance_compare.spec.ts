@@ -84,9 +84,9 @@ describe('Performance Compare', function () {
 
       console.log('NestJs Avg: ' + gray(String(nestRes.avg)))
       if (diSingletonRes.avg > nestRes.avg) {
-        console.log(yellow(`PERF: Diff NestJs ${diff(diRes.avg, nestRes.avg)}`))
+        console.log(yellow(`PERF: Diff NestJs ${diff(diSingletonRes.avg, nestRes.avg)}`))
       } else {
-        console.log(blue(`PERF: Diff NestJs ${diff(nestRes.avg, diRes.avg)}`))
+        console.log(blue(`PERF: Diff NestJs ${diff(nestRes.avg, diSingletonRes.avg)}`))
       }
 
       if (failIfLess) {
