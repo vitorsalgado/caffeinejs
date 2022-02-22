@@ -15,6 +15,9 @@ import { CafTransientRoot } from './_fixtures/di.js'
 import { bootstrap } from './_fixtures/nestjs.js'
 import { NestRoot } from './_fixtures/nestjs.js'
 import { NestTransientRoot } from './_fixtures/nestjs.js'
+import { loopCtx } from './_fixtures/loopback.js'
+import { LoopRoot } from './_fixtures/loopback.js'
+import { LoopTransientRoot } from './_fixtures/loopback.js'
 
 const nestApp = await bootstrap()
 
@@ -35,9 +38,14 @@ cronometro(
       di.get(CafTransientRoot)
     },
 
-    async nestjs() {
+    loopBack() {
+      loopCtx.getSync(LoopRoot.name)
+      loopCtx.getSync(LoopTransientRoot.name)
+    },
+
+    nestjs() {
       nestApp.get(NestRoot)
-      await nestApp.resolve(NestTransientRoot)
+      return nestApp.resolve(NestTransientRoot)
     },
   },
   {

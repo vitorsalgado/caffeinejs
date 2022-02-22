@@ -11,6 +11,8 @@ import { tsy } from './_fixtures/tsy.js'
 import { TsyRoot } from './_fixtures/tsy.js'
 import { bootstrap } from './_fixtures/nest.js'
 import { NestRoot } from './_fixtures/nest.js'
+import { loopCtx } from './_fixtures/loopback.js'
+import { LoopRoot } from './_fixtures/loopback.js'
 
 const failIfLess = process.env.TEST_FAIL_PERF === 'true'
 
@@ -57,6 +59,7 @@ describe('Performance Compare', function () {
     return bootstrap().then(nestApp => {
       expect(inv.get(InvRoot)).toBeInstanceOf(InvRoot)
       expect(tsy.resolve(TsyRoot)).toBeInstanceOf(TsyRoot)
+      expect(loopCtx.getSync(LoopRoot.name)).toBeInstanceOf(LoopRoot)
       expect(di.get(Root)).toBeInstanceOf(Root)
 
       const invRes = resolve(times, () => inv.get(InvRoot))
@@ -64,6 +67,7 @@ describe('Performance Compare', function () {
       const diRes = resolve(times, () => di.get(Root))
       const diSingletonRes = resolve(times, () => di.get(RootSingleton))
       const nestRes = resolve(times, () => nestApp.get(NestRoot))
+      const loopRes = resolve(times, () => loopCtx.getSync(LoopRoot.name))
 
       console.log('DI Avg: ' + gray(String(diRes.avg)))
       console.log('DI Singleton Avg: ' + gray(String(diSingletonRes.avg)))
@@ -80,6 +84,14 @@ describe('Performance Compare', function () {
         console.log(yellow(`PERF: Diff Tsyringe ${diff(diRes.avg, tsyRes.avg)}`))
       } else {
         console.log(blue(`PERF: Diff Tsyringe ${diff(tsyRes.avg, diRes.avg)}`))
+      }
+
+      console.log('LoopBack Avg: ' + gray(String(loopRes.avg)))
+      console.log('LoopBack Avg: ' + gray(String(tsyRes.avg)))
+      if (diRes.avg > tsyRes.avg) {
+        console.log(yellow(`PERF: Diff LoopBack ${diff(diRes.avg, loopRes.avg)}`))
+      } else {
+        console.log(blue(`PERF: Diff LoopBack ${diff(loopRes.avg, diRes.avg)}`))
       }
 
       console.log('NestJs Avg: ' + gray(String(nestRes.avg)))
