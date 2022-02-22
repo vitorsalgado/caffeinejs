@@ -14,7 +14,7 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@caffeinejs/core": "0.0.0",
+    "@caffeinejs/std": "0.0.0",
     "reflect-metadata": "^0.1.13"
   }
 }

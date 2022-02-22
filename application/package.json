@@ -6,6 +6,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
+    "start": "node --loader ts-node/esm main.ts",
     "build": "rm -rf dist && tsc --build --force tsconfig.build.json",
     "test": "jest --detectOpenHandles",
     "test:coverage": "jest --detectOpenHandles --coverage"
@@ -14,11 +15,13 @@
     "dist",
     "package.json"
   ],
-  "devDependencies": {
-    "@caffeinejs/internal-perf": "^0.0.0"
-  },
   "dependencies": {
     "@caffeinejs/di": "workspace:^",
-    "globby": "^13.1.1"
+    "@caffeinejs/std": "workspace:^",
+    "globby": "^13.1.1",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@caffeinejs/internal-perf": "^0.0.0"
   }
 }
