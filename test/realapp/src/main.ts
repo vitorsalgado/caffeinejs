@@ -24,7 +24,7 @@ await createConnection({
 
 getConnection('test')
 
-di.bootstrap()
+di.initInstances()
 
 const repo = di.get(UserRepository)
 
