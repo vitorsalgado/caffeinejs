@@ -270,10 +270,8 @@ export class DI implements Container {
       }
     }
 
-    if (scope.registerDestructionCallback) {
-      if (binding.preDestroy) {
-        scope.registerDestructionCallback(() => scope.cachedInstance<any>(binding)?.[binding.preDestroy!]())
-      }
+    if (binding.scopeId && binding.scopeId !== scopeId) {
+      DI.getScope(binding.scopeId).undo?.(binding)
     }
 
     binding.scopeId = scopeId
@@ -293,6 +291,8 @@ export class DI implements Container {
 
     this.bindingRegistry.register(token, binding)
     this.mapNamed(binding)
+
+    scope.configure?.(binding)
   }
 
   get<T, A = unknown>(token: Token<T>, args?: A): T {

@@ -9,5 +9,7 @@ export interface Scope {
 
   remove(binding: Binding): void
 
-  registerDestructionCallback?(callback: () => Promise<void> | void): void
+  configure?(binding: Binding): void
+
+  undo?(binding: Binding): void
 }

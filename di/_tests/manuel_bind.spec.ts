@@ -176,6 +176,7 @@ describe('Manual Binding', function () {
         const di = DI.setup()
 
         di.bind(LateDestroyable).toSelf()
+        di.bind(LateDestroyable).toSelf()
         di.get(LateDestroyable)
 
         await di.unbindAsync(LateDestroyable)
