@@ -249,39 +249,6 @@ describe('Class', function () {
     })
   })
 
-  describe('optional injections', function () {
-    class Repo {}
-
-    interface Service {
-      run(): void
-    }
-
-    @Injectable()
-    class OptSvc {
-      constructor(@Optional() readonly repo?: Repo) {}
-    }
-
-    @Injectable()
-    class NonSvc {
-      constructor(readonly repo?: Repo) {}
-    }
-
-    @Injectable()
-    class Ctrl {
-      constructor(@Inject('service') @Optional() readonly service?: Service) {}
-    }
-
-    it('should inject null values when dependency cannot be resolved and is marked as optional', function () {
-      const di = DI.setup()
-      const svc = di.get(OptSvc)
-      const ctrl = di.get(Ctrl)
-
-      expect(svc.repo).toBeUndefined()
-      expect(() => di.get(NonSvc)).toThrow()
-      expect(ctrl.service).toBeUndefined()
-    })
-  })
-
   describe('nested resolution graph', function () {
     describe('and using singleton scope for all', function () {
       @Injectable()
