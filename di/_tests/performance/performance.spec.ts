@@ -1,10 +1,10 @@
 import { performance } from 'perf_hooks'
-import { DI } from '../DI.js'
-import { Injectable } from '../decorators/Injectable.js'
-import { PostConstruct } from '../decorators/PostConstruct.js'
-import { Transient } from '../decorators/Transient.js'
-import { Inject } from '../decorators/Inject.js'
-import { Container } from '../Container.js'
+import { DI } from '../../DI.js'
+import { Injectable } from '../../decorators/Injectable.js'
+import { PostConstruct } from '../../decorators/PostConstruct.js'
+import { Transient } from '../../decorators/Transient.js'
+import { Inject } from '../../decorators/Inject.js'
+import { Container } from '../../Container.js'
 
 describe('Performance', () => {
   const kVal = Symbol('perf_val')

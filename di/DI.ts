@@ -283,7 +283,7 @@ export class DI implements Container {
     scope.configure?.(binding)
   }
 
-  get<T, A = unknown>(token: Token<T>, args: A): T {
+  get<T, A = unknown>(token: Token<T>, args?: A): T {
     const bindings = this.getBindings<T>(token)
 
     if (bindings.length > 1) {
