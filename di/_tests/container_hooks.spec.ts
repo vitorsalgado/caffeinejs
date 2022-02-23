@@ -1,31 +1,14 @@
 import { jest } from '@jest/globals'
 import { expect } from '@jest/globals'
-import { Token } from '../Token.js'
-import { Binding } from '../Binding.js'
 import { DI } from '../DI.js'
 import { ConditionalOn } from '../decorators/ConditionalOn.js'
 import { Configuration } from '../decorators/Configuration.js'
 import { Namespace } from '../decorators/Namespace.js'
 import { Bean } from '../decorators/Bean.js'
 import { Injectable } from '../decorators/Injectable.js'
-import { ContainerLifecycleListener } from '../Container.js'
 
 describe('Container Lifecycle Listener', function () {
   const spy = jest.fn()
-
-  class Inspector implements ContainerLifecycleListener {
-    onBinding(token: Token, binding: Binding): void {
-      spy()
-    }
-
-    onNotBound(token: Token, binding: Binding): void {
-      spy()
-    }
-
-    onBound(token: Token, binding: Binding): void {
-      spy()
-    }
-  }
 
   // 1
   @Injectable()
@@ -58,10 +41,19 @@ describe('Container Lifecycle Listener', function () {
     }
   }
 
-  it('should call inspector methods on container specific registration steps', function () {
-    DI.setContainerLifecycleListener(new Inspector())
-    DI.setup()
+  it('should call inspector methods on container specific registration steps', async function () {
+    const di = new DI()
 
-    expect(spy).toHaveBeenCalledTimes(12)
+    di.hooks.on('onSetup', () => spy())
+    di.hooks.on('onBindingRegistered', () => spy())
+    di.hooks.on('onBindingNotRegistered', () => spy())
+    di.hooks.on('onSetupComplete', () => spy())
+    di.hooks.on('onDisposed', () => spy())
+
+    di.setup()
+
+    await di.dispose()
+
+    expect(spy).toHaveBeenCalledTimes(14)
   })
 })

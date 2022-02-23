@@ -6,6 +6,7 @@ import { Binder } from './Binder.js'
 import { DI } from './DI.js'
 import { Lifecycle } from './Lifecycle.js'
 import { MetadataReader } from './MetadataReader.js'
+import { HookListener } from './HookListener.js'
 
 export interface ContainerOptions {
   namespace: Identifier
@@ -21,19 +22,12 @@ export const InitialOptions: ContainerOptions = {
   scopeId: Lifecycle.SINGLETON,
 }
 
-export interface ContainerLifecycleListener {
-  onBinding(token: Token, binding: Binding): void
-
-  onBound(token: Token, binding: Binding): void
-
-  onNotBound(token: Token, binding: Binding): void
-}
-
 export interface Container {
   readonly namespace: Identifier
   readonly parent?: DI
   readonly [Symbol.toStringTag]: string
   readonly size: number
+  readonly hooks: HookListener
 
   configureBinding<T>(token: Token<T>, incoming: Binding<T>): void
 

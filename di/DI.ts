@@ -46,14 +46,15 @@ import { Identifier } from './internal/types.js'
 import { Container } from './Container.js'
 import { InitialOptions } from './Container.js'
 import { ContainerOptions } from './Container.js'
-import { ContainerLifecycleListener } from './Container.js'
 import { containerToString } from './internal/utils/containerToString.js'
+import { InternalHookListener } from './internal/InternalHookListener.js'
+import { HookListener } from './HookListener.js'
+import { RejectionWrapper } from './internal/RejectionWrapper.js'
 
 export class DI implements Container {
   protected static Filters: Filter[] = []
   protected static readonly Scopes = new Map(DI.builtInScopes().entries())
   protected static readonly PostProcessors = new Set<PostProcessor>()
-  protected static ContainerLifecycle?: ContainerLifecycleListener
 
   protected readonly bindingRegistry = new BindingRegistry()
   protected readonly bindingNames = new Map<Identifier, Binding[]>()
@@ -64,10 +65,11 @@ export class DI implements Container {
   protected readonly lateBind?: boolean
   protected readonly overriding?: boolean
 
+  readonly hooks: HookListener = new InternalHookListener()
   readonly namespace: Identifier
   readonly parent?: DI
 
-  constructor(options: Partial<ContainerOptions> | string | symbol, parent?: DI) {
+  constructor(options: Partial<ContainerOptions> | string | symbol = '', parent?: DI) {
     const opts =
       typeof options === 'string' || typeof options === 'symbol'
         ? { ...InitialOptions, namespace: options }
@@ -90,7 +92,7 @@ export class DI implements Container {
     return this.bindingRegistry.size()
   }
 
-  static setup(options: Partial<ContainerOptions> | Identifier = '', parent?: DI): DI {
+  static setup(options: Partial<ContainerOptions> | string | symbol = '', parent?: DI): DI {
     const di = new DI(options, parent)
     di.setup()
 
@@ -143,23 +145,9 @@ export class DI implements Container {
     DI.Filters.push(...notNil(filters))
   }
 
-  static setContainerLifecycleListener(listener: ContainerLifecycleListener) {
-    DI.ContainerLifecycle = notNil(listener)
-  }
-
   protected static async preDestroyBinding(binding: Binding): Promise<void> {
     const scope = DI.Scopes.get(binding.scopeId) as Scope
-    const instance: any = scope.cachedInstance(binding)
-
-    const r = instance?.[binding.preDestroy as Identifier]()
-
-    if (r && 'then' in r && typeof r.then === 'function') {
-      return r.finally(() => scope.remove(binding))
-    }
-
-    scope.remove(binding)
-
-    return Promise.resolve()
+    return Promise.resolve(scope.cachedInstance<any>(binding)?.[binding.preDestroy as Identifier]())
   }
 
   protected static bindInternalComponents(container: DI) {
@@ -295,7 +283,7 @@ export class DI implements Container {
     scope.configure?.(binding)
   }
 
-  get<T, A = unknown>(token: Token<T>, args?: A): T {
+  get<T, A = unknown>(token: Token<T>, args: A): T {
     const bindings = this.getBindings<T>(token)
 
     if (bindings.length > 1) {
@@ -509,31 +497,49 @@ export class DI implements Container {
   }
 
   dispose(): Promise<void> {
-    return Promise.all(
-      this.bindingRegistry
-        .toArray()
-        .filter(({ binding }) => binding.preDestroy)
-        .map(({ binding }) => DI.preDestroyBinding(binding)),
-    ).then(() => this.resetInstances())
+    const destroyers: Promise<void | RejectionWrapper>[] = []
+    const tokens: Token[] = []
+
+    for (const [token, binding] of this.bindingRegistry.entries()) {
+      tokens.push(token)
+
+      if (binding.preDestroy) {
+        destroyers.push(DI.preDestroyBinding(binding).catch(err => new RejectionWrapper(err)))
+      }
+    }
+
+    return Promise.all(destroyers)
+      .then(results => {
+        for (const token of tokens) {
+          this.resetInstance(token)
+        }
+
+        const rejections: RejectionWrapper[] = results.filter(x => x instanceof RejectionWrapper) as RejectionWrapper[]
+
+        if (rejections.length === 0) {
+          return
+        }
+
+        return Promise.reject(rejections.map(x => x.reason))
+      })
+      .finally(() => this.hooks.emit('onDisposed'))
   }
 
   setup(): void {
     for (const [token, binding] of TypeRegistrar.entries()) {
-      DI.ContainerLifecycle?.onBinding(token, binding)
+      this.hooks.emit('onSetup', { token, binding })
 
       if (!this.isRegistrable(binding) || !this.filter(token, binding)) {
-        DI.ContainerLifecycle?.onNotBound(token, binding)
+        this.hooks.emit('onBindingNotRegistered', { token, binding })
         continue
       }
 
       const pass = binding.conditionals.every(conditional => conditional({ container: this, token, binding }))
 
       if (pass) {
-        DI.ContainerLifecycle?.onBound(token, binding)
         this.configureBinding(token, binding)
+        this.hooks.emit('onBindingRegistered', { token, binding })
       } else {
-        DI.ContainerLifecycle?.onNotBound(token, binding)
-
         if (binding.configuration) {
           const tokens = Reflect.getOwnMetadata(Vars.CONFIGURATION_TOKENS_PROVIDED, token)
 
@@ -541,14 +547,16 @@ export class DI implements Container {
             TypeRegistrar.deleteBean(tk)
           }
         }
+
+        this.hooks.emit('onBindingNotRegistered', { token, binding })
       }
     }
 
     for (const [token, binding] of TypeRegistrar.beans()) {
-      DI.ContainerLifecycle?.onBinding(token, binding)
+      this.hooks.emit('onSetup', { token, binding })
 
       if (!this.isRegistrable(binding) || !this.filter(token, binding)) {
-        DI.ContainerLifecycle?.onNotBound(token, binding)
+        this.hooks.emit('onBindingNotRegistered', { token, binding })
         continue
       }
 
@@ -566,15 +574,16 @@ export class DI implements Container {
           )
         }
 
-        DI.ContainerLifecycle?.onBound(token, binding)
-
         this.configureBinding(token, binding)
+        this.hooks.emit('onBindingRegistered', { token, binding })
       } else {
-        DI.ContainerLifecycle?.onNotBound(token, binding)
+        this.hooks.emit('onBindingNotRegistered', { token, binding })
       }
     }
 
     DI.bindInternalComponents(this)
+
+    this.hooks.emit('onSetupComplete')
   }
 
   entries(): Iterable<[Token, Binding]> {
