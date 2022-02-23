@@ -17,7 +17,7 @@ import { Ctor } from './internal/types.js'
 import { Container } from './Container.js'
 
 export interface Binder<T> {
-  to(ctor: Ctor<T>): BinderOptions<T>
+  toClass(ctor: Ctor<T>): BinderOptions<T>
 
   toSelf(): BinderOptions<T>
 
@@ -37,8 +37,8 @@ export class BindTo<T> implements Binder<T> {
     private readonly binding: Binding<T>,
   ) {}
 
-  to(ctor: Ctor<T>): BindToOptions<T> {
-    check(typeof ctor === 'function', `Binding .to() parameter must be class reference. Received: ${typeof ctor}`)
+  toClass(ctor: Ctor<T>): BindToOptions<T> {
+    check(typeof ctor === 'function', `Binding .toClass() parameter must be class reference. Received: ${typeof ctor}`)
 
     this.binding.rawProvider = new ClassProvider(ctor)
     this.container.configureBinding(this.token, this.binding)
@@ -53,7 +53,7 @@ export class BindTo<T> implements Binder<T> {
       )
     }
 
-    return this.to(this.token as Ctor)
+    return this.toClass(this.token as Ctor)
   }
 
   toValue(value: T): BinderOptions<T> {

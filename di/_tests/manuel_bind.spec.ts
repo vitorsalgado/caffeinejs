@@ -73,7 +73,7 @@ describe('Manual Binding', function () {
       const di = DI.setup()
       const before = di.has(Late)
 
-      di.bind(Late).to(Late).singletonScoped()
+      di.bind(Late).toClass(Late).singletonScoped()
 
       const after = di.has(Late)
       const late = di.get(Late)
@@ -86,7 +86,7 @@ describe('Manual Binding', function () {
     it('should bind to class by name', function () {
       const di = DI.setup()
 
-      di.bind('test').to(Late)
+      di.bind('test').toClass(Late)
 
       const r = di.get<Late>('test')
 
@@ -97,7 +97,7 @@ describe('Manual Binding', function () {
     it('should bind abstract class to concrete implementation', function () {
       const di = DI.setup()
 
-      di.bind(Abs).to(Impl).singletonScoped()
+      di.bind(Abs).toClass(Impl).singletonScoped()
 
       const impl = di.get(Abs)
 
