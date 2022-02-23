@@ -1,5 +1,6 @@
 import { expect } from '@jest/globals'
 import { jest } from '@jest/globals'
+import { describe } from '@jest/globals'
 import { Binding } from '../Binding.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Named } from '../decorators/Named.js'
@@ -8,6 +9,7 @@ import { DI } from '../DI.js'
 import { BuiltInMetadataReader } from '../internal/BuiltInMetadataReader.js'
 import { Token } from '../Token.js'
 import { MetadataReader } from '../MetadataReader.js'
+import { Configuration } from '../decorators/Configuration.js'
 
 describe('DI', function () {
   const kTestName = Symbol('test-name')
@@ -112,6 +114,25 @@ describe('DI', function () {
       DI.setup({ metadataReader: new Custom(new BuiltInMetadataReader()) })
 
       expect(spy).toHaveBeenCalled()
+    })
+  })
+
+  describe('when asking for the configuration beans', function () {
+    @Injectable()
+    class Dep1 {}
+
+    @Injectable()
+    class Dep2 {}
+
+    @Configuration()
+    class Conf {}
+
+    it('should return only class type tokens decorated with @Configuration()', function () {
+      const di = DI.setup()
+      const conf = Array.from(di.configurationBeans())
+
+      expect(conf).toHaveLength(1)
+      expect(conf[0]).toEqual(Conf)
     })
   })
 })

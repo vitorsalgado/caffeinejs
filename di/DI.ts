@@ -586,11 +586,19 @@ export class DI implements Container {
     this.hooks.emit('onSetupComplete')
   }
 
-  entries(): Iterable<[Token, Binding]> {
+  *configurationBeans(): IterableIterator<Token> {
+    for (const [token, binding] of this.bindingRegistry.entries()) {
+      if (binding.configuration) {
+        yield token
+      }
+    }
+  }
+
+  entries(): IterableIterator<[Token, Binding]> {
     return this.bindingRegistry.entries()
   }
 
-  qualifiers(): Iterable<[Identifier, Binding[]]> {
+  qualifiers(): IterableIterator<[Identifier, Binding[]]> {
     return this.bindingNames.entries()
   }
 
