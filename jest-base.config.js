@@ -42,15 +42,4 @@ export default {
     '<rootDir>/test',
   ],
   modulePathIgnorePatterns: ['dist', 'coverage', 'examples/*', 'benchmarks/*', 'scripts/*', 'internal/*'],
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    '/benchmarks/',
-    '/examples/',
-    '/dist/',
-    '/out/',
-    '/coverage/',
-    '<rootDir>/scripts/*',
-    '<rootDir>/internal/*',
-    '<rootDir>/test/*',
-  ],
 }
