@@ -1,0 +1,17 @@
+{
+  "name": "@caffeinejs/web",
+  "version": "0.0.0",
+  "description": "CaffeineJs Web",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "rm -rf dist && tsc --build --force tsconfig.build.json",
+    "test": "yarn node --experimental-vm-modules $(yarn bin jest) --detectOpenHandles",
+    "test:coverage": "yarn test --coverage"
+  },
+  "files": [
+    "dist",
+    "package.json"
+  ]
+}
