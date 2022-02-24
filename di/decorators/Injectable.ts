@@ -9,8 +9,6 @@ import { isNil } from '../internal/utils/isNil.js'
 import { configureBean } from '../internal/utils/beanUtils.js'
 import { getLookupProperties } from '../internal/utils/getLookupProperties.js'
 import { TypeRegistrar } from '../internal/TypeRegistrar.js'
-import { BagArgsClassProvider } from '../internal/providers/BagArgsClassProvider.js'
-import { Ctor } from '../internal/types.js'
 
 export function Injectable<T>(token?: Token) {
   return function <TFunction extends Function>(target: TFunction | object, propertyKey?: string | symbol) {
@@ -23,18 +21,13 @@ export function Injectable<T>(token?: Token) {
         )
       }
 
-      const injections = getParamTypes(target)
-
       TypeRegistrar.configure<T>(target, {
-        injections,
+        injections: getParamTypes(target),
         injectableProperties: getInjectableProperties(target),
         injectableMethods: getInjectableMethods(target),
         lookupProperties: getLookupProperties(target),
         type: target,
         names: token ? [token] : undefined,
-        rawProvider: injections.some(x => x.bag && x.bag.length > 0)
-          ? new BagArgsClassProvider(target as Ctor)
-          : undefined,
       } as Partial<Binding>)
 
       return

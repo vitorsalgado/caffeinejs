@@ -4,6 +4,7 @@ import { Token } from '../Token.js'
 import { tokenStr } from '../Token.js'
 import { notNil } from './utils/notNil.js'
 import { RepeatedInjectableConfigurationError } from './errors.js'
+import { mergeObject } from './utils/mergeObject.js'
 
 export namespace TypeRegistrar {
   const _entries = new Map<Token, Binding>()
@@ -42,7 +43,7 @@ export namespace TypeRegistrar {
     const entry = _entries.get(tk)
 
     if (entry) {
-      _entries.set(tk, { ...entry, ...info })
+      _entries.set(tk, mergeObject(entry, info))
     } else {
       _entries.set(tk, newBinding(info))
     }

@@ -17,6 +17,7 @@ export interface TokenSpec<T = any> {
   bag?: TokenBag[]
   multiple?: boolean
   optional?: boolean
+  decorated?: boolean
 }
 
 export function isNamedToken(dep: unknown): dep is string | symbol {

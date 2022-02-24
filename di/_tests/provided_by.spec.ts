@@ -41,7 +41,7 @@ describe('Provided By', function () {
   }
 
   @Injectable()
-  @ProvidedBy(ctx => {
+  @ProvidedBy(() => {
     spy()
     return new Dep('created')
   })

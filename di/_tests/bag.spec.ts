@@ -1,10 +1,10 @@
 import { Injectable } from '../decorators/Injectable.js'
 import { Bag } from '../decorators/Bag.js'
 import { bagItem } from '../decorators/Bag.js'
+import { bagItems } from '../decorators/Bag.js'
 import { DI } from '../DI.js'
 import { Optional } from '../decorators/Optional.js'
 import { InjectAll } from '../decorators/InjectAll.js'
-import { bagItems } from '../decorators/Bag.js'
 
 describe('Injection Bag', function () {
   const kDep = Symbol('test')
@@ -41,14 +41,11 @@ describe('Injection Bag', function () {
   @Injectable()
   class DiffTypes {
     constructor(
-      @Bag([bagItem(Dep1), { token: Dep2, optional: true, key: 'dep2' }])
-      readonly args: { dep1: Dep1 },
-      @Bag([bagItem(kDep, 'dep3')])
-      readonly other: { dep3: Dep3 },
+      @Bag([bagItem(Dep1), { token: Dep2, optional: true, key: 'dep2' }]) readonly args: { dep1: Dep1 },
+      @Bag([bagItem(kDep, 'dep3')]) readonly other: { dep3: Dep3 },
       @Optional() readonly dep2: Dep2 | undefined,
       @InjectAll(Base) readonly base: Base[],
-      @Bag([bagItems(Base)])
-      readonly another: { base: Base[] },
+      @Bag([bagItems(Base)]) readonly another: { base: Base[] },
     ) {}
   }
 

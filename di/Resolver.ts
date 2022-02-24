@@ -85,7 +85,7 @@ export namespace Resolver {
         )}' because the injection token is undefined.\n` +
           `This could mean that the component '${tokenStr(target)}' has a circular reference.` +
           solutions(
-            `- If this was intentional, make sure to decorate your circular dependency with @${Defer.name} and use the type TypeOf<> to avoid TS errors on compilation.`,
+            `- If this was intentional, make sure to decorate your circular dependency with @${Defer.name} and use the type 'TypeOf<>' to avoid TS errors during compilation.`,
           ),
       )
     }

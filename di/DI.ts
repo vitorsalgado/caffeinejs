@@ -10,6 +10,8 @@ import { ScopeNotRegisteredError } from './internal/errors.js'
 import { CircularReferenceError } from './internal/errors.js'
 import { NoUniqueInjectionForTokenError } from './internal/errors.js'
 import { NoResolutionForTokenError } from './internal/errors.js'
+import { InvalidBindingError } from './internal/errors.js'
+import { solutions } from './internal/errors.js'
 import { AfterInitInterceptor } from './internal/interceptors/AfterInitInterceptor.js'
 import { BeforeInitInterceptor } from './internal/interceptors/BeforeInitInterceptor.js'
 import { ContainerScope } from './internal/scopes/ContainerScope.js'
@@ -44,6 +46,7 @@ import { Filter } from './Filter.js'
 import { MetadataReader } from './MetadataReader.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { Identifier } from './internal/types.js'
+import { Ctor } from './internal/types.js'
 import { Container } from './Container.js'
 import { InitialOptions } from './Container.js'
 import { ContainerOptions } from './Container.js'
@@ -51,6 +54,7 @@ import { containerToString } from './internal/utils/containerToString.js'
 import { InternalHookListener } from './internal/InternalHookListener.js'
 import { HookListener } from './HookListener.js'
 import { RejectionWrapper } from './internal/RejectionWrapper.js'
+import { BagArgsClassProvider } from './internal/providers/BagArgsClassProvider.js'
 
 export class DI implements Container {
   protected static Filters: Filter[] = []
@@ -185,6 +189,19 @@ export class DI implements Container {
   configureBinding<T>(token: Token<T>, incoming: Binding<T>): void {
     notNil(token)
     notNil(incoming)
+
+    const hasBag = incoming.injections.some(x => x.bag && x.bag.length > 0)
+
+    if (hasBag) {
+      if (incoming.rawProvider && !(incoming.rawProvider instanceof BagArgsClassProvider)) {
+        throw new InvalidBindingError(
+          `Binding '${tokenStr(token)}' contains constructor @Bag() parameters but is using a different provider. ` +
+            solutions(`- Check if the component '${tokenStr(token)}' is using a custom provider and remove it`),
+        )
+      } else {
+        incoming.rawProvider = new BagArgsClassProvider(incoming.type as Ctor)
+      }
+    }
 
     const binding = { ...incoming, ...this.metadataReader.read(token) }
     const scopeId = binding.scopeId ? binding.scopeId : this.scopeId
