@@ -617,6 +617,10 @@ export class DI implements Container {
     }
   }
 
+  types(): IterableIterator<[Token, Binding]> {
+    return TypeRegistrar.entries()
+  }
+
   entries(): IterableIterator<[Token, Binding]> {
     return this.bindingRegistry.entries()
   }

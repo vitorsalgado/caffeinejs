@@ -71,6 +71,8 @@ export interface Container {
 
   configurationBeans(): IterableIterator<Token>
 
+  types(): IterableIterator<[Token, Binding]>
+
   entries(): IterableIterator<[Token, Binding]>
 
   qualifiers(): IterableIterator<[Identifier, Binding[]]>
