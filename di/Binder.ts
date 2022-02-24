@@ -4,6 +4,7 @@ import { Provider } from './Provider.js'
 import { Token } from './Token.js'
 import { isNamedToken } from './Token.js'
 import { tokenStr } from './Token.js'
+import { TokenSpec } from './Token.js'
 import { Binding } from './Binding.js'
 import { check } from './internal/utils/check.js'
 import { notNil } from './internal/utils/notNil.js'
@@ -15,6 +16,7 @@ import { TokenProvider } from './internal/providers/TokenProvider.js'
 import { FactoryProvider } from './internal/providers/FactoryProvider.js'
 import { Ctor } from './internal/types.js'
 import { Container } from './Container.js'
+import { FunctionProvider } from './internal/providers/FunctionProvider.js'
 
 export interface Binder<T> {
   toClass(ctor: Ctor<T>): BinderOptions<T>
@@ -28,6 +30,8 @@ export interface Binder<T> {
   toFactory(factory: (ctx: ResolutionContext) => T): BinderOptions<T>
 
   toProvider(provider: Provider<T>): BinderOptions<T>
+
+  toFunction(fn: (...args: any[]) => unknown, injections: TokenSpec[]): BinderOptions<T>
 }
 
 export class BindTo<T> implements Binder<T> {
@@ -99,6 +103,16 @@ export class BindTo<T> implements Binder<T> {
     )
 
     this.binding.rawProvider = provider
+    this.container.configureBinding(this.token, this.binding)
+
+    return new BindToOptions<T>(this.container, this.token, this.binding)
+  }
+
+  toFunction(fn: (...args: any[]) => unknown, injections: TokenSpec[]): BinderOptions<T> {
+    check(typeof fn === 'function', `.toFunction() only accepts function types`)
+
+    this.binding.rawProvider = new FunctionProvider(fn) as Provider<T>
+    this.binding.injections = injections
     this.container.configureBinding(this.token, this.binding)
 
     return new BindToOptions<T>(this.container, this.token, this.binding)

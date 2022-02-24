@@ -13,7 +13,7 @@ export interface TokenBag {
 
 export interface TokenSpec<T = any> {
   token: Token<T>
-  tokenType: Token<T>
+  tokenType?: Token<T>
   bag?: TokenBag[]
   multiple?: boolean
   optional?: boolean

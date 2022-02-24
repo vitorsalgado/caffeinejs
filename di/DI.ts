@@ -34,6 +34,7 @@ import { DefaultServiceLocator } from './ServiceLocator.js'
 import { ServiceLocator } from './ServiceLocator.js'
 import { tokenStr } from './Token.js'
 import { isNamedToken, Token } from './Token.js'
+import { TokenSpec } from './Token.js'
 import { isNil } from './internal/utils/isNil.js'
 import { loadModule } from './internal/utils/loadModule.js'
 import { notNil } from './internal/utils/notNil.js'
@@ -143,6 +144,11 @@ export class DI implements Container {
 
   static addFilters(...filters: Filter[]) {
     DI.Filters.push(...notNil(filters))
+  }
+
+  static arg(token: Token, options?: Omit<TokenSpec, 'token'>): TokenSpec {
+    notNil(token)
+    return { token, tokenType: token, ...options }
   }
 
   protected static async preDestroyBinding(binding: Binding): Promise<void> {

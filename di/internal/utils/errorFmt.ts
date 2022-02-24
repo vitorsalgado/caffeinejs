@@ -26,6 +26,8 @@ export function fmtParamError(ctor: Token, indexOrProp: number | (string | symbo
 
 export function fmtTokenError(spec: TokenSpec): string {
   return `'${tokenStr(spec.token)}'${
-    !isNil(spec.tokenType) && spec.token !== spec.tokenType ? ` of type '${tokenStr(spec.tokenType)}'` : ''
+    !isNil(spec.tokenType) && spec.tokenType && spec.token !== spec.tokenType
+      ? ` of type '${tokenStr(spec.tokenType)}'`
+      : ''
   }`
 }
