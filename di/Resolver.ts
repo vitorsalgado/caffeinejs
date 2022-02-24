@@ -17,6 +17,7 @@ import { Container } from './Container.js'
 import { Optional } from './decorators/Optional.js'
 import { Defer } from './decorators/Defer.js'
 import { Primary } from './decorators/Primary.js'
+import { InjectAll } from './decorators/InjectAll.js'
 
 export namespace Resolver {
   export function resolve<T, A = unknown>(container: Container, token: Token<T>, binding?: Binding<T>, args?: A): T {
@@ -109,7 +110,8 @@ export namespace Resolver {
       `Unable to resolve ${fmtParamError(target, indexOrProp)} with token ${fmtTokenError(dep)}.` +
         solutions(
           `- Check if the type '${tokenStr(target)}' has all its dependencies correctly registered`,
-          `- If this dependency is optional and can be undefined, decorate it with @${Optional.name}`,
+          `- For multiple injections, make sure to use the decorator '@${InjectAll.name}' passing the type of the array`,
+          `- If the dependency is optional, decorate it with @${Optional.name}`,
         ),
     )
   }

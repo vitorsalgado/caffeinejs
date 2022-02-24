@@ -1,10 +1,8 @@
 import { jest } from '@jest/globals'
 import { v4 } from 'uuid'
-import { Inject } from '../decorators/Inject.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { InjectAll } from '../decorators/InjectAll.js'
 import { Named } from '../decorators/Named.js'
-import { Optional } from '../decorators/Optional.js'
 import { Primary } from '../decorators/Primary.js'
 import { DI } from '../DI'
 import { NoUniqueInjectionForTokenError } from '../internal/errors.js'
@@ -292,6 +290,31 @@ describe('Class', function () {
         expect(service.repo).toEqual(repo)
         expect(repo.dep).toEqual(dep)
       })
+    })
+  })
+
+  describe('non property constructor resolution', function () {
+    @Injectable()
+    class Dep {
+      id = 'hello world'
+    }
+
+    @Injectable()
+    class Root {
+      readonly dep: Dep
+
+      constructor(private _dep: Dep) {
+        this.dep = _dep
+      }
+    }
+
+    it('should injection values on non exposed constructor arguments', function () {
+      const di = DI.setup()
+      const root = di.get(Root)
+
+      expect(root).toBeInstanceOf(Root)
+      expect(root.dep).toBeInstanceOf(Dep)
+      expect(root.dep.id).toEqual('hello world')
     })
   })
 })
