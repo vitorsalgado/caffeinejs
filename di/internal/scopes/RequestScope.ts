@@ -11,7 +11,7 @@ export class RequestScope implements Scope {
   private readonly _instances = new Map<number, unknown>()
   private _entered = false
 
-  begin() {
+  activate() {
     if (this._entered) {
       throw new IllegalScopeStateError(
         'Request scoping block already in progress. ' + 'Make sure to start one request scope block per time.',

@@ -57,7 +57,7 @@ describe('Request Scope', function () {
   const di = DI.setup()
 
   async function requestListener(req: IncomingMessage, res: ServerResponse) {
-    scope.begin()
+    scope.activate()
 
     const ctrl = di.get(Ctrl)
 
@@ -87,8 +87,8 @@ describe('Request Scope', function () {
   })
 
   it('should fail when entering twice on request scope', async function () {
-    scope.begin()
-    expect(() => scope.begin()).toThrow()
+    scope.activate()
+    expect(() => scope.activate()).toThrow()
     await scope.finish()
   })
 

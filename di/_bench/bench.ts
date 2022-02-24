@@ -87,7 +87,7 @@ const controller = new Controller(new Service(new RepoImpl()))
 const fastify = Fastify()
 
 fastify.get('/request', async (req, res) => {
-  scope.begin()
+  scope.activate()
 
   res.status(200).send(di.get(Controller).find())
 
@@ -95,7 +95,7 @@ fastify.get('/request', async (req, res) => {
 })
 
 fastify.get('/request-with-singleton', async (req, res) => {
-  scope.begin()
+  scope.activate()
 
   res.status(200).send(di.get(SingletonController).find())
 
