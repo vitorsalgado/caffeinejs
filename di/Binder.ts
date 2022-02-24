@@ -38,7 +38,10 @@ export class BindTo<T> implements Binder<T> {
   ) {}
 
   toClass(ctor: Ctor<T>): BindToOptions<T> {
-    check(typeof ctor === 'function', `Binding .toClass() parameter must be class reference. Received: ${typeof ctor}`)
+    check(
+      typeof ctor === 'function',
+      `Binding .toClass() parameter must be class reference. Received: '${typeof ctor}'`,
+    )
 
     this.binding.rawProvider = new ClassProvider(ctor)
     this.container.configureBinding(this.token, this.binding)
@@ -49,7 +52,8 @@ export class BindTo<T> implements Binder<T> {
   toSelf(): BindToOptions<T> {
     if (isNamedToken(this.token)) {
       throw new InvalidBindingError(
-        '.toSelf() cannot be used when binding key is not a class type. ' + `Current token is: ${tokenStr(this.token)}`,
+        '.toSelf() cannot be used when binding key is not a class type. ' +
+          `Current token is: '${tokenStr(this.token)}' of type '${typeof this.token}'`,
       )
     }
 
@@ -75,11 +79,11 @@ export class BindTo<T> implements Binder<T> {
   toFactory(factory: (ctx: ResolutionContext) => T): BinderOptions<T> {
     check(
       typeof factory === 'function',
-      `Binding .toFactory() parameter must be function type. Received: ${typeof factory}`,
+      `Binding .toFactory() parameter must be function type. Received: '${typeof factory}'`,
     )
     check(
       factory.length <= 1,
-      `Binding .toFactory() must receive a function with at most one argument, which is the provider context. Received a function with '${factory.length}' argument(s).`,
+      `Binding .toFactory() must receive a function with at most one argument, which is the provider context. Received a function with '${factory.length}' arguments.`,
     )
 
     this.binding.rawProvider = new FactoryProvider(factory)

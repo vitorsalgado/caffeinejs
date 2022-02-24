@@ -9,6 +9,7 @@ import { DI } from './DI.js'
 import { PostResolutionInterceptor } from './PostResolutionInterceptor.js'
 import { ResolutionContext } from './ResolutionContext.js'
 import { FunctionPostResolutionInterceptor } from './internal/interceptors/FunctionPostResolutionInterceptor.js'
+import { check } from './internal/utils/check.js'
 
 export interface BinderOptions<T> {
   as(scopeId: Identifier): BinderOptions<T>
@@ -34,6 +35,8 @@ export interface BinderOptions<T> {
   byPassPostProcessors(): BinderOptions<T>
 
   intercept(interceptor: PostResolutionInterceptor<T>): BinderOptions<T>
+
+  options<O extends object>(options: O): BinderOptions<T>
 }
 
 export class BindToOptions<T> implements BinderOptions<T> {
@@ -134,6 +137,15 @@ export class BindToOptions<T> implements BinderOptions<T> {
     this.binding.interceptors.push(
       notNil(typeof interceptor === 'function' ? new FunctionPostResolutionInterceptor(interceptor) : interceptor),
     )
+    this.container.configureBinding(this.token, this.binding)
+
+    return this
+  }
+
+  options<O extends object>(options: O): BinderOptions<T> {
+    check(typeof options === 'object', `Options must be an object type. Received: '${typeof options}'`)
+
+    this.binding.options = options
     this.container.configureBinding(this.token, this.binding)
 
     return this

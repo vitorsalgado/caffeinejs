@@ -44,16 +44,6 @@ describe('DI', function () {
     expect(protoStr).toEqual('[object DI]')
   })
 
-  it('should return the number of registered components when calling size()', function () {
-    const di = DI.setup()
-    const expected = 3 + 7 // user registered + internals
-
-    di.setup()
-    di.setup()
-
-    expect(di.size).toEqual(expected)
-  })
-
   it('should allow to iterate all binding entries', function () {
     const di = DI.setup()
     const entries = new Map(di.entries())
@@ -105,6 +95,7 @@ describe('DI', function () {
 
       class Custom implements MetadataReader {
         constructor(private readonly original: MetadataReader) {}
+
         read(token: Token): Partial<Binding> {
           spy()
           return this.original.read(token)
@@ -134,5 +125,19 @@ describe('DI', function () {
       expect(conf).toHaveLength(1)
       expect(conf[0]).toEqual(Conf)
     })
+  })
+
+  // This test considers ALL injectable defined in this test file
+  // --
+  it('should return the number of registered components when calling size()', function () {
+    const di = DI.setup()
+    const userDefined = 6 // all injectables in this file
+    const internals = 7 // DI internal beans
+    const expected = userDefined + internals
+
+    di.setup()
+    di.setup()
+
+    expect(di.size).toEqual(expected)
   })
 })

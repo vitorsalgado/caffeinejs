@@ -14,7 +14,7 @@ export interface ConfigurationProviderOptions {
   primary: boolean
   late: boolean
   lazy: boolean
-  options: unknown
+  options: object
   byPassPostProcessors: boolean
   interceptors: PostResolutionInterceptor[]
 }

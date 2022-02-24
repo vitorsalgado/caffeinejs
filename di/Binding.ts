@@ -26,7 +26,7 @@ export interface Binding<T = any> {
   lazy?: boolean
   preDestroy?: Identifier
   postConstruct?: Identifier
-  options?: unknown
+  options?: object
   byPassPostProcessors?: boolean
 }
 
@@ -41,7 +41,7 @@ export function newBinding<T>(initial: Partial<Binding<T>> = {}): Binding<T> {
     namespace: initial.namespace || '',
     names: initial.names || [],
     conditionals: initial.conditionals || [],
-    options: initial.options,
+    options: initial.options || {},
     configuredBy: initial.configuredBy,
     primary: initial.primary,
     lazy: initial.lazy,
