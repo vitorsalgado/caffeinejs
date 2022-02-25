@@ -1,8 +1,8 @@
 import { expect } from '@jest/globals'
-import { Token } from '../Token.js'
 import { DI } from '../DI.js'
 import { Injectable } from '../decorators/Injectable.js'
 import { Optional } from '../decorators/Optional.js'
+import { FilterContext } from '../Filter.js'
 
 describe('Filters', function () {
   const kMeta = '__test_filter'
@@ -13,7 +13,7 @@ describe('Filters', function () {
     }
   }
 
-  const filter = (token: Token) => Reflect.getOwnMetadata(kMeta, token) === true
+  const filter = (ctx: FilterContext) => Reflect.getOwnMetadata(kMeta, ctx.token) === true
 
   @Injectable()
   class Valid {}

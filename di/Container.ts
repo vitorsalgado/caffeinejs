@@ -40,6 +40,8 @@ export interface Container {
 
   getMany<T, A = unknown>(token: Token<T>, args?: A): T[]
 
+  getAsync<T, A = unknown>(token: Token<T>, args?: A): Promise<T>
+
   has<T>(token: Token<T>, checkParent?: boolean): boolean
 
   search(predicate: <T>(token: Token<T>, registration: Binding) => boolean): BindingEntry[]

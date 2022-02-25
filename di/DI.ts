@@ -55,6 +55,7 @@ import { InternalHookListener } from './internal/InternalHookListener.js'
 import { HookListener } from './HookListener.js'
 import { RejectionWrapper } from './internal/RejectionWrapper.js'
 import { BagArgsClassProvider } from './internal/providers/BagArgsClassProvider.js'
+import { AsyncResolver } from './AsyncResolver.js'
 
 export class DI implements Container {
   protected static readonly Scopes = new Map(DI.builtInScopes().entries())
@@ -349,6 +350,22 @@ export class DI implements Container {
     }
 
     return bindings.map(binding => Resolver.resolve(this, token, binding, args))
+  }
+
+  getAsync<T, A = unknown>(token: Token<T>, args?: A): Promise<T> {
+    const bindings = this.getBindings<T>(token)
+
+    if (bindings.length > 1) {
+      const primary = bindings.find(x => x.primary)
+
+      if (primary) {
+        return AsyncResolver.resolveAsync<T>(this, token, primary, args)
+      }
+
+      throw new NoUniqueInjectionForTokenError(token)
+    }
+
+    return AsyncResolver.resolveAsync<T>(this, token, bindings[0], args)
   }
 
   has<T>(token: Token<T>, checkParent = false): boolean {
@@ -683,6 +700,6 @@ export class DI implements Container {
   }
 
   protected filter(token: Token, binding: Binding): boolean {
-    return this.filters.every(filter => !filter(token, binding))
+    return this.filters.every(filter => !filter({ token, binding }))
   }
 }

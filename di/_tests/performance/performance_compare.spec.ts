@@ -2,9 +2,9 @@ import { performance } from 'perf_hooks'
 import { expect } from '@jest/globals'
 import { yellow, blue } from 'colorette'
 import { gray } from 'colorette'
-import { Root } from './_fixtures/caf.js'
-import { di } from './_fixtures/caf.js'
-import { RootSingleton } from './_fixtures/caf.js'
+import { Root } from './_fixtures/di.js'
+import { di } from './_fixtures/di.js'
+import { RootSingleton } from './_fixtures/di.js'
 import { inv } from './_fixtures/inversify.js'
 import { InvRoot } from './_fixtures/inversify.js'
 import { tsy } from './_fixtures/tsy.js'
@@ -53,10 +53,44 @@ describe('Performance Compare', function () {
     return result
   }
 
+  async function resolveAsync(times: number, res: () => Promise<unknown>) {
+    const result = {
+      avg: -1,
+      max: -1,
+      min: Number.MAX_SAFE_INTEGER,
+      items: [] as { pos: number; total: number }[],
+    }
+
+    let i: number
+
+    for (i = 0; i < times; i++) {
+      const start = performance.now()
+
+      await res()
+
+      const end = performance.now()
+      const total = end - start
+
+      if (total < result.min) {
+        result.min = total
+      }
+      if (total > result.max) {
+        result.max = total
+      }
+
+      result.items.push({ pos: i, total })
+    }
+
+    result.avg = result.items.reduce((p, c) => p + c.total, 0) / result.items.length
+    result.items.sort((a, b) => b.total - a.total)
+
+    return result
+  }
+
   it('should resolve 15k times in less time then the others', async () => {
     const times = 15000
 
-    return bootstrap().then(nestApp => {
+    return bootstrap().then(async nestApp => {
       expect(inv.get(InvRoot)).toBeInstanceOf(InvRoot)
       expect(tsy.resolve(TsyRoot)).toBeInstanceOf(TsyRoot)
       expect(loopCtx.getSync(LoopRoot.name)).toBeInstanceOf(LoopRoot)
@@ -69,8 +103,11 @@ describe('Performance Compare', function () {
       const nestRes = resolve(times, () => nestApp.get(NestRoot))
       const loopRes = resolve(times, () => loopCtx.getSync(LoopRoot.name))
 
+      const diAsync = await resolveAsync(times, () => di.getAsync(RootSingleton))
+
       console.log('DI Avg: ' + gray(String(diRes.avg)))
       console.log('DI Singleton Avg: ' + gray(String(diSingletonRes.avg)))
+      console.log('DI Async Avg: ' + gray(String(diAsync.avg)))
 
       console.log('Inversify Avg: ' + gray(String(invRes.avg)))
       if (diRes.avg > invRes.avg) {
