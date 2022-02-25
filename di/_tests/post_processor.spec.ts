@@ -101,20 +101,24 @@ describe('Post Processors', function () {
   const ppOne = new PpOne()
   const ppTwo = new PpTwo()
 
+  const di = new DI()
+
   beforeAll(() => {
     DI.bindScope(kScope, new CustomTransient())
-    DI.addPostProcessor(new PpOne())
-    DI.addPostProcessor(new PpTwo())
+
+    di.addPostProcessor(new PpOne())
+    di.addPostProcessor(new PpTwo())
   })
 
   afterAll(() => {
     DI.unbindScope(kScope)
-    DI.removePostProcessor(ppOne)
-    DI.removePostProcessor(ppTwo)
+
+    di.removeAllPostProcessors()
   })
 
   it('should execute post processors calling the provider just one time per execution', async function () {
-    const di = DI.setup()
+    di.setup()
+
     const dep = di.get(Dep)
     const nonDep = di.get(NonDep)
     const conf = di.get(Conf)

@@ -7,6 +7,9 @@ import { DI } from './DI.js'
 import { Lifecycle } from './Lifecycle.js'
 import { MetadataReader } from './MetadataReader.js'
 import { HookListener } from './HookListener.js'
+import { Filter } from './Filter.js'
+import { PostProcessor } from './PostProcessor.js'
+import { notNil } from './internal/utils/notNil.js'
 
 export interface ContainerOptions {
   namespace: Identifier
@@ -55,6 +58,12 @@ export interface Container {
 
   getBindings<T>(token: Token<T>): Binding<T>[]
 
+  addPostProcessor(postProcessor: PostProcessor): void
+
+  removePostProcessor(posProcessor: PostProcessor): void
+
+  removeAllPostProcessors(): void
+
   clear(): void
 
   resetInstances(): void
@@ -66,6 +75,8 @@ export interface Container {
   initInstances(): void
 
   dispose(): Promise<void>
+
+  addFilters(...filters: Filter[]): void
 
   setup(): void
 

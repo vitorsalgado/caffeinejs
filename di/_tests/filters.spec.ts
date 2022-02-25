@@ -30,9 +30,10 @@ describe('Filters', function () {
   describe('using a custom filter', function () {
     describe('when it doesnt match', function () {
       it('should not register the component in the container', function () {
-        DI.addFilters(filter)
+        const di = new DI()
 
-        const di = DI.setup()
+        di.addFilters(filter)
+        di.setup()
 
         expect(di.has(Valid)).toBeTruthy()
         expect(di.has(NonValid)).toBeFalsy()

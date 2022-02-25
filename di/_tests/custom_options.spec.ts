@@ -85,17 +85,18 @@ describe('Options', function () {
 
     it('should pass options to configuration provided components', function () {
       const pp = new SpyPp()
+      const di = new DI()
 
-      DI.addPostProcessor(pp)
+      di.addPostProcessor(pp)
+      di.setup()
 
-      const di = DI.setup()
       const dep = di.get(BeanDep)
 
       expect(dep).toBeInstanceOf(BeanDep)
       expect(spy).toHaveBeenCalledTimes(1)
       expect(spy).toHaveBeenCalledWith(options)
 
-      DI.removePostProcessor(pp)
+      di.removePostProcessor(pp)
     })
 
     describe('applying multiple options', function () {

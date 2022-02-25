@@ -57,10 +57,10 @@ import { RejectionWrapper } from './internal/RejectionWrapper.js'
 import { BagArgsClassProvider } from './internal/providers/BagArgsClassProvider.js'
 
 export class DI implements Container {
-  protected static Filters: Filter[] = []
   protected static readonly Scopes = new Map(DI.builtInScopes().entries())
-  protected static readonly PostProcessors = new Set<PostProcessor>()
 
+  protected readonly postProcessors = new Set<PostProcessor>()
+  protected readonly filters: Filter[] = []
   protected readonly bindingRegistry = new BindingRegistry()
   protected readonly bindingNames = new Map<Identifier, Binding[]>()
   protected readonly multipleBeansRefCache = new Map<Token, Binding[]>()
@@ -71,7 +71,7 @@ export class DI implements Container {
   protected readonly overriding?: boolean
 
   readonly hooks: HookListener = new InternalHookListener()
-  readonly namespace: Identifier
+  readonly namespace: string | symbol
   readonly parent?: DI
 
   constructor(options: Partial<ContainerOptions> | string | symbol = '', parent?: DI) {
@@ -133,21 +133,9 @@ export class DI implements Container {
     return scope as T
   }
 
-  static addPostProcessor(postProcessor: PostProcessor) {
-    DI.PostProcessors.add(notNil(postProcessor))
-  }
-
-  static removePostProcessor(posProcessor: PostProcessor) {
-    DI.PostProcessors.delete(posProcessor)
-  }
-
   static async scan(paths: string[]): Promise<void> {
     notNil(paths)
     await Promise.all(paths.map(path => loadModule(path)))
-  }
-
-  static addFilters(...filters: Filter[]) {
-    DI.Filters.push(...notNil(filters))
   }
 
   static arg(token: Token, options?: Omit<TokenSpec, 'token'>): TokenSpec {
@@ -266,7 +254,7 @@ export class DI implements Container {
     }
 
     if (!binding.byPassPostProcessors) {
-      for (const postProcessor of DI.PostProcessors) {
+      for (const postProcessor of this.postProcessors) {
         chain.push(new BeforeInitInterceptor(postProcessor))
       }
     }
@@ -276,7 +264,7 @@ export class DI implements Container {
     }
 
     if (!binding.byPassPostProcessors) {
-      for (const postProcessor of DI.PostProcessors) {
+      for (const postProcessor of this.postProcessors) {
         chain.push(new AfterInitInterceptor(postProcessor))
       }
     }
@@ -446,10 +434,17 @@ export class DI implements Container {
       this,
     )
 
-    this.bindingRegistry
-      .toArray()
-      .filter(x => x.binding.scopeId === Lifecycle.CONTAINER)
-      .forEach(({ token, binding }) => child.bindingRegistry.register(token, newBinding({ ...binding, id: undefined })))
+    child.addFilters(...this.filters)
+
+    for (const value of this.postProcessors.values()) {
+      child.addPostProcessor(value)
+    }
+
+    for (const [token, binding] of this.bindingRegistry.entries()) {
+      if (binding.scopeId === Lifecycle.CONTAINER) {
+        child.bindingRegistry.register(token, newBinding({ ...binding, id: undefined }))
+      }
+    }
 
     DI.bindInternalComponents(child)
 
@@ -470,6 +465,18 @@ export class DI implements Container {
     }
 
     return []
+  }
+
+  addPostProcessor(postProcessor: PostProcessor) {
+    this.postProcessors.add(notNil(postProcessor))
+  }
+
+  removePostProcessor(posProcessor: PostProcessor) {
+    this.postProcessors.delete(posProcessor)
+  }
+
+  removeAllPostProcessors() {
+    this.postProcessors.clear()
   }
 
   clear(): void {
@@ -546,6 +553,10 @@ export class DI implements Container {
         return Promise.reject(rejections.map(x => x.reason))
       })
       .finally(() => this.hooks.emit('onDisposed'))
+  }
+
+  addFilters(...filters: Filter[]) {
+    this.filters.push(...notNil(filters))
   }
 
   setup(): void {
@@ -672,6 +683,6 @@ export class DI implements Container {
   }
 
   protected filter(token: Token, binding: Binding): boolean {
-    return DI.Filters.every(filter => !filter(token, binding))
+    return this.filters.every(filter => !filter(token, binding))
   }
 }
