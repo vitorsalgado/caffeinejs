@@ -3,7 +3,7 @@ import { ResolutionContext } from '../../ResolutionContext.js'
 import { Resolver } from '../../Resolver.js'
 import { Ctor } from '../types.js'
 
-export class BagArgsClassProvider<T> implements Provider<T> {
+export class ConstructorDestructuringProvider<T> implements Provider<T> {
   constructor(private readonly clazz: Ctor<T>) {}
 
   provide(ctx: ResolutionContext): T {

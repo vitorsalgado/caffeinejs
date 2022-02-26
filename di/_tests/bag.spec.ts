@@ -29,7 +29,7 @@ describe('Injection Bag', function () {
   class Root {
     constructor(
       @Bag([
-        bagItem(Dep1),
+        bagItem(Dep1, 'dep1'),
         { token: Dep2, optional: true, key: 'dep2' },
         bagItem(kDep, 'dep3'),
         bagItem(Base, 'base', { multiple: true }),
@@ -41,11 +41,11 @@ describe('Injection Bag', function () {
   @Injectable()
   class DiffTypes {
     constructor(
-      @Bag([bagItem(Dep1), { token: Dep2, optional: true, key: 'dep2' }]) readonly args: { dep1: Dep1 },
+      @Bag([bagItem(Dep1, 'dep1'), { token: Dep2, optional: true, key: 'dep2' }]) readonly args: { dep1: Dep1 },
       @Bag([bagItem(kDep, 'dep3')]) readonly other: { dep3: Dep3 },
       @Optional() readonly dep2: Dep2 | undefined,
       @InjectAll(Base) readonly base: Base[],
-      @Bag([bagItems(Base)]) readonly another: { base: Base[] },
+      @Bag([bagItems(Base, 'base')]) readonly another: { base: Base[] },
     ) {}
   }
 

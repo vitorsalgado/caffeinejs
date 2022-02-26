@@ -54,7 +54,7 @@ import { containerToString } from './internal/utils/containerToString.js'
 import { InternalHookListener } from './internal/InternalHookListener.js'
 import { HookListener } from './HookListener.js'
 import { RejectionWrapper } from './internal/RejectionWrapper.js'
-import { BagArgsClassProvider } from './internal/providers/BagArgsClassProvider.js'
+import { ConstructorDestructuringProvider } from './internal/providers/ConstructorDestructuringProvider.js'
 import { AsyncResolver } from './AsyncResolver.js'
 
 export class DI implements Container {
@@ -182,13 +182,16 @@ export class DI implements Container {
     const hasBag = incoming.injections.some(x => x.bag && x.bag.length > 0)
 
     if (hasBag) {
-      if (incoming.rawProvider && !(incoming.rawProvider instanceof BagArgsClassProvider)) {
+      if (incoming.rawProvider && !(incoming.rawProvider instanceof ConstructorDestructuringProvider)) {
         throw new InvalidBindingError(
           `Binding '${tokenStr(token)}' contains constructor @Bag() parameters but is using a different provider. ` +
-            solutions(`- Check if the component '${tokenStr(token)}' is using a custom provider and remove it`),
+            solutions(
+              `- Check if the component '${tokenStr(token)}' is using a custom provider and remove it. ` +
+                `When using constructor destructuring injection, 'ConstructorDestructuringProvider' need to be used`,
+            ),
         )
       } else {
-        incoming.rawProvider = new BagArgsClassProvider(incoming.type as Ctor)
+        incoming.rawProvider = new ConstructorDestructuringProvider(incoming.type as Ctor)
       }
     }
 
