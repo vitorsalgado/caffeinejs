@@ -44,7 +44,7 @@ export interface Container {
 
   has<T>(token: Token<T>, checkParent?: boolean): boolean
 
-  search(predicate: <T>(token: Token<T>, registration: Binding) => boolean): BindingEntry[]
+  search(predicate: <T>(token: Token<T>, binding: Binding) => boolean): BindingEntry[]
 
   bind<T>(token: Token<T>): Binder<T>
 

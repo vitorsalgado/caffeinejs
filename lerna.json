@@ -4,6 +4,7 @@
   "useWorkspaces": true,
   "packages": [
     "application",
+    "web",
     "std",
     "di",
     "examples/*",

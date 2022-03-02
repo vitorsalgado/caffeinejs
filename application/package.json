@@ -6,7 +6,7 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "start": "node --loader ts-node/esm main.ts",
+    "start": "node --loader ts-node/esm index.ts",
     "build": "rm -rf dist && tsc --build --force tsconfig.build.json",
     "test": "jest --detectOpenHandles",
     "test:coverage": "jest --detectOpenHandles --coverage"

@@ -1,9 +1,8 @@
 import { notNil } from '@caffeinejs/std'
 import { ApplicationContext } from '../ApplicationContext.js'
-import { ConfigurationSources } from './ConfigurationSources.js'
-import { ConfigurationSourceLoader } from './ConfigurationSourceLoader.js'
+import { Sources } from './Sources.js'
+import { SourceLoader } from './SourceLoader.js'
 import { EnvironmentPostProcessor } from './EnvironmentPostProcessor.js'
-import { ConfigurationSource } from './ConfigurationSource.js'
 
 export class Environment {
   private readonly _envs = new Map<string, unknown>()
@@ -12,11 +11,11 @@ export class Environment {
   private _config: object | undefined
 
   constructor(
-    private sources: ConfigurationSource[] = [],
-    private readonly _configurationSourceLoaders: ConfigurationSourceLoader[] = [],
+    configurationSources: Sources,
+    private readonly _loaders: SourceLoader[] = [],
     private readonly _postProcessors: EnvironmentPostProcessor[] = [],
   ) {
-    this._configurationSources = new ConfigurationSources(sources)
+    this._configurationSources = configurationSources
   }
 
   getEnv<T>(key: string): T | undefined
@@ -44,8 +43,12 @@ export class Environment {
     return this._configs.get(key) as T | undefined
   }
 
-  configurationSources(): ConfigurationSources {
+  sources(): Sources {
     return this._configurationSources
+  }
+
+  addLoader(loader: SourceLoader) {
+    this._loaders.push(loader)
   }
 
   configurations<T extends object>(): T {
@@ -61,7 +64,7 @@ export class Environment {
 
     for (const source of this._configurationSources.getSources()) {
       const ext = source.source.split('.').pop() || source.loadAsExtension || ''
-      const loader = this._configurationSourceLoaders.find(x => x.extensions().includes(ext))
+      const loader = this._loaders.find(x => x.extensions().includes(ext))
 
       if (loader) {
         loaders.push(loader.load(source))

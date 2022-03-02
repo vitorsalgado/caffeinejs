@@ -375,7 +375,7 @@ export class DI implements Container {
     return this.bindingRegistry.has(token) || (checkParent && (this.parent || false) && this.parent.has(token, true))
   }
 
-  search(predicate: <T>(token: Token<T>, registration: Binding) => boolean): BindingEntry[] {
+  search(predicate: <T>(token: Token<T>, binding: Binding) => boolean): BindingEntry[] {
     notNil(predicate)
 
     const result: BindingEntry[] = []

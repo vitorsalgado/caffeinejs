@@ -1,18 +1,18 @@
 import { notNil } from '@caffeinejs/std'
-import { ConfigurationSource } from './ConfigurationSource.js'
+import { Source } from './Source.js'
 
-export class ConfigurationSources {
-  constructor(private readonly configSources: Array<ConfigurationSource>) {}
+export class Sources {
+  constructor(private readonly configSources: Array<Source> = []) {}
 
-  get(name: string): ConfigurationSource | unknown {
+  get(name: string): Source | unknown {
     return this.configSources.find(x => x.name === notNil(name))
   }
 
-  addFirst(source: ConfigurationSource) {
+  addFirst(source: Source) {
     this.configSources.unshift(notNil(source))
   }
 
-  addBefore(name: string, source: ConfigurationSource) {
+  addBefore(name: string, source: Source) {
     notNil(name)
     notNil(source)
 
@@ -25,7 +25,7 @@ export class ConfigurationSources {
     this.configSources.splice(index, 0, source)
   }
 
-  addAfter(name: string, source: ConfigurationSource) {
+  addAfter(name: string, source: Source) {
     notNil(name)
     notNil(source)
 
@@ -38,7 +38,7 @@ export class ConfigurationSources {
     this.configSources.splice(index + 1, 0, source)
   }
 
-  addLast(source: ConfigurationSource) {
+  addLast(source: Source) {
     this.configSources.push(notNil(source))
   }
 
@@ -53,7 +53,7 @@ export class ConfigurationSources {
     this.configSources.splice(0)
   }
 
-  getSources(): ConfigurationSource[] {
+  getSources(): Source[] {
     return [...this.configSources]
   }
 }

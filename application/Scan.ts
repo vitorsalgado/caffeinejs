@@ -11,6 +11,6 @@ export function Scan(patterns: string | string[] | Partial<ScanOptions>): ClassD
   return function (target) {
     const opts = typeof patterns === 'string' || Array.isArray(patterns) ? { patterns } : patterns
 
-    Reflections.define(Vars.APP_SCAN, opts, target)
+    Reflections.set(Vars.APP_SCAN, opts, target)
   }
 }

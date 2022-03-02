@@ -1,15 +1,20 @@
 // import { beforeEach } from '@jest/globals'
 // import { afterEach } from '@jest/globals'
 // import { expect } from '@jest/globals'
+// import { Json } from '@caffeinejs/std'
 // import { ConfigurationSourceLoader } from '../ConfigurationSourceLoader.js'
 // import { ConfigRegistrar } from '../ConfigRegistrar.js'
+// import { ConfigurationSource } from '../ConfigurationSource.js'
+// import { Environment } from '../Environment.js'
 //
 // describe('Configuration loader', function () {
 //   describe('when configuring', function () {
+//     const environment = new Environment()
+//
 //     class One implements ConfigurationSourceLoader {
 //       readonly name = 'one'
 //
-//       load(): Promise<object> {
+//       load(source: ConfigurationSource): Promise<Json> {
 //         return Promise.resolve({ test: 'one' })
 //       }
 //
@@ -18,10 +23,10 @@
 //       }
 //     }
 //
-//     class Two implements ConfigurationSourceLoader<object> {
+//     class Two implements ConfigurationSourceLoader {
 //       readonly name = 'two'
 //
-//       load(): Promise<object> {
+//       load(source: ConfigurationSource): Promise<Json> {
 //         return Promise.resolve({ test: 'two' })
 //       }
 //
@@ -30,10 +35,10 @@
 //       }
 //     }
 //
-//     class Three implements ConfigurationSourceLoader<object> {
+//     class Three implements ConfigurationSourceLoader {
 //       readonly name = 'three'
 //
-//       load(): Promise<object> {
+//       load(source: ConfigurationSource): Promise<Json> {
 //         return Promise.resolve({ test: 'three' })
 //       }
 //
@@ -42,10 +47,10 @@
 //       }
 //     }
 //
-//     class Four implements ConfigurationSourceLoader<object> {
+//     class Four implements ConfigurationSourceLoader {
 //       readonly name = 'four'
 //
-//       load(): Promise<object> {
+//       load(source: ConfigurationSource): Promise<Json> {
 //         return Promise.resolve({ test: 'one' })
 //       }
 //
@@ -54,10 +59,10 @@
 //       }
 //     }
 //
-//     class NewOne implements ConfigurationSourceLoader<object> {
+//     class NewOne implements ConfigurationSourceLoader {
 //       readonly name = 'new_one'
 //
-//       load(): Promise<object> {
+//       load(source: ConfigurationSource): Promise<Json> {
 //         return Promise.resolve({ test: 'new_one' })
 //       }
 //

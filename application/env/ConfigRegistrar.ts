@@ -1,18 +1,18 @@
 import { notNil } from '@caffeinejs/std'
-import { ConfigurationSource } from './ConfigurationSource.js'
+import { Source } from './Source.js'
 
 export namespace ConfigRegistrar {
-  const loaders: Array<ConfigurationSource> = []
+  const loaders: Array<Source> = []
 
-  export function get(name: string): ConfigurationSource | unknown {
+  export function get(name: string): Source | unknown {
     return loaders.find(x => x.name === notNil(name))
   }
 
-  export function addFirst(source: ConfigurationSource) {
+  export function addFirst(source: Source) {
     loaders.unshift(notNil(source))
   }
 
-  export function addBefore(name: string, source: ConfigurationSource) {
+  export function addBefore(name: string, source: Source) {
     notNil(name)
     notNil(source)
 
@@ -25,7 +25,7 @@ export namespace ConfigRegistrar {
     loaders.splice(index, 0, source)
   }
 
-  export function addAfter(name: string, source: ConfigurationSource) {
+  export function addAfter(name: string, source: Source) {
     notNil(name)
     notNil(source)
 
@@ -38,7 +38,7 @@ export namespace ConfigRegistrar {
     loaders.splice(index + 1, 0, source)
   }
 
-  export function addLast(source: ConfigurationSource) {
+  export function addLast(source: Source) {
     loaders.push(notNil(source))
   }
 

@@ -4,6 +4,6 @@ import { Vars } from './internal/Vars.js'
 
 export function Profile(profile: string): ClassDecorator {
   return function (target) {
-    Reflections.define(Vars.APP_PROFILE, notNil(profile), target)
+    Reflections.set(Vars.APP_PROFILE, notNil(profile), target)
   }
 }

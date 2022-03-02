@@ -3,4 +3,9 @@
   "compilerOptions": {
     "outDir": "./dist"
   },
+  "references": [
+    { "path": "../std", "prepend": false },
+    { "path": "../di", "prepend": false },
+    { "path": "../application", "prepend": false }
+  ]
 }

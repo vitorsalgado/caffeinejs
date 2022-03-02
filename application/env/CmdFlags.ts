@@ -1,3 +1,3 @@
-export class Flags {
+export class CmdFlags {
   constructor(private readonly args: string[]) {}
 }

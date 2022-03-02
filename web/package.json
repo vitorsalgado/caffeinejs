@@ -13,5 +13,11 @@
   "files": [
     "dist",
     "package.json"
-  ]
+  ],
+  "dependencies": {
+    "@caffeinejs/application": "workspace:^",
+    "@caffeinejs/di": "workspace:^",
+    "@caffeinejs/std": "workspace:^",
+    "fastify": "^3.27.2"
+  }
 }
