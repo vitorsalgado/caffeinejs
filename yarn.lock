@@ -505,7 +505,7 @@ __metadata:
     inversify: ^6.0.1
     jest: 27.5.1
     lerna: ^4.0.0
-    lint-staged: ^12.3.4
+    lint-staged: ^12.3.5
     nodemon: ^2.0.15
     pinst: ^3.0.0
     prettier: ^2.5.1
@@ -514,7 +514,7 @@ __metadata:
     supertest: ^6.2.2
     table: ^6.8.0
     ts-jest: 27.1.3
-    ts-node: ^10.6.0
+    ts-node: ^10.7.0
     tsyringe: ^4.6.0
     typescript: ^4.6.2
     uuid: ^8.3.2
@@ -533,9 +533,9 @@ __metadata:
   dependencies:
     "@caffeinejs/application": "workspace:^"
     "@caffeinejs/di": ^0.0.0
-    mongodb: ^4.4.0
+    mongodb: ^4.4.1
     reflect-metadata: ^0.1.13
-    typeorm: ^0.2.44
+    typeorm: ^0.2.45
   languageName: unknown
   linkType: soft
 
@@ -7248,9 +7248,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:^12.3.4":
-  version: 12.3.4
-  resolution: "lint-staged@npm:12.3.4"
+"lint-staged@npm:^12.3.5":
+  version: 12.3.5
+  resolution: "lint-staged@npm:12.3.5"
   dependencies:
     cli-truncate: ^3.1.0
     colorette: ^2.0.16
@@ -7267,7 +7267,7 @@ __metadata:
     yaml: ^1.10.2
   bin:
     lint-staged: bin/lint-staged.js
-  checksum: 4e0b4b9da4183a0daeab35d41e4d243fb1270a39db997efa0c3745fa148a7a4b8b723a51cb757595fc8bb118796ca1465e67aede72f25e9ea48165aec36cec3b
+  checksum: 6653c7078b36741e521e5f309b56bb75db198a05cbdd188124ff82a290e352ade3eb1e6080265729e19711ac08d190e300874af00e4e540b57b3c8f0690e2573
   languageName: node
   linkType: hard
 
@@ -7803,29 +7803,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb-connection-string-url@npm:^2.4.1":
-  version: 2.4.2
-  resolution: "mongodb-connection-string-url@npm:2.4.2"
+"mongodb-connection-string-url@npm:^2.5.2":
+  version: 2.5.2
+  resolution: "mongodb-connection-string-url@npm:2.5.2"
   dependencies:
     "@types/whatwg-url": ^8.2.1
     whatwg-url: ^11.0.0
-  checksum: aed2718840c79f8d6be35309e308bf4466a009256da6b02e6212abeef39ae27bf6101273580696e246e51ee4f7471e2d938c44e8f8a5194982092f692b37c571
+  checksum: bd13af7d62d33e2d6e5217692961e34b2dafbbba5f41d361417257592754df3e925efc00fa8a5e038624e284245dab39e913d5f06ff962feede86d5f58fc5827
   languageName: node
   linkType: hard
 
-"mongodb@npm:^4.4.0":
-  version: 4.4.0
-  resolution: "mongodb@npm:4.4.0"
+"mongodb@npm:^4.4.1":
+  version: 4.4.1
+  resolution: "mongodb@npm:4.4.1"
   dependencies:
     bson: ^4.6.1
     denque: ^2.0.1
-    mongodb-connection-string-url: ^2.4.1
+    mongodb-connection-string-url: ^2.5.2
     saslprep: ^1.0.3
-    socks: ^2.6.1
+    socks: ^2.6.2
   dependenciesMeta:
     saslprep:
       optional: true
-  checksum: e485927d1def94f28564bdcb98d82144914bf23854e8bd15437fcef0d9a36f36997f7e97e0aad730ebf299c6a919430669198e02b5e2f4410f74a4002409b182
+  checksum: 5a2924df04612cc3dfd54e6f4a9b4ab01683fe2bcb8a6aa424485939fc213aea4c7e9b59ef244aa30ccc14948906990335a6371310fe354aec8206983f3f733a
   languageName: node
   linkType: hard
 
@@ -9764,7 +9764,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"socks@npm:^2.3.3, socks@npm:^2.6.1":
+"socks@npm:^2.3.3, socks@npm:^2.6.1, socks@npm:^2.6.2":
   version: 2.6.2
   resolution: "socks@npm:2.6.2"
   dependencies:
@@ -10549,9 +10549,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-node@npm:^10.6.0":
-  version: 10.6.0
-  resolution: "ts-node@npm:10.6.0"
+"ts-node@npm:^10.7.0":
+  version: 10.7.0
+  resolution: "ts-node@npm:10.7.0"
   dependencies:
     "@cspotcode/source-map-support": 0.7.0
     "@tsconfig/node10": ^1.0.7
@@ -10579,10 +10579,11 @@ __metadata:
   bin:
     ts-node: dist/bin.js
     ts-node-cwd: dist/bin-cwd.js
+    ts-node-esm: dist/bin-esm.js
     ts-node-script: dist/bin-script.js
     ts-node-transpile-only: dist/bin-transpile.js
     ts-script: dist/bin-script-deprecated.js
-  checksum: bc7589d8c38dc75a2a6f832ac43faaac7edd3d0ef4643f46a9deeaabcdd35722e8c89e729fcd39a16069b30d09e297c2fb3eec917a82dd3f1e7da8b352bbd447
+  checksum: 2a379e43f7478d0b79e1e63af91fe222d83857727957df4bd3bdf3c0a884de5097b12feb9bbf530074526b8874c0338b0e6328cf334f3a5e2c49c71e837273f7
   languageName: node
   linkType: hard
 
@@ -10731,9 +10732,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typeorm@npm:^0.2.44":
-  version: 0.2.44
-  resolution: "typeorm@npm:0.2.44"
+"typeorm@npm:^0.2.45":
+  version: 0.2.45
+  resolution: "typeorm@npm:0.2.45"
   dependencies:
     "@sqltools/formatter": ^1.2.2
     app-root-path: ^3.0.0
@@ -10801,7 +10802,7 @@ __metadata:
       optional: true
   bin:
     typeorm: cli.js
-  checksum: f89deb1f0e9451964ab7c2d5d16ac902079f0eb061d7d0663fe94180f86c42dc2150ee9bf433389e67b4e55e9581836084419a6bbacdc393f44b8ae7b4e9f5da
+  checksum: b7684a52c8ba3b796fb9f7d9ea6223edd9256dbeec67c4befe39515ce684dd684d82a2d53158b738555f5c964efaf09144bdd3ced046638e89aa46483d9a696b
   languageName: node
   linkType: hard
 
