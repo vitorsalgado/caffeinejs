@@ -15,8 +15,8 @@
   "dependencies": {
     "@caffeinejs/application": "workspace:^",
     "@caffeinejs/di": "^0.0.0",
-    "mongodb": "^4.4.1",
+    "mongodb": "^4.5.0",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.2.45"
+    "typeorm": "^0.3.6"
   }
 }
