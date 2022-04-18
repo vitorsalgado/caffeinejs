@@ -489,7 +489,7 @@ __metadata:
     "@nestjs/core": ^8.4.4
     "@types/jest": ^27.4.1
     "@types/js-yaml": ^4.0.5
-    "@types/node": ^17.0.23
+    "@types/node": ^17.0.24
     "@types/supertest": ^2.0.12
     "@types/uuid": ^8.3.4
     "@typescript-eslint/eslint-plugin": ^5.19.0
@@ -505,7 +505,7 @@ __metadata:
     inversify: ^6.0.1
     jest: 27.5.1
     lerna: ^4.0.0
-    lint-staged: ^12.3.7
+    lint-staged: ^12.3.8
     nodemon: ^2.0.15
     pinst: ^3.0.0
     prettier: ^2.6.2
@@ -2449,10 +2449,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^17.0.23":
-  version: 17.0.23
-  resolution: "@types/node@npm:17.0.23"
-  checksum: a3517554737cbb042e76c30d0e5482192ac4d9bea0eeb086e2622d9cabf460a0eb52a696b99fcd18e7fcc93c96db6cc7ae507f6608f256ef0b5c1d8c87a5a470
+"@types/node@npm:^17.0.24":
+  version: 17.0.24
+  resolution: "@types/node@npm:17.0.24"
+  checksum: 9e7c4f863601b2430b4c2429a89935f22eba692956f5013c90a4c7fb0e1401ed8add8c4307453c5d6b8b985384500f8c3f644427ab88632640cc396159af479a
   languageName: node
   linkType: hard
 
@@ -7260,9 +7260,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:^12.3.7":
-  version: 12.3.7
-  resolution: "lint-staged@npm:12.3.7"
+"lint-staged@npm:^12.3.8":
+  version: 12.3.8
+  resolution: "lint-staged@npm:12.3.8"
   dependencies:
     cli-truncate: ^3.1.0
     colorette: ^2.0.16
@@ -7280,7 +7280,7 @@ __metadata:
     yaml: ^1.10.2
   bin:
     lint-staged: bin/lint-staged.js
-  checksum: b595097556880eb2ab7ce2cf105047f6f22525ccfd608fbdc63ab243259aa36a26949576fadff673748fb885e7cb37ad3f4471d964ad54c1205d57a58999ba24
+  checksum: af6a89ae4244e4eac7180c6e7da452f378fd156ff38eaa666ecbb78f1e2efb7f1a9fc766dcc1cdde2bd76e03da68e602056ca9d2f1c6e46cf10aa83d20bf4d49
   languageName: node
   linkType: hard
 
