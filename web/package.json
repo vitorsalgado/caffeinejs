@@ -18,6 +18,6 @@
     "@caffeinejs/application": "workspace:^",
     "@caffeinejs/di": "workspace:^",
     "@caffeinejs/std": "workspace:^",
-    "fastify": "^3.28.0"
+    "fastify": "^3.29.0"
   }
 }
