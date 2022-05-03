@@ -12,7 +12,7 @@ describe('Async Providers', function () {
   }
 
   class Async extends AsyncProvider<unknown> {
-    provide(ctx: ResolutionContext<unknown>): Promise<unknown> {
+    provide(ctx: ResolutionContext): Promise<unknown> {
       return new Promise<unknown>(resolve => {
         setTimeout(() => resolve(new Root('async')), 500)
       })

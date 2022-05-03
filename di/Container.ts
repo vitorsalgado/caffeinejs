@@ -9,7 +9,6 @@ import { MetadataReader } from './MetadataReader.js'
 import { HookListener } from './HookListener.js'
 import { Filter } from './Filter.js'
 import { PostProcessor } from './PostProcessor.js'
-import { notNil } from './internal/utils/notNil.js'
 
 export interface ContainerOptions {
   namespace: Identifier
