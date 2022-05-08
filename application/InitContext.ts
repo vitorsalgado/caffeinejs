@@ -1,7 +1,7 @@
 import { Container } from '@caffeinejs/di'
 import { Environment } from './env/Environment.js'
 
-export class ApplicationContext {
+export class InitContext {
   constructor(
     readonly id: string,
     readonly startedAt: number,

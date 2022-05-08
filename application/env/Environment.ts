@@ -1,5 +1,5 @@
 import { notNil } from '@caffeinejs/std'
-import { ApplicationContext } from '../ApplicationContext.js'
+import { InitContext } from '../InitContext.js'
 import { Sources } from './Sources.js'
 import { SourceLoader } from './SourceLoader.js'
 import { EnvironmentPostProcessor } from './EnvironmentPostProcessor.js'
@@ -55,7 +55,7 @@ export class Environment {
     return notNil(this._config) as T
   }
 
-  async refresh(context: ApplicationContext): Promise<void> {
+  async refresh(context: InitContext): Promise<void> {
     for (const [key, value] of Object.entries(process.env)) {
       this._envs.set(key, value)
     }

@@ -1,5 +1,5 @@
-import { ApplicationContext } from './ApplicationContext.js'
+import { InitContext } from './InitContext.js'
 
 export interface OnApplicationBootstrap {
-  onApplicationBootstrap(ctx: ApplicationContext): Promise<void>
+  onApplicationBootstrap(ctx: InitContext): Promise<void>
 }

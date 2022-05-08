@@ -1,6 +1,6 @@
-import { ApplicationContext } from '../ApplicationContext.js'
+import { InitContext } from '../InitContext.js'
 import { Environment } from './Environment.js'
 
 export interface EnvironmentPostProcessor {
-  process(environment: Environment, context: ApplicationContext): Promise<void>
+  process(environment: Environment, context: InitContext): Promise<void>
 }

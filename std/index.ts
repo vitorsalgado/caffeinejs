@@ -1,6 +1,5 @@
 export * from './preconditions/notNil.js'
-export * as R from './reflection/reflections.js'
-export * as Reflections from './reflection/reflections.js'
+export * from './reflection/reflection.js'
 export * from './util/Maybe.js'
 
 // Types
