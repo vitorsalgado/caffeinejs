@@ -44,7 +44,7 @@
     "url": "https://github.com/vitorsalgado/winter-framework/issues"
   },
   "homepage": "https://github.com/vitorsalgado/winter-framework#readme",
-  "packageManager": "yarn@3.2.0",
+  "packageManager": "yarn@3.2.1",
   "devDependencies": {
     "@commitlint/cli": "^16.3.0",
     "@commitlint/config-conventional": "^16.2.4",
