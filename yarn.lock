@@ -521,7 +521,7 @@ __metadata:
     "@commitlint/cli": ^16.3.0
     "@commitlint/config-conventional": ^16.2.4
     "@jest/globals": ^28.1.0
-    "@loopback/context": ^4.1.2
+    "@loopback/context": ^5.0.0
     "@nestjs/common": ^8.4.5
     "@nestjs/core": ^8.4.5
     "@types/jest": ^27.5.1
@@ -1936,30 +1936,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@loopback/context@npm:^4.1.2":
-  version: 4.1.2
-  resolution: "@loopback/context@npm:4.1.2"
+"@loopback/context@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@loopback/context@npm:5.0.0"
   dependencies:
-    "@loopback/metadata": ^4.1.2
+    "@loopback/metadata": ^5.0.0
     "@types/debug": ^4.1.7
     debug: ^4.3.4
     hyperid: ^3.0.1
     p-event: ^4.2.0
-    tslib: ^2.3.1
+    tslib: ^2.4.0
     uuid: ^8.3.2
-  checksum: e74d47f6be672d576c5b4d0078ce14189c7b7c7ed3bbd4dee6d512dd2506f41a0ae6b546f6f2ef35dd744ca31f34f0788c9181b9b9dd70241dab0164d083c3b4
+  checksum: 16035804fe9bfbb5fc83339f775daaa2219199e4d6fbcc1574775327bb1a32f0c5bcb0c6a81029b2c7a94054d0ce10d0097290007cfa182ba48c22af2440be94
   languageName: node
   linkType: hard
 
-"@loopback/metadata@npm:^4.1.2":
-  version: 4.1.2
-  resolution: "@loopback/metadata@npm:4.1.2"
+"@loopback/metadata@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@loopback/metadata@npm:5.0.0"
   dependencies:
     debug: ^4.3.4
     lodash: ^4.17.21
     reflect-metadata: ^0.1.13
-    tslib: ^2.3.1
-  checksum: 5ace26b0c94fbb4f50aae6eacb34ca48ca6f1ba95bf24f4cead8a4355343b75097c0fb18e148953c2afd90ca1156197d59a59913e09e02644125c4773dbcfa73
+    tslib: ^2.4.0
+  checksum: 03a05088355c650523d4e3c6d73e6280c60eb5f10b2d1b9b3e82037c91c5ddf3ecce9e172ca5b97edeb9124f969ce8fd577a774b21f2bb694bd75e040372d7f8
   languageName: node
   linkType: hard
 
@@ -11979,7 +11979,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:2.4.0, tslib@npm:^2.1.0, tslib@npm:^2.3.1":
+"tslib@npm:2.4.0, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.4.0":
   version: 2.4.0
   resolution: "tslib@npm:2.4.0"
   checksum: 8c4aa6a3c5a754bf76aefc38026134180c053b7bd2f81338cb5e5ebf96fefa0f417bff221592bf801077f5bf990562f6264fecbc42cd3309b33872cb6fc3b113
