@@ -46,8 +46,8 @@
   "homepage": "https://github.com/vitorsalgado/winter-framework#readme",
   "packageManager": "yarn@3.2.1",
   "devDependencies": {
-    "@commitlint/cli": "^16.3.0",
-    "@commitlint/config-conventional": "^16.2.4",
+    "@commitlint/cli": "^17.0.0",
+    "@commitlint/config-conventional": "^17.0.0",
     "@jest/globals": "^28.1.0",
     "@loopback/context": "^5.0.0",
     "@nestjs/common": "^8.4.5",
