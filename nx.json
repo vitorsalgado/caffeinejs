@@ -1,0 +1,36 @@
+{
+  "extends": "nx/presets/npm.json",
+  "projectType": "library",
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": [
+          "build",
+          "test",
+          "test:coverage",
+          "test:npm",
+          "bench",
+          "bench:compare",
+          "prebuild",
+          "format",
+          "lint",
+          "test:watch",
+          "test:cov",
+          "test:debug",
+          "test:e2e"
+        ]
+      }
+    }
+  },
+  "targetDefaults": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ]
+    }
+  },
+  "affected": {
+    "defaultBase": "main"
+  }
+}

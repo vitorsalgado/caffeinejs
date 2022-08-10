@@ -15,9 +15,9 @@
     "package.json"
   ],
   "dependencies": {
-    "@caffeinejs/application": "workspace:^",
-    "@caffeinejs/di": "workspace:^",
-    "@caffeinejs/std": "workspace:^",
-    "fastify": "^3.29.0"
+    "@caffeinejs/application": "^0.0.0",
+    "@caffeinejs/di": "^0.0.0",
+    "@caffeinejs/std": "^0.0.0",
+    "fastify": "^4.4.0"
   }
 }

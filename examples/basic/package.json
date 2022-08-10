@@ -4,6 +4,7 @@
   "description": "Basic Example",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "private": true,
   "exports": {
     ".": "./dist/index.js",
     "./package.json": "./package.json"

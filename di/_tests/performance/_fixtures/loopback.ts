@@ -1,8 +1,4 @@
-import LoopBack from '@loopback/context'
-
-const Context = LoopBack.Context
-const injectable = LoopBack.injectable
-const inject = LoopBack.inject
+import { Context, inject, injectable } from '@loopback/context'
 
 @injectable()
 class LoopRep {}
