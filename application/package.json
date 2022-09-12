@@ -20,7 +20,7 @@
     "@caffeinejs/std": "^0.0.0",
     "globby": "^13.1.2",
     "js-yaml": "^4.1.0",
-    "uuid": "^8.3.2"
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "@caffeinejs/internal-perf": "^0.0.0"
